@@ -233,11 +233,16 @@ export default function LawyerApplication() {
         office_address: formData.officeAddress
       };
 
-      const response = await axios.post(`${API}/lawyer-applications`, payload);
+      const response = await axios.post(`${API}/lawyers/applications`, payload);
       setSubmitted(true);
       toast.success('Application submitted successfully!');
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error('Submission error details:', {
+        message: error.message,
+        response: error.response,
+        request: error.request,
+        config: error.config
+      });
       const errorMsg = error.response?.data?.detail || error.message || 'Failed to submit application';
       toast.error(errorMsg);
     } finally {

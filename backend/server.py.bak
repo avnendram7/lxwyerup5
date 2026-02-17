@@ -35,11 +35,7 @@ from routes import (
     events_router,
     notifications_router
 )
-
 from services.database import close_db
-from models.lawyer_application import LawyerApplicationCreate
-from routes.lawfirms import LawFirmApplicationCreate
-from routes.firm_lawyers import FirmLawyerApplicationCreate
 
 # Create the main app
 app = FastAPI(title="Lxwyer Up API")
@@ -79,25 +75,16 @@ api_router.include_router(events_router)
 api_router.include_router(notifications_router)
 
 # Legacy endpoint for lawyer applications (for backward compatibility)
-# These are already included via their respective routers, but if we need specific paths:
-# The routers are already included above with prefixes.
-# api_router.include_router(lawyers_router) adds /api/lawyers/...
-# To support /api/lawyer-applications, we should add a redirect or specific route wrapper.
-
 from routes.lawyers import submit_lawyer_application
-@api_router.post("/lawyer-applications")
-async def submit_lawyer_application_legacy(application: LawyerApplicationCreate):
-    return await submit_lawyer_application(application)
+api_router.post("/lawyer-applications")(submit_lawyer_application)
 
+# Legacy endpoint for lawfirm applications (for backward compatibility)
 from routes.lawfirms import submit_lawfirm_application
-@api_router.post("/lawfirm-applications")
-async def submit_lawfirm_application_legacy(application: LawFirmApplicationCreate):
-    return await submit_lawfirm_application(application)
+api_router.post("/lawfirm-applications")(submit_lawfirm_application)
 
+# Legacy endpoint for firm lawyer applications
 from routes.firm_lawyers import submit_firm_lawyer_application
-@api_router.post("/firm-lawyer-applications")
-async def submit_firm_lawyer_application_legacy(application: FirmLawyerApplicationCreate):
-    return await submit_firm_lawyer_application(application)
+api_router.post("/firm-lawyer-applications")(submit_firm_lawyer_application)
 
 # Include the router in the main app
 app.include_router(api_router)

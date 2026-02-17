@@ -65,3 +65,38 @@ async def submit_lawyer_application(application: LawyerApplicationCreate):
     
     await db.lawyer_applications.insert_one(app_data.model_dump())
     return {'message': 'Application submitted successfully', 'id': app_data.id}
+
+
+from fastapi import UploadFile, File, Depends
+from services.auth import get_current_user
+import shutil
+import os
+import uuid
+
+@router.post("/me/photo")
+async def upload_profile_photo(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Upload profile photo for the current user"""
+    # Create uploads directory if not exists (although server.py does this, good to be safe or use the defined path)
+    UPLOAD_DIR = "uploads"
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    
+    # Generate unique filename
+    file_extension = os.path.splitext(file.filename)[1]
+    filename = f"{user['id']}_{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Construct URL (assuming server runs on localhost:8000 or relative path)
+    # in production this should be a full URL or relative to static mount
+    photo_url = f"/uploads/{filename}"
+    
+    # Update user in database
+    await db.users.update_one(
+        {'id': user['id']},
+        {'$set': {'photo': photo_url}}
+    )
+    
+    return {'photo_url': photo_url}

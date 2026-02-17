@@ -1,21 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models.user import User, UserCreate, UserLogin, TokenResponse
-from services.auth import hash_password, verify_password, create_token, decode_token
+from services.auth import hash_password, verify_password, create_token, decode_token, get_current_user
 from services.database import db
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-security = HTTPBearer()
-
-
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Dependency to get current authenticated user"""
-    token = credentials.credentials
-    payload = decode_token(token)
-    user = await db.users.find_one({'id': payload['user_id']}, {'_id': 0})
-    if not user:
-        raise HTTPException(status_code=404, detail='User not found')
-    return user
 
 
 async def register_user(user_data: UserCreate):
@@ -63,6 +52,32 @@ async def login(login_data: UserLogin):
         {'_id': 0}
     )
     if not user:
+        # Check if they have a pending application
+        if login_data.user_type == 'lawyer':
+            application = await db.lawyer_applications.find_one({'email': login_data.email})
+            if application:
+                # Verify password
+                pwd_hash = application.get('password_hash')
+                if pwd_hash and verify_password(login_data.password, pwd_hash):
+                    status = application.get('status', 'pending')
+                    if status == 'pending':
+                        raise HTTPException(status_code=403, detail='Your application is pending approval')
+                    elif status == 'rejected':
+                        raise HTTPException(status_code=403, detail='Your application was rejected')
+        
+        elif login_data.user_type == 'law_firm':
+             # Note: Law firm apps use 'contact_email'
+            application = await db.lawfirm_applications.find_one({'contact_email': login_data.email})
+            if application:
+                # Verify password
+                pwd_hash = application.get('password_hash')
+                if pwd_hash and verify_password(login_data.password, pwd_hash):
+                    status = application.get('status', 'pending')
+                    if status == 'pending':
+                        raise HTTPException(status_code=403, detail='Your application is pending approval')
+                    elif status == 'rejected':
+                        raise HTTPException(status_code=403, detail='Your application was rejected')
+
         raise HTTPException(status_code=401, detail='Invalid credentials')
     
     # Check both password fields (password_hash for lawyers, password for regular users)

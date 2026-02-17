@@ -60,7 +60,7 @@ import JoinFirmSignup from './pages/JoinFirmSignup';
 import EmergencyPage from './pages/EmergencyPage';
 import ScrollToTop from './components/ScrollToTop';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = "http://127.0.0.1:8000";
 export const API = `${BACKEND_URL}/api`;
 
 // Auth Context

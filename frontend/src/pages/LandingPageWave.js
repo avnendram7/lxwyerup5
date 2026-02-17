@@ -247,61 +247,61 @@ const SmoothScrolling = () => {
    SCALES OF JUSTICE INTRO – zooms out on scroll
    ───────────────────────────────────────────── */
 
-const ScalesOfJusticeIntro = () => {
+// Legal data labels with positions (distributed around the scales) - 30% FASTER
+const legalDataItems = [
+    { label: 'Family Law', angle: 30, dist: 280, delay: 0, dur: 2.8 },
+    { label: 'Criminal Law', angle: 75, dist: 310, delay: 0.6, dur: 3.2 },
+    { label: 'Contracts', angle: 120, dist: 260, delay: 1.2, dur: 2.7 },
+    { label: 'Property Law', angle: 165, dist: 300, delay: 0.3, dur: 2.9 },
+    { label: 'Tax Law', angle: 210, dist: 270, delay: 1.5, dur: 2.5 },
+    { label: 'IP Rights', angle: 250, dist: 320, delay: 0.9, dur: 3.4 },
+    { label: 'Corporate', angle: 290, dist: 290, delay: 1.8, dur: 2.8 },
+    { label: 'Civil Rights', angle: 340, dist: 250, delay: 0.4, dur: 2.5 },
+    { label: 'Labor Law', angle: 55, dist: 340, delay: 2.1, dur: 3.0 },
+    { label: 'Banking Law', angle: 145, dist: 330, delay: 1.1, dur: 2.7 },
+    { label: 'Cyber Law', angle: 195, dist: 260, delay: 2.4, dur: 2.9 },
+    { label: 'Consumer Law', angle: 310, dist: 300, delay: 0.7, dur: 2.6 },
+];
+
+// Rays pointing toward center
+const rays = [
+    { angle: 0, len: 350, w: 2 },
+    { angle: 45, len: 300, w: 1.5 },
+    { angle: 90, len: 320, w: 1 },
+    { angle: 135, len: 280, w: 1.5 },
+    { angle: 180, len: 340, w: 2 },
+    { angle: 225, len: 300, w: 1 },
+    { angle: 270, len: 310, w: 1.5 },
+    { angle: 315, len: 290, w: 1 },
+];
+
+const ScalesOfJusticeIntro = React.memo(() => {
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ['start start', 'end start'],
     });
 
-    const scaleVal = useTransform(scrollYProgress, [0, 0.5], [1, 0.1]);
+    const scaleVal = useTransform(scrollYProgress, [0, 0.5], [1.6, 0.16]);
     const opacityVal = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
     const yVal = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
     const blurVal = useTransform(scrollYProgress, [0, 0.4], [0, 20]);
 
-    const [blur, setBlur] = useState(0);
-    useMotionValueEvent(blurVal, 'change', (v) => setBlur(v));
-
-    // Legal data labels with positions (distributed around the scales) - 30% FASTER
-    const legalDataItems = [
-        { label: 'Family Law', angle: 30, dist: 280, delay: 0, dur: 2.8 },
-        { label: 'Criminal Law', angle: 75, dist: 310, delay: 0.6, dur: 3.2 },
-        { label: 'Contracts', angle: 120, dist: 260, delay: 1.2, dur: 2.7 },
-        { label: 'Property Law', angle: 165, dist: 300, delay: 0.3, dur: 2.9 },
-        { label: 'Tax Law', angle: 210, dist: 270, delay: 1.5, dur: 2.5 },
-        { label: 'IP Rights', angle: 250, dist: 320, delay: 0.9, dur: 3.4 },
-        { label: 'Corporate', angle: 290, dist: 290, delay: 1.8, dur: 2.8 },
-        { label: 'Civil Rights', angle: 340, dist: 250, delay: 0.4, dur: 2.5 },
-        { label: 'Labor Law', angle: 55, dist: 340, delay: 2.1, dur: 3.0 },
-        { label: 'Banking Law', angle: 145, dist: 330, delay: 1.1, dur: 2.7 },
-        { label: 'Cyber Law', angle: 195, dist: 260, delay: 2.4, dur: 2.9 },
-        { label: 'Consumer Law', angle: 310, dist: 300, delay: 0.7, dur: 2.6 },
-    ];
-
-    // Rays pointing toward center
-    const rays = [
-        { angle: 0, len: 350, w: 2 },
-        { angle: 45, len: 300, w: 1.5 },
-        { angle: 90, len: 320, w: 1 },
-        { angle: 135, len: 280, w: 1.5 },
-        { angle: 180, len: 340, w: 2 },
-        { angle: 225, len: 300, w: 1 },
-        { angle: 270, len: 310, w: 1.5 },
-        { angle: 315, len: 290, w: 1 },
-    ];
+    // Create a template motion value for the filter string
+    const filterVal = useTransform(blurVal, (v) => `blur(${v}px)`);
 
     return (
         <section ref={ref} className="relative" style={{ height: '160vh', background: '#f8faff' }}>
             <div
                 className="sticky top-0 flex items-center justify-center"
-                style={{ height: '100vh', zIndex: 20, pointerEvents: 'none', overflow: 'hidden' }}
+                style={{ height: '100vh', zIndex: 20, pointerEvents: 'none', overflow: 'visible' }}
             >
                 <motion.div
                     style={{
                         scale: scaleVal,
                         opacity: opacityVal,
                         y: yVal,
-                        filter: `blur(${blur}px)`,
+                        filter: filterVal,
                     }}
                     className="relative flex flex-col items-center gap-6"
                 >
@@ -447,13 +447,13 @@ const ScalesOfJusticeIntro = () => {
                         {/* Base (static) */}
                         <rect x="35" y="82" width="30" height="5" rx="2.5" fill="url(#baseGrad)" />
 
-                        {/* Animated Beam Group - STATIC */}
-                        <g style={{ transformOrigin: '50px 20px' }}>
+                        {/* Animated Beam Group - SWAYING */}
+                        <g style={{ transformOrigin: '50px 20px', animation: 'balanceBeam 6s ease-in-out infinite' }}>
                             {/* Beam */}
                             <rect x="15" y="18" width="70" height="4" rx="2" fill="url(#beamGrad)" />
 
-                            {/* Left Pan Group - STATIC */}
-                            <g style={{ transformOrigin: '20px 22px' }}>
+                            {/* Left Pan Group - COUNTER ROTATE */}
+                            <g style={{ transformOrigin: '20px 22px', animation: 'counterRotate 6s ease-in-out infinite' }}>
                                 {/* Left pan chain */}
                                 <line x1="20" y1="22" x2="20" y2="45" stroke="#60a5fa" strokeWidth="1.5" />
                                 <line x1="15" y1="22" x2="15" y2="40" stroke="#60a5fa" strokeWidth="1" opacity="0.6" />
@@ -462,8 +462,8 @@ const ScalesOfJusticeIntro = () => {
                                 <path d="M10 45 Q20 55 30 45" stroke="#3b82f6" strokeWidth="2" fill="rgba(59,130,246,0.15)" />
                             </g>
 
-                            {/* Right Pan Group - STATIC */}
-                            <g style={{ transformOrigin: '80px 22px' }}>
+                            {/* Right Pan Group - COUNTER ROTATE */}
+                            <g style={{ transformOrigin: '80px 22px', animation: 'counterRotate 6s ease-in-out infinite' }}>
                                 {/* Right pan chain */}
                                 <line x1="80" y1="22" x2="80" y2="45" stroke="#60a5fa" strokeWidth="1.5" />
                                 <line x1="75" y1="22" x2="75" y2="40" stroke="#60a5fa" strokeWidth="1" opacity="0.6" />
@@ -509,7 +509,7 @@ const ScalesOfJusticeIntro = () => {
             </div>
         </section>
     );
-};
+});
 
 /* ─────────────────────────────────────────────
    SCROLL-REACTIVE SPHERE – transforms per section
