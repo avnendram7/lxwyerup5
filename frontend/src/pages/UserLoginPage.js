@@ -25,8 +25,8 @@ export default function UserLoginPage() {
       const payload = { email: formData.email, password: formData.password, user_type: 'client' };
       const response = await axios.post(`${API}/auth/login`, payload);
 
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
 
       toast.success('Welcome back!');
       navigate('/user-dashboard');

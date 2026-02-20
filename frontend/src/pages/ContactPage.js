@@ -38,7 +38,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden font-['Outfit']">
+    <div className="min-h-screen bg-white dark:bg-slate-950 relative overflow-hidden font-['Outfit']">
       <GradientOrbs />
       <NavbarWave />
 
@@ -76,7 +76,7 @@ const ContactHero = ({ fadeInUp }) => {
           variants={fadeInUp}
         >
           <motion.h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -85,7 +85,7 @@ const ContactHero = ({ fadeInUp }) => {
           </motion.h1>
 
           <motion.p
-            className="text-xl sm:text-2xl text-slate-600 max-w-2xl mx-auto font-light"
+            className="text-xl sm:text-2xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-light"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -125,7 +125,7 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
   ];
 
   return (
-    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50 backdrop-blur-sm relative z-10">
+    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm relative z-10">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Contact Form */}
@@ -133,16 +133,16 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
             variants={fadeInUp}
-            className="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-slate-200 shadow-xl animate-float"
+            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl animate-float"
           >
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Send Us a Message</h2>
-            <p className="text-slate-600 mb-8">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Send Us a Message</h2>
+            <p className="text-slate-600 dark:text-slate-300 mb-8">
               Fill out the form below and we'll get back to you within 24 hours
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Full Name
                 </label>
                 <motion.input
@@ -152,13 +152,13 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-600 focus:outline-none transition-all duration-300"
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
                   placeholder="John Doe"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Email Address
                 </label>
                 <motion.input
@@ -168,13 +168,13 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-600 focus:outline-none transition-all duration-300"
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
                   placeholder="john@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Phone Number
                 </label>
                 <motion.input
@@ -184,13 +184,13 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-600 focus:outline-none transition-all duration-300"
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
                   placeholder="+91 9876543210"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Message
                 </label>
                 <motion.textarea
@@ -200,7 +200,7 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   onChange={handleChange}
                   required
                   rows="5"
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-600 focus:outline-none transition-all duration-300 resize-none"
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 resize-none placeholder:text-slate-400"
                   placeholder="Tell us about your legal needs..."
                 />
               </div>
@@ -230,8 +230,8 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Get in Touch</h2>
-            <p className="text-slate-600 mb-8">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Get in Touch</h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-8">
               Reach out to us through any of these channels
             </p>
 
@@ -243,22 +243,22 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
                   transition={{ delay: index * 0.1 + 0.4 }}
                   whileHover={{ x: 5 }}
-                  className="flex items-start space-x-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300"
+                  className="flex items-start space-x-4 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all duration-300"
                 >
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-blue-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <info.icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">{info.title}</h3>
+                    <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{info.title}</h3>
                     {info.link ? (
                       <a
                         href={info.link}
-                        className="text-slate-600 hover:text-blue-600 transition-colors"
+                        className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {info.value}
                       </a>
                     ) : (
-                      <p className="text-slate-600">{info.value}</p>
+                      <p className="text-slate-600 dark:text-slate-300">{info.value}</p>
                     )}
                   </div>
                 </motion.div>

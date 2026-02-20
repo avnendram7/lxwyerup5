@@ -33,8 +33,8 @@ export default function UserSignupPage() {
       toast.success('Account created successfully!');
 
       // Auto login
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
 
       navigate('/user-dashboard');
     } catch (error) {

@@ -11,17 +11,17 @@ import { WaveLayout } from '../components/WaveLayout';
 
 const SimpleNavbar = ({ navigate }) => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-[#0F2944]" />
-            <span className="text-xl font-bold text-[#0F2944]">Lxwyer Up</span>
+            <Scale className="w-6 h-6 text-[#0F2944] dark:text-blue-400" />
+            <span className="text-xl font-bold text-[#0F2944] dark:text-blue-50">Lxwyer Up</span>
           </button>
 
           <Button
             onClick={() => navigate('/role-selection')}
-            className="text-[#0F2944] hover:text-[#0F2944]/80"
+            className="text-[#0F2944] dark:text-blue-100 hover:text-[#0F2944]/80 dark:hover:text-blue-200"
             variant="ghost"
           >
             Sign Up
@@ -134,12 +134,12 @@ const UnifiedLogin = () => {
       }
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify({
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('user', JSON.stringify({
           ...response.data.user,
           user_type: role.userType
         }));
-        localStorage.setItem('userRole', role.userType);
+        sessionStorage.setItem('userRole', role.userType);
 
         toast.success('Login successful!');
         navigate(role.redirectPath);
@@ -153,7 +153,7 @@ const UnifiedLogin = () => {
   };
 
   return (
-    <WaveLayout hideNavbar={true} className="bg-gradient-to-br from-orange-50 via-white to-green-50">
+    <WaveLayout hideNavbar={true} className="bg-gradient-to-br from-orange-50 via-white to-green-50 dark:from-slate-900 dark:via-black dark:to-slate-900 transition-colors duration-500">
       <SimpleNavbar navigate={navigate} />
 
       <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
@@ -165,10 +165,10 @@ const UnifiedLogin = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-[#0F2944] mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold text-[#0F2944] dark:text-white mb-4 transition-colors">
               Welcome Back
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-400 transition-colors">
               Select your role and login to continue
             </p>
           </motion.div>
@@ -187,8 +187,8 @@ const UnifiedLogin = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   onClick={() => setSelectedRole(role.id)}
                   className={`cursor-pointer rounded-2xl p-6 transition-all duration-300 border-2 ${isSelected
-                    ? 'bg-[#0F2944] border-[#0F2944] shadow-xl'
-                    : 'bg-white border-gray-200 hover:border-[#0F2944] hover:shadow-lg'
+                    ? 'bg-[#0F2944] dark:bg-blue-600 border-[#0F2944] dark:border-blue-500 shadow-xl'
+                    : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-[#0F2944] dark:hover:border-blue-400 hover:shadow-lg'
                     }`}
                 >
                   <div className="flex flex-col items-center text-center">
@@ -196,14 +196,14 @@ const UnifiedLogin = () => {
                       className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${isSelected ? 'bg-white/20' : 'bg-[#0F2944]/10'
                         }`}
                     >
-                      <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-[#0F2944]'}`} />
+                      <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-[#0F2944] dark:text-blue-400'}`} />
                     </div>
 
-                    <h3 className={`text-xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-[#0F2944]'}`}>
+                    <h3 className={`text-xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-[#0F2944] dark:text-blue-100'}`}>
                       {role.title}
                     </h3>
 
-                    <p className={`text-sm ${isSelected ? 'text-white/90' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${isSelected ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'}`}>
                       {role.description}
                     </p>
                   </div>
@@ -220,11 +220,11 @@ const UnifiedLogin = () => {
               transition={{ duration: 0.5 }}
               className="max-w-md mx-auto"
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-slate-800 transition-colors duration-300">
                 <form onSubmit={handleLogin} className="space-y-6">
                   {/* Email Field */}
                   <div>
-                    <label className="block text-sm font-semibold text-[#0F2944] mb-2">
+                    <label className="block text-sm font-semibold text-[#0F2944] dark:text-blue-200 mb-2">
                       Email Address *
                     </label>
                     <div className="relative">
@@ -234,7 +234,7 @@ const UnifiedLogin = () => {
                         value={loginData.email}
                         onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                         placeholder="your@email.com"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F2944]/20 focus:border-[#0F2944] text-gray-900 placeholder:text-gray-400"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F2944]/20 dark:focus:ring-blue-500/20 focus:border-[#0F2944] dark:focus:border-blue-500 text-gray-900 dark:text-white placeholder:text-gray-400 dark:bg-slate-800 transition-colors"
                         required
                       />
                     </div>
@@ -242,7 +242,7 @@ const UnifiedLogin = () => {
 
                   {/* Password Field */}
                   <div>
-                    <label className="block text-sm font-semibold text-[#0F2944] mb-2">
+                    <label className="block text-sm font-semibold text-[#0F2944] dark:text-blue-200 mb-2">
                       Password *
                     </label>
                     <div className="relative">
@@ -252,7 +252,7 @@ const UnifiedLogin = () => {
                         value={loginData.password}
                         onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                         placeholder="Enter your password"
-                        className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F2944]/20 focus:border-[#0F2944] text-gray-900 placeholder:text-gray-400"
+                        className="w-full pl-10 pr-12 py-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F2944]/20 dark:focus:ring-blue-500/20 focus:border-[#0F2944] dark:focus:border-blue-500 text-gray-900 dark:text-white placeholder:text-gray-400 dark:bg-slate-800 transition-colors"
                         required
                       />
                       <button
@@ -269,7 +269,7 @@ const UnifiedLogin = () => {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      className="text-sm text-[#0F2944] hover:underline"
+                      className="text-sm text-[#0F2944] dark:text-blue-400 hover:underline"
                     >
                       Forgot Password?
                     </button>
@@ -279,7 +279,7 @@ const UnifiedLogin = () => {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#0F2944] hover:bg-[#0F2944]/90 text-white py-6 rounded-xl font-semibold transition-all duration-300 group"
+                    className="w-full bg-[#0F2944] dark:bg-blue-600 hover:bg-[#0F2944]/90 dark:hover:bg-blue-700 text-white py-6 rounded-xl font-semibold transition-all duration-300 group"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center">
@@ -299,10 +299,10 @@ const UnifiedLogin = () => {
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200"></div>
+                      <div className="w-full border-t border-gray-200 dark:border-slate-700"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                      <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400">Or continue with</span>
                     </div>
                   </div>
 
@@ -318,12 +318,12 @@ const UnifiedLogin = () => {
                           });
 
                           if (response.data.token) {
-                            localStorage.setItem('token', response.data.token);
-                            localStorage.setItem('user', JSON.stringify({
+                            sessionStorage.setItem('token', response.data.token);
+                            sessionStorage.setItem('user', JSON.stringify({
                               ...response.data.user,
                               user_type: role.userType
                             }));
-                            localStorage.setItem('userRole', role.userType);
+                            sessionStorage.setItem('userRole', role.userType);
 
                             toast.success('Login successful!');
                             navigate(role.redirectPath);
@@ -345,11 +345,11 @@ const UnifiedLogin = () => {
 
                 {/* Sign Up Link */}
                 <div className="mt-6 text-center">
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Don't have an account?{' '}
                     <button
                       onClick={() => navigate('/role-selection')}
-                      className="text-[#0F2944] font-semibold hover:underline"
+                      className="text-[#0F2944] dark:text-blue-400 font-semibold hover:underline"
                     >
                       Sign Up
                     </button>

@@ -14,14 +14,15 @@ export default function AdminLogin() {
     password: ''
   });
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await axios.post(`${API}/admin/login`, formData);
-      localStorage.setItem('adminToken', response.data.token);
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
       toast.success('Welcome, Admin!');
       navigate('/admin-dashboard');
     } catch (error) {
@@ -30,7 +31,7 @@ export default function AdminLogin() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black flex flex-col">
       {/* Navigation Bar */}
@@ -57,7 +58,7 @@ export default function AdminLogin() {
           backgroundSize: '40px 40px'
         }} />
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,13 +72,13 @@ export default function AdminLogin() {
             </div>
             <span className="text-2xl font-bold text-white">Admin Portal</span>
           </div>
-          
+
           <div className="bg-slate-900/50 backdrop-blur-md border border-red-500/30 rounded-2xl p-8 shadow-2xl shadow-red-500/10">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white mb-2">Admin Login</h2>
               <p className="text-slate-400">Authorized personnel only</p>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <CorporateInput
                 label="Admin Email"
@@ -89,7 +90,7 @@ export default function AdminLogin() {
                 icon={Mail}
                 required
               />
-              
+
               <CorporateInput
                 label="Admin Password"
                 type="password"
@@ -100,7 +101,7 @@ export default function AdminLogin() {
                 icon={Lock}
                 required
               />
-              
+
               <CorporateButton
                 type="submit"
                 variant="primary"
@@ -116,7 +117,7 @@ export default function AdminLogin() {
                 )}
               </CorporateButton>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-slate-500 text-sm">
                 This portal is for authorized administrators only

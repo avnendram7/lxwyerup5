@@ -152,13 +152,16 @@ const BookingSignup = () => {
 
       // Register the user
       try {
-        await axios.post(`${API}/auth/register`, {
+        const response = await axios.post(`${API}/auth/signup`, {
           full_name: formData.full_name,
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
           user_type: 'client'
         });
+
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
 
         toast.success('Payment successful! Account created.');
 
@@ -212,8 +215,8 @@ const BookingSignup = () => {
             <div key={s.num} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${s.num === step ? 'bg-[#0F2944] text-white' :
-                    s.num < step ? 'bg-green-600 text-white' :
-                      'bg-gray-200 text-gray-500'
+                  s.num < step ? 'bg-green-600 text-white' :
+                    'bg-gray-200 text-gray-500'
                   }`}>
                   {s.num < step ? '✓' : s.num}
                 </div>
@@ -362,8 +365,8 @@ const BookingSignup = () => {
                           key={type.value}
                           onClick={() => updateField('consultationType', type.value)}
                           className={`p-4 rounded-xl border-2 transition-all ${formData.consultationType === type.value
-                              ? 'border-[#0F2944] bg-[#0F2944]/5'
-                              : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-[#0F2944] bg-[#0F2944]/5'
+                            : 'border-gray-200 hover:border-gray-300'
                             }`}
                         >
                           <div className="text-2xl mb-1">{type.icon}</div>
@@ -388,8 +391,8 @@ const BookingSignup = () => {
                             key={idx}
                             onClick={() => updateField('selectedDate', date)}
                             className={`p-3 rounded-xl border-2 transition-all text-center ${isSelected
-                                ? 'border-[#0F2944] bg-[#0F2944] text-white'
-                                : 'border-gray-200 hover:border-[#0F2944] hover:bg-gray-50'
+                              ? 'border-[#0F2944] bg-[#0F2944] text-white'
+                              : 'border-gray-200 hover:border-[#0F2944] hover:bg-gray-50'
                               }`}
                           >
                             <div className={`text-xs ${isSelected ? 'text-white/80' : 'text-gray-500'}`}>{dayName}</div>
@@ -415,10 +418,10 @@ const BookingSignup = () => {
                             onClick={() => isAvailable && updateField('selectedTime', time)}
                             disabled={!isAvailable}
                             className={`py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${isSelected
-                                ? 'border-[#0F2944] bg-[#0F2944] text-white'
-                                : isAvailable
-                                  ? 'border-gray-200 hover:border-[#0F2944] text-[#0F2944]'
-                                  : 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                              ? 'border-[#0F2944] bg-[#0F2944] text-white'
+                              : isAvailable
+                                ? 'border-gray-200 hover:border-[#0F2944] text-[#0F2944]'
+                                : 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
                               }`}
                           >
                             {time}

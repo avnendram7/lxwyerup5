@@ -14,18 +14,18 @@ export default function FirmClientLogin() {
     password: ''
   });
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await axios.post(`${API}/firm-clients/login`, formData);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('userRole', 'firm_client');
-      
+
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('userRole', 'firm_client');
+
       toast.success('Welcome back!');
       navigate('/firm-client-dashboard');
     } catch (error) {
@@ -34,7 +34,7 @@ export default function FirmClientLogin() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black flex flex-col">
       {/* Navigation Bar */}
@@ -61,7 +61,7 @@ export default function FirmClientLogin() {
           backgroundSize: '40px 40px'
         }} />
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,13 +75,13 @@ export default function FirmClientLogin() {
             </div>
             <span className="text-2xl font-bold text-white">Lxwyer Up</span>
           </Link>
-          
+
           <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-2xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white mb-2">Firm Client Login</h2>
               <p className="text-slate-400">Track your case progress</p>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <CorporateInput
                 label="Email Address"
@@ -93,7 +93,7 @@ export default function FirmClientLogin() {
                 icon={Mail}
                 required
               />
-              
+
               <CorporateInput
                 label="Password"
                 type="password"
@@ -104,7 +104,7 @@ export default function FirmClientLogin() {
                 icon={Lock}
                 required
               />
-              
+
               <CorporateButton
                 type="submit"
                 variant="primary"
@@ -119,7 +119,7 @@ export default function FirmClientLogin() {
                 )}
               </CorporateButton>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-slate-400">
                 Don't have access?{' '}
@@ -128,7 +128,7 @@ export default function FirmClientLogin() {
                 </Link>
               </p>
             </div>
-            
+
             <div className="mt-4 text-center">
               <Link to="/lawfirm-role" className="text-slate-500 hover:text-slate-400 text-sm transition-colors">
                 Back to role selection

@@ -90,9 +90,9 @@ export default function FirmClientDashboard() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userRole');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('userRole');
     toast.success('Logged out successfully');
     navigate('/');
   };

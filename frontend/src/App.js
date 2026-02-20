@@ -3,7 +3,7 @@ import '@/App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from './components/ui/sonner';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from 'next-themes';
 
 // Pages
 import LandingPageWave from './pages/LandingPageWave';
@@ -60,20 +60,30 @@ import JoinFirmSignup from './pages/JoinFirmSignup';
 import EmergencyPage from './pages/EmergencyPage';
 import ScrollToTop from './components/ScrollToTop';
 
-const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL = "http://localhost:8000";
 export const API = `${BACKEND_URL}/api`;
 
 // Auth Context
 export const AuthContext = React.createContext();
 
 const ProtectedRoute = ({ children, requiredType }) => {
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = sessionStorage.getItem('token');
+  let user = {};
+
+  try {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser && storedUser !== "undefined") {
+      user = JSON.parse(storedUser);
+    }
+  } catch (e) {
+    console.error("Failed to parse user from session storage", e);
+    sessionStorage.removeItem('user');
+  }
 
   if (!token) {
     if (requiredType === 'lawyer') return <Navigate to="/lawyer-login" />;
     if (requiredType === 'law_firm') return <Navigate to="/lawfirm-login" />;
-    if (requiredType === 'firm_lawyer') return <Navigate to="/lawfirm-lawyer-login" />;
+    if (requiredType === 'firm_lawyer') return <Navigate to="/firm-lawyer-login" />;
     if (requiredType === 'firm_client') return <Navigate to="/firm-client-login" />;
     return <Navigate to="/user-login" />;
   }
@@ -89,14 +99,19 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = sessionStorage.getItem('user');
+      if (storedUser && storedUser !== "undefined") {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (e) {
+      console.error("Failed to parse stored user", e);
+      sessionStorage.removeItem('user');
     }
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthContext.Provider value={{ user, setUser }}>
         <div className="App">
           <BrowserRouter>

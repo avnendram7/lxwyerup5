@@ -120,11 +120,11 @@ export const WaveLayout = ({ children, hideNavbar = false, className = '', style
     window.scrollTo(0, 0);
   }, []);
 
-  const defaultStyle = { backgroundColor: '#f8faff', fontFamily: "'Outfit', sans-serif" };
+  const defaultStyle = { fontFamily: "'Outfit', sans-serif" };
   const mergedStyle = { ...defaultStyle, ...style };
 
   return (
-    <div className={`min-h-screen relative ${className}`} style={mergedStyle}>
+    <div className={`min-h-screen relative bg-[#f8faff] dark:bg-black transition-colors duration-300 ${className}`} style={mergedStyle}>
       <StyleInjector />
       <SmoothScrolling />
       <GradientOrbs />

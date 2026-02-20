@@ -11,6 +11,8 @@ class UserCreate(BaseModel):
     user_type: Literal['client', 'lawyer', 'law_firm']
     phone: Optional[str] = None
     firm_name: Optional[str] = None
+    practice_start_date: Optional[str] = None
+    education_details: Optional[dict] = None
 
 
 class UserLogin(BaseModel):
@@ -27,6 +29,8 @@ class User(BaseModel):
     user_type: Literal['client', 'lawyer', 'law_firm']
     phone: Optional[str] = None
     firm_name: Optional[str] = None
+    practice_start_date: Optional[str] = None
+    education_details: Optional[dict] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scale, User, Mail, Phone, Lock, MapPin, Briefcase, GraduationCap, IndianRupee, FileText, Camera, CheckCircle, ArrowLeft, Loader2, ArrowRight, Building2 } from 'lucide-react';
+import { Scale, User, Mail, Phone, Lock, MapPin, Briefcase, GraduationCap, IndianRupee, FileText, Camera, CheckCircle, ArrowLeft, Loader2, ArrowRight, Building2, Calendar } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
@@ -79,6 +79,15 @@ const specializations = [
 ];
 const languageOptions = ["Hindi", "English", "Marathi", "Punjabi", "Gujarati", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Urdu"];
 
+const calculateExperience = (startDate) => {
+  if (!startDate) return 0;
+  const start = new Date(startDate);
+  const now = new Date();
+  const diffInMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  const years = diffInMonths / 12;
+  return Math.max(0, Math.floor(years));
+};
+
 export default function LawyerApplication() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -98,11 +107,12 @@ export default function LawyerApplication() {
     lawFirmName: '',
     barCouncilNumber: '',
     specialization: '',
-    experience: '',
+    practiceStart: '', // Replaces hardcoded experience
     state: '',
     city: '',
     court: '',
     education: '',
+    graduationDate: '', // New field
     languages: [],
     feeMin: '',
     feeMax: '',
@@ -182,7 +192,7 @@ export default function LawyerApplication() {
       }
     }
     if (stepNum === 2) {
-      if (!formData.barCouncilNumber || !formData.specialization || !formData.experience) {
+      if (!formData.barCouncilNumber || !formData.specialization || !formData.practiceStart) {
         toast.error('Please fill all required fields');
         return false;
       }
@@ -203,8 +213,14 @@ export default function LawyerApplication() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.education || formData.languages.length === 0 || !formData.bio) {
+    if (!formData.education || !formData.graduationDate || formData.languages.length === 0 || !formData.bio) {
       toast.error('Please fill all required fields');
+      return;
+    }
+
+    const bioWordCount = formData.bio.trim().split(/\s+/).length;
+    if (bioWordCount < 100 || bioWordCount > 300) {
+      toast.error(`Bio must be between 100 and 300 words. Current: ${bioWordCount} words.`);
       return;
     }
 
@@ -221,12 +237,14 @@ export default function LawyerApplication() {
         law_firm_name: formData.lawyerType === 'law_firm' ? formData.lawFirmName : null,
         bar_council_number: formData.barCouncilNumber,
         specialization: formData.specialization,
-        experience: parseInt(formData.experience) || 0,
+        experience: calculateExperience(formData.practiceStart),
+        practice_start_date: formData.practiceStart,
         cases_won: 0,
         state: formData.state,
         city: formData.city,
         court: formData.court,
-        education: formData.education,
+        education: `${formData.education} (Graduated: ${formData.graduationDate})`,
+        education_details: { degree: formData.education, graduation_date: formData.graduationDate },
         languages: formData.languages,
         fee_range: `₹${formData.feeMin} - ₹${formData.feeMax}`,
         bio: formData.bio,
@@ -243,7 +261,19 @@ export default function LawyerApplication() {
         request: error.request,
         config: error.config
       });
-      const errorMsg = error.response?.data?.detail || error.message || 'Failed to submit application';
+      let errorMsg = error.message || 'Failed to submit application';
+      const errorData = error.response?.data?.detail;
+
+      if (errorData) {
+        if (typeof errorData === 'string') {
+          errorMsg = errorData;
+        } else if (Array.isArray(errorData)) {
+          // Handle Pydantic validation errors
+          errorMsg = errorData.map(err => err.msg || JSON.stringify(err)).join('. ');
+        } else if (typeof errorData === 'object') {
+          errorMsg = errorData.msg || errorData.message || JSON.stringify(errorData);
+        }
+      }
       toast.error(errorMsg);
     } finally {
       setLoading(false);
@@ -257,7 +287,7 @@ export default function LawyerApplication() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md text-center p-8 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/50 shadow-xl"
+            className="w-full max-w-md text-center p-8 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -267,21 +297,21 @@ export default function LawyerApplication() {
             >
               <CheckCircle className="w-10 h-10 text-green-600" />
             </motion.div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-3">Application Submitted!</h2>
-            <p className="text-slate-600 mb-4">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">Application Submitted!</h2>
+            <p className="text-slate-600 dark:text-slate-300 mb-4">
               Thank you for applying to join LxwyerAI. Our team will review your application and get back to you within 24-48 hours.
             </p>
 
-            <div className="bg-blue-50/50 rounded-xl p-4 mb-6 text-left border border-blue-100">
-              <p className="text-sm text-slate-800">
+            <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-xl p-4 mb-6 text-left border border-blue-100 dark:border-blue-900/30">
+              <p className="text-sm text-slate-800 dark:text-slate-200">
                 <strong>Application Type:</strong> {formData.lawyerType === 'independent' ? 'Independent Lawyer' : 'Law Firm Associate'}
               </p>
               {formData.lawyerType === 'law_firm' && (
-                <p className="text-sm text-slate-800 mt-1">
+                <p className="text-sm text-slate-800 dark:text-slate-200 mt-1">
                   <strong>Law Firm:</strong> {formData.lawFirmName}
                 </p>
               )}
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                 Once approved, you can login with <strong>{formData.email}</strong> to access your dashboard.
               </p>
             </div>
@@ -324,32 +354,32 @@ export default function LawyerApplication() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          className="w-full max-w-2xl bg-white/60 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-6 sm:p-8"
+          className="w-full max-w-2xl bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-2xl rounded-2xl p-6 sm:p-8"
         >
           {/* Step 1: Personal Info + Lawyer Type */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">Personal Information</h2>
-                <p className="text-slate-500">Let's start with your basic details</p>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Personal Information</h2>
+                <p className="text-slate-500 dark:text-slate-400">Let's start with your basic details</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Full Name *</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       value={formData.name}
                       onChange={(e) => updateField('name', e.target.value)}
                       placeholder="Adv. Rajesh Kumar"
-                      className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email Address *</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
@@ -357,20 +387,20 @@ export default function LawyerApplication() {
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
                       placeholder="advocate@example.com"
-                      className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Phone Number *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       value={formData.phone}
                       onChange={(e) => updateField('phone', e.target.value)}
                       placeholder="+91 98765 43210"
-                      className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                     />
                   </div>
                 </div>
@@ -385,7 +415,7 @@ export default function LawyerApplication() {
                         value={formData.password}
                         onChange={(e) => updateField('password', e.target.value)}
                         placeholder="••••••••"
-                        className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                       />
                     </div>
                   </div>
@@ -398,7 +428,7 @@ export default function LawyerApplication() {
                         value={formData.confirmPassword}
                         onChange={(e) => updateField('confirmPassword', e.target.value)}
                         placeholder="••••••••"
-                        className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                       />
                     </div>
                   </div>
@@ -406,7 +436,7 @@ export default function LawyerApplication() {
 
                 {/* Lawyer Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">Professional Type *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Professional Type *</label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
@@ -418,8 +448,8 @@ export default function LawyerApplication() {
                         });
                       }}
                       className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.lawyerType === 'independent'
-                        ? 'border-indigo-600 bg-indigo-50/50'
-                        : 'border-slate-200 hover:border-indigo-200 bg-white/50'
+                        ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 bg-white/50 dark:bg-slate-900/50'
                         }`}
                     >
                       <User className={`w-8 h-8 ${formData.lawyerType === 'independent' ? 'text-indigo-600' : 'text-slate-400'}`} />
@@ -433,8 +463,8 @@ export default function LawyerApplication() {
                       type="button"
                       onClick={() => updateField('lawyerType', 'law_firm')}
                       className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.lawyerType === 'law_firm'
-                        ? 'border-indigo-600 bg-indigo-50/50'
-                        : 'border-slate-200 hover:border-indigo-200 bg-white/50'
+                        ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 bg-white/50 dark:bg-slate-900/50'
                         }`}
                     >
                       <Building2 className={`w-8 h-8 ${formData.lawyerType === 'law_firm' ? 'text-indigo-600' : 'text-slate-400'}`} />
@@ -455,7 +485,7 @@ export default function LawyerApplication() {
                       exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden"
                     >
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Select Your Law Firm *</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Select Your Law Firm *</label>
                       <select
                         value={formData.lawFirmId}
                         onChange={(e) => {
@@ -465,7 +495,7 @@ export default function LawyerApplication() {
                             lawFirmName: selectedFirm?.firm_name || ''
                           });
                         }}
-                        className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                       >
                         <option value="">Select a law firm</option>
                         {lawFirms.map(firm => (
@@ -490,7 +520,7 @@ export default function LawyerApplication() {
                         type="file"
                         accept="image/*"
                         onChange={handlePhotoUpload}
-                        className="pl-10 bg-white/50 border-slate-200 file:bg-indigo-50 file:text-indigo-700 file:border-0 file:rounded-lg text-slate-900"
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 text-slate-900 dark:text-gray-300"
                       />
                     </div>
                     {formData.photo && (
@@ -518,24 +548,24 @@ export default function LawyerApplication() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Bar Council Number *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Bar Council Number *</label>
                   <div className="relative">
                     <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       value={formData.barCouncilNumber}
                       onChange={(e) => updateField('barCouncilNumber', e.target.value)}
                       placeholder="D/1234/2015"
-                      className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Specialization *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Specialization *</label>
                   <select
                     value={formData.specialization}
                     onChange={(e) => updateField('specialization', e.target.value)}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   >
                     <option value="">Select your specialization</option>
                     {specializations.map(spec => (
@@ -546,21 +576,22 @@ export default function LawyerApplication() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Years of Experience *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Start of Practice *</label>
                     <div className="relative">
-                      <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <Input
-                        type="number"
-                        value={formData.experience}
-                        onChange={(e) => {
-                          const val = e.target.value.slice(0, 2);
-                          updateField('experience', val);
-                        }}
-                        placeholder="10"
-                        className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
-                        min="0"
+                        type="month"
+                        value={formData.practiceStart}
+                        onChange={(e) => updateField('practiceStart', e.target.value)}
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                        max={new Date().toISOString().slice(0, 7)}
                       />
                     </div>
+                  </div>
+                  <div className="flex items-end pb-3">
+                    <p className="text-sm text-slate-500">
+                      Experience: <span className="font-bold text-indigo-600">{calculateExperience(formData.practiceStart)} Years</span>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -577,7 +608,7 @@ export default function LawyerApplication() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">State *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">State *</label>
                   <select
                     value={formData.state}
                     onChange={(e) => {
@@ -587,7 +618,7 @@ export default function LawyerApplication() {
                         court: ''
                       });
                     }}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   >
                     <option value="">Select State</option>
                     {states.map(state => (
@@ -597,11 +628,11 @@ export default function LawyerApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">City *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">City *</label>
                   <select
                     value={formData.city}
                     onChange={(e) => updateField('city', e.target.value)}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     disabled={!formData.state}
                   >
                     <option value="">Select City</option>
@@ -612,11 +643,11 @@ export default function LawyerApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Primary Court *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Primary Court *</label>
                   <select
                     value={formData.court}
                     onChange={(e) => updateField('court', e.target.value)}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     disabled={!formData.state}
                   >
                     <option value="">Select Court</option>
@@ -627,13 +658,13 @@ export default function LawyerApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Office Address *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Office Address *</label>
                   <textarea
                     value={formData.officeAddress}
                     onChange={(e) => updateField('officeAddress', e.target.value)}
                     placeholder="e.g. Chamber 405, Delhi High Court..."
                     rows={2}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   />
                 </div>
               </div>
@@ -650,20 +681,34 @@ export default function LawyerApplication() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Education & Qualifications *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Education & Qualifications *</label>
                   <div className="relative">
                     <GraduationCap className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
                     <Input
                       value={formData.education}
                       onChange={(e) => updateField('education', e.target.value)}
                       placeholder="LLB from Delhi University, LLM from NLS"
-                      className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Languages *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Graduation Month/Year *</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Input
+                      type="month"
+                      value={formData.graduationDate}
+                      onChange={(e) => updateField('graduationDate', e.target.value)}
+                      className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      max={new Date().toISOString().slice(0, 7)}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Languages *</label>
                   <div className="flex flex-wrap gap-2">
                     {languageOptions.map(lang => (
                       <button
@@ -672,7 +717,7 @@ export default function LawyerApplication() {
                         onClick={() => toggleLanguage(lang)}
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${formData.languages.includes(lang)
                           ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                       >
                         {lang}
@@ -682,7 +727,7 @@ export default function LawyerApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Consultation Fee Range *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Consultation Fee Range *</label>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                       <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -691,7 +736,7 @@ export default function LawyerApplication() {
                         value={formData.feeMin}
                         onChange={(e) => updateField('feeMin', e.target.value)}
                         placeholder="Min (e.g., 3000)"
-                        className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                       />
                     </div>
                     <div className="relative">
@@ -701,21 +746,27 @@ export default function LawyerApplication() {
                         value={formData.feeMax}
                         onChange={(e) => updateField('feeMax', e.target.value)}
                         placeholder="Max (e.g., 10000)"
-                        className="pl-10 bg-white/50 border-slate-200 text-slate-900 focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Professional Bio *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Professional Bio *</label>
                   <textarea
                     value={formData.bio}
                     onChange={(e) => updateField('bio', e.target.value)}
-                    placeholder="Write a brief description about your practice..."
-                    rows={4}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    placeholder="Write a brief description about your practice, areas of expertise, and professional background..."
+                    rows={6}
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className={`text-xs ${formData.bio.trim().split(/\s+/).length < 100 || formData.bio.trim().split(/\s+/).length > 300 ? 'text-red-500' : 'text-slate-500'}`}>
+                      Word count: {formData.bio.trim() ? formData.bio.trim().split(/\s+/).length : 0} / 100-300 words
+                    </p>
+                    <p className="text-xs text-slate-400">Describe yourself, your expertise, and your approach to law.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -727,7 +778,7 @@ export default function LawyerApplication() {
               <Button
                 variant="ghost"
                 onClick={() => setStep(step - 1)}
-                className="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 -ml-4"
+                className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 -ml-4"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -739,7 +790,7 @@ export default function LawyerApplication() {
             {step < 4 ? (
               <Button
                 onClick={handleNext}
-                className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 rounded-xl px-8"
+                className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40 rounded-xl px-8"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -748,7 +799,7 @@ export default function LawyerApplication() {
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 rounded-xl px-8"
+                className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40 rounded-xl px-8"
               >
                 {loading ? (
                   <>
@@ -767,7 +818,7 @@ export default function LawyerApplication() {
         <p className="text-center text-slate-500 text-sm mt-6">
           By submitting, you agree to our verification process.
         </p>
-      </div>
-    </WaveLayout>
+      </div >
+    </WaveLayout >
   );
 }

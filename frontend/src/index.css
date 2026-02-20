@@ -48,6 +48,15 @@ code {
         --input: 217 33% 17%;
         --ring: 217 91% 60%;
         --radius: 0.75rem;
+
+        /* Navbar Variables - Light Mode */
+        --navbar-bg: rgba(255, 255, 255, 0.85);
+        --navbar-border: rgba(0, 0, 0, 0.06);
+        --navbar-text: #0f172a;
+        --navbar-text-scrolled: #1e293b;
+        --navbar-link: #475569;
+        --navbar-link-scrolled: #64748b;
+        --mobile-menu-bg: rgba(255, 255, 255, 0.97);
     }
 }
 
@@ -60,6 +69,38 @@ code {
         @apply bg-background text-foreground;
     }
 }
+
+.dark {
+    --background: 0 0% 0%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 19% 27%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 212 26% 87%;
+
+    /* Navbar Variables - Dark Mode */
+    --navbar-bg: rgba(2, 6, 23, 0.85);
+    --navbar-border: rgba(255, 255, 255, 0.06);
+    --navbar-text: #f8fafc;
+    --navbar-text-scrolled: #e2e8f0;
+    --navbar-link: #94a3b8;
+    --navbar-link-scrolled: #cbd5e1;
+    --mobile-menu-bg: rgba(2, 6, 23, 0.97);
+}
+
 
 @layer utilities {
     .glass {
@@ -77,6 +118,19 @@ code {
     .animate-float {
         animation: float 6s ease-in-out infinite;
     }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
 }
 
 /* Smooth scrolling */
@@ -87,6 +141,7 @@ html {
 /* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -102,10 +157,11 @@ html {
     background: #3b82f6;
 }
 
+/* Rest of the file... */
 /* ─────────────────────────────────────────────
    GLOBAL ANIMATIONS (from LandingPageWave)
    ───────────────────────────────────────────── */
-
+/* ... animations ... */
 @keyframes orbFloat1 {
     0% {
         transform: translate(0, 0) scale(1);

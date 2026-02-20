@@ -1,0 +1,50 @@
+import pandas as pd
+import joblib
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.ensemble import RandomForestClassifier
+
+# 1. Load Data
+print("⏳ Loading data...")
+df = pd.read_csv('data/sentiment_data.csv')
+X = df['text']
+y = df['label']
+
+label_names = {0: "Neutral", 1: "Urgent", 2: "Positive"}
+print(f"   Classes: {dict(y.value_counts().sort_index())}")
+
+# 2. Vectorization (Convert text to numbers)
+# We use TF-IDF. 'ngram_range=(1,2)' helps capture phrases like "police beating".
+print("⏳ Vectorizing text...")
+vectorizer = TfidfVectorizer(ngram_range=(1, 3), min_df=1, stop_words='english')
+X_vec = vectorizer.fit_transform(X)
+
+# 3. Split Data (80% Train, 20% Test)
+X_train, X_test, y_train, y_test = train_test_split(X_vec, y, test_size=0.2, random_state=42, stratify=y)
+
+# 4. Train Random Forest
+print("⏳ Training Random Forest model...")
+model = RandomForestClassifier(
+    n_estimators=100,      # Number of "trees" in the forest
+    max_depth=None,        # Let trees grow fully
+    random_state=42,
+    class_weight='balanced'
+)
+model.fit(X_train, y_train)
+
+# 5. Evaluate
+y_pred = model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+print(f"✅ Training Complete! Accuracy: {acc*100:.2f}%")
+print("\n📊 Classification Report:")
+print(classification_report(y_test, y_pred, target_names=[label_names[i] for i in sorted(label_names)]))
+
+# 6. Save Model (Sustainability Step)
+if not os.path.exists('models'):
+    os.makedirs('models')
+
+joblib.dump(model, 'models/sentiment_model.pkl')
+joblib.dump(vectorizer, 'models/sentiment_vectorizer.pkl')
+print("💾 Model saved to 'models/' folder.")

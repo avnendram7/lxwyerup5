@@ -15,17 +15,17 @@ import { dummyLawFirms } from '../data/lawFirmsDataExtended';
 
 const SimpleNavbar = ({ navigate }) => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-950 shadow-sm border-b border-slate-200 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-[#0F2944]" />
-            <span className="text-xl font-bold text-[#0F2944]">Lxwyer Up</span>
+            <Scale className="w-6 h-6 text-[#0F2944] dark:text-white" />
+            <span className="text-xl font-bold text-[#0F2944] dark:text-white">Lxwyer Up</span>
           </button>
 
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-600 hover:text-[#0F2944] transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-slate-400 hover:text-[#0F2944] dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -153,9 +153,11 @@ const JoinFirmSignup = () => {
         } else if (typeof errorMsg === 'string') {
           toast.error(errorMsg);
         } else {
-          // Still proceed if registration fails (user might already exist)
-          toast.success('Payment successful!');
-          setSubmitted(true);
+          sessionStorage.setItem('token', response.data.token);
+          sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
+          toast.success('Account created!');
+          navigate('/firm-lawyer-dashboard');
         }
       }
     }, 3000);
@@ -248,7 +250,7 @@ const JoinFirmSignup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <SimpleNavbar navigate={navigate} />
 
       <div className="pt-24 pb-12 max-w-4xl mx-auto px-4">
@@ -261,18 +263,18 @@ const JoinFirmSignup = () => {
           ].map((s, idx) => (
             <div key={s.num} className="flex items-center">
               <div className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${s.num === step ? 'bg-[#0F2944] text-white' :
-                    s.num < step ? 'bg-green-600 text-white' :
-                      'bg-gray-200 text-gray-500'
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${s.num === step ? 'bg-[#0F2944] dark:bg-white text-white dark:text-[#0F2944]' :
+                  s.num < step ? 'bg-green-600 text-white' :
+                    'bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-500'
                   }`}>
                   {s.num < step ? '✓' : s.num}
                 </div>
-                <span className={`text-xs mt-1 ${s.num <= step ? 'text-[#0F2944]' : 'text-gray-400'}`}>
+                <span className={`text-xs mt-1 ${s.num <= step ? 'text-[#0F2944] dark:text-white' : 'text-gray-400 dark:text-slate-600'}`}>
                   {s.label}
                 </span>
               </div>
               {idx < 2 && (
-                <div className={`w-16 h-1 mx-2 rounded ${s.num < step ? 'bg-green-600' : 'bg-gray-200'
+                <div className={`w-16 h-1 mx-2 rounded ${s.num < step ? 'bg-green-600' : 'bg-gray-200 dark:bg-slate-800'
                   }`} />
               )}
             </div>
@@ -286,32 +288,32 @@ const JoinFirmSignup = () => {
               key={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white border border-gray-200 shadow-lg rounded-2xl p-6"
+              className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-lg rounded-2xl p-6"
             >
               {/* Step 1: Personal Information */}
               {step === 1 && (
                 <div className="space-y-6">
                   <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-[#0F2944]">Join as Client</h2>
-                    <p className="text-gray-600">Create your account to work with {firm.firm_name}</p>
+                    <h2 className="text-2xl font-bold text-[#0F2944] dark:text-white">Join as Client</h2>
+                    <p className="text-gray-600 dark:text-slate-400">Create your account to work with {firm.firm_name}</p>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#0F2944] mb-2">Full Name *</label>
+                      <label className="block text-sm font-medium text-[#0F2944] dark:text-slate-300 mb-2">Full Name *</label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <Input
                           value={formData.full_name}
                           onChange={(e) => updateField('full_name', e.target.value)}
                           placeholder="Your full name"
-                          className="pl-10 bg-white border-gray-200 rounded-xl text-black placeholder:text-gray-400"
+                          className="pl-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-gray-400"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#0F2944] mb-2">Email Address *</label>
+                      <label className="block text-sm font-medium text-[#0F2944] dark:text-slate-300 mb-2">Email Address *</label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <Input
@@ -319,7 +321,7 @@ const JoinFirmSignup = () => {
                           value={formData.email}
                           onChange={(e) => updateField('email', e.target.value)}
                           placeholder="your@email.com"
-                          className="pl-10 bg-white border-gray-200 rounded-xl text-black placeholder:text-gray-400"
+                          className="pl-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-gray-400"
                         />
                       </div>
                     </div>
@@ -375,26 +377,26 @@ const JoinFirmSignup = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-[#0F2944] mb-2">Company Name (Optional)</label>
+                        <label className="block text-sm font-medium text-[#0F2944] dark:text-slate-300 mb-2">Company Name (Optional)</label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             value={formData.company_name}
                             onChange={(e) => updateField('company_name', e.target.value)}
                             placeholder="Your Company Ltd."
-                            className="pl-10 bg-white border-gray-200 rounded-xl text-black placeholder:text-gray-400"
+                            className="pl-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-gray-400"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#0F2944] mb-2">Your Designation (Optional)</label>
+                        <label className="block text-sm font-medium text-[#0F2944] dark:text-slate-300 mb-2">Your Designation (Optional)</label>
                         <div className="relative">
                           <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             value={formData.designation}
                             onChange={(e) => updateField('designation', e.target.value)}
                             placeholder="CEO, Manager, etc."
-                            className="pl-10 bg-white border-gray-200 rounded-xl text-black placeholder:text-gray-400"
+                            className="pl-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-gray-400"
                           />
                         </div>
                       </div>
@@ -454,8 +456,8 @@ const JoinFirmSignup = () => {
                             type="button"
                             onClick={() => updateField('urgency', option.value)}
                             className={`p-3 rounded-xl border-2 transition-all text-center ${formData.urgency === option.value
-                                ? 'border-[#0F2944] bg-[#0F2944]/5'
-                                : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-[#0F2944] bg-[#0F2944]/5'
+                              : 'border-gray-200 hover:border-gray-300'
                               }`}
                           >
                             <div className={`font-medium ${formData.urgency === option.value ? 'text-[#0F2944]' : 'text-gray-700'}`}>
@@ -620,8 +622,8 @@ const JoinFirmSignup = () => {
 
           {/* Sidebar - Firm Info */}
           <div className="md:col-span-1">
-            <div className="bg-white border border-gray-200 shadow-lg rounded-2xl p-6 sticky top-24">
-              <h3 className="text-sm font-medium text-gray-500 mb-4">JOINING</h3>
+            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-lg rounded-2xl p-6 sticky top-24">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">JOINING</h3>
 
               <div className="flex items-start gap-4 mb-4">
                 <img
@@ -630,7 +632,7 @@ const JoinFirmSignup = () => {
                   className="w-16 h-16 rounded-xl object-cover"
                 />
                 <div>
-                  <h4 className="font-bold text-[#0F2944]">{firm.firm_name}</h4>
+                  <h4 className="font-bold text-[#0F2944] dark:text-white">{firm.firm_name}</h4>
                 </div>
               </div>
 

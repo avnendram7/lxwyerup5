@@ -76,6 +76,7 @@ const subscriptionPlans = [
 export default function LawFirmApplication() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  // const [step, setStep] = useState(4);
   const [loading, setLoading] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [billingCycle, setBillingCycle] = useState('yearly'); // 'monthly' or 'yearly'
@@ -101,6 +102,7 @@ export default function LawFirmApplication() {
     total_lawyers: '',
     total_staff: '',
     description: '',
+    consultation_fee: '',
     achievements: '',
     // Payment
     cardNumber: '',
@@ -280,6 +282,7 @@ export default function LawFirmApplication() {
           total_lawyers: parseInt(formData.total_lawyers),
           total_staff: parseInt(formData.total_staff) || 0,
           description: formData.description,
+          consultation_fee: parseInt(formData.consultation_fee) || 0,
           achievements: formData.achievements,
           subscription_plan: selectedPlan,
           billing_cycle: billingCycle,
@@ -321,7 +324,7 @@ export default function LawFirmApplication() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg bg-white/60 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-8 text-center"
+            className="w-full max-w-lg bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-2xl rounded-2xl p-8 text-center"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -331,25 +334,25 @@ export default function LawFirmApplication() {
             >
               <CheckCircle className="w-12 h-12 text-green-600" />
             </motion.div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-3">Registration Successful!</h2>
-            <p className="text-slate-600 mb-6">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3">Registration Successful!</h2>
+            <p className="text-slate-600 dark:text-slate-300 mb-6">
               Your law firm <strong>{formData.firm_name}</strong> has been registered successfully.
             </p>
 
-            <div className="bg-slate-50/50 rounded-xl p-4 mb-6 text-left border border-slate-200">
-              <h3 className="font-semibold text-slate-800 mb-3">Subscription Details</h3>
-              <div className="space-y-2 text-sm text-slate-700">
+            <div className="bg-slate-50/50 dark:bg-slate-900/50 rounded-xl p-4 mb-6 text-left border border-slate-200 dark:border-slate-800">
+              <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">Subscription Details</h3>
+              <div className="space-y-2 text-sm text-slate-700 dark:text-slate-400">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Plan</span>
-                  <span className="font-medium text-slate-800">{plan.name}</span>
+                  <span className="text-slate-500 dark:text-slate-500">Plan</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200">{plan.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Billing</span>
-                  <span className="font-medium text-slate-800 capitalize">{billingCycle}</span>
+                  <span className="text-slate-500 dark:text-slate-500">Billing</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200 capitalize">{billingCycle}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-200">
-                  <span className="font-semibold text-slate-800">Amount Paid</span>
-                  <span className="font-bold text-slate-800">₹{getTotal().toLocaleString()}</span>
+                <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">Amount Paid</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">₹{getTotal().toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -380,8 +383,8 @@ export default function LawFirmApplication() {
       <div className="flex-1 flex flex-col items-center justify-center p-4 sm:px-6 lg:px-8 pt-24 pb-12">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-3">Register Your Law Firm</h1>
-          <p className="text-slate-600">Join India's leading legal platform</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-white mb-3">Register Your Law Firm</h1>
+          <p className="text-slate-600 dark:text-slate-400">Join India's leading legal platform</p>
         </div>
 
         {/* Progress Steps */}
@@ -410,7 +413,7 @@ export default function LawFirmApplication() {
         </div>
 
         {/* Form Card */}
-        <div className="w-full max-w-4xl bg-white/60 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-6 md:p-8">
+        <div className="w-full max-w-4xl bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-2xl rounded-2xl p-6 md:p-8">
           <AnimatePresence mode="wait">
             {/* Step 1: Firm Details */}
             {step === 1 && (
@@ -427,43 +430,43 @@ export default function LawFirmApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Firm Name *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Firm Name *</label>
                   <Input
                     value={formData.firm_name}
                     onChange={(e) => setFormData({ ...formData, firm_name: e.target.value })}
                     placeholder="e.g., Sharma & Associates"
-                    className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Registration Number *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Registration Number *</label>
                   <Input
                     value={formData.registration_number}
                     onChange={(e) => setFormData({ ...formData, registration_number: e.target.value })}
                     placeholder="Bar Council Registration Number"
-                    className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Established Year *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Established Year *</label>
                     <Input
                       type="number"
                       value={formData.established_year}
                       onChange={(e) => setFormData({ ...formData, established_year: e.target.value })}
                       placeholder="e.g., 2010"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Website (Optional)</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Website (Optional)</label>
                     <Input
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://yourfirm.com"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                 </div>
@@ -486,66 +489,66 @@ export default function LawFirmApplication() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Full Name *</label>
                     <Input
                       value={formData.contact_name}
                       onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
                       placeholder="Contact person name"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Designation</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Designation</label>
                     <Input
                       value={formData.contact_designation}
                       onChange={(e) => setFormData({ ...formData, contact_designation: e.target.value })}
                       placeholder="e.g., Managing Partner"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email *</label>
                   <Input
                     type="email"
                     value={formData.contact_email}
                     onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
                     placeholder="contact@yourfirm.com"
-                    className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Phone *</label>
                   <Input
                     type="tel"
                     value={formData.contact_phone}
                     onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
                     placeholder="+91 XXXXX XXXXX"
-                    className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Password *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Password *</label>
                     <Input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="Min 6 characters"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Confirm Password *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm Password *</label>
                     <Input
                       type="password"
                       value={formData.confirm_password}
                       onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
                       placeholder="Re-enter password"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                 </div>
@@ -567,22 +570,22 @@ export default function LawFirmApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Office Address</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Office Address</label>
                   <Input
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="Full office address"
-                    className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">State *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">State *</label>
                     <select
                       value={formData.state}
                       onChange={(e) => setFormData({ ...formData, state: e.target.value, city: '', court: '' })}
-                      className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
+                      className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
                     >
                       <option value="">Select State</option>
                       {states.map(state => (
@@ -591,11 +594,11 @@ export default function LawFirmApplication() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">City *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">City *</label>
                     <select
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
+                      className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
                       disabled={!formData.state}
                     >
                       <option value="">Select City</option>
@@ -605,11 +608,11 @@ export default function LawFirmApplication() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Primary Court *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Primary Court *</label>
                     <select
                       value={formData.court}
                       onChange={(e) => setFormData({ ...formData, court: e.target.value })}
-                      className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
+                      className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
                       disabled={!formData.state}
                     >
                       <option value="">Select Court</option>
@@ -622,18 +625,18 @@ export default function LawFirmApplication() {
 
                 <div className="mt-4">
                   <div className="w-1/3">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Pincode</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Pincode</label>
                     <Input
                       value={formData.pincode}
                       onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                       placeholder="110001"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">Practice Areas * (Select all that apply)</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Practice Areas * (Select all that apply)</label>
                   <div className="grid grid-cols-3 gap-2">
                     {practiceAreas.map(area => (
                       <button
@@ -642,7 +645,7 @@ export default function LawFirmApplication() {
                         onClick={() => handlePracticeAreaToggle(area)}
                         className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${formData.practice_areas.includes(area)
                           ? 'bg-teal-700 text-white shadow-md shadow-teal-200'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                       >
                         {area}
@@ -669,46 +672,57 @@ export default function LawFirmApplication() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Total Lawyers *</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Total Lawyers *</label>
                     <Input
                       type="number"
                       value={formData.total_lawyers}
                       onChange={(e) => setFormData({ ...formData, total_lawyers: e.target.value })}
                       placeholder="Number of lawyers"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Total Staff</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Total Staff</label>
                     <Input
                       type="number"
                       value={formData.total_staff}
                       onChange={(e) => setFormData({ ...formData, total_staff: e.target.value })}
                       placeholder="Support staff count"
-                      className="bg-white/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                      className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">About Your Firm *</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">About Your Firm *</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe your firm's expertise, values, and approach..."
                     rows={4}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Key Achievements (Optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Consultation Fee (₹) *</label>
+                  <Input
+                    type="number"
+                    value={formData.consultation_fee}
+                    onChange={(e) => setFormData({ ...formData, consultation_fee: e.target.value })}
+                    placeholder="e.g., 2000"
+                    className="bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:border-teal-600 focus:ring-teal-600/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Key Achievements (Optional)</label>
                   <textarea
                     value={formData.achievements}
                     onChange={(e) => setFormData({ ...formData, achievements: e.target.value })}
                     placeholder="Notable cases won, awards, recognitions..."
                     rows={3}
-                    className="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
+                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600"
                   />
                 </div>
               </motion.div>
@@ -731,12 +745,12 @@ export default function LawFirmApplication() {
 
                 {/* Billing Toggle */}
                 <div className="flex justify-center mb-6">
-                  <div className="bg-slate-100 p-1 rounded-xl flex">
+                  <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex">
                     <button
                       onClick={() => setBillingCycle('monthly')}
                       className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${billingCycle === 'monthly'
-                        ? 'bg-white text-teal-900 shadow'
-                        : 'text-slate-500 hover:text-teal-900'
+                        ? 'bg-white dark:bg-slate-700 text-teal-900 dark:text-teal-300 shadow'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-teal-900 dark:hover:text-teal-400'
                         }`}
                     >
                       Monthly
@@ -744,12 +758,12 @@ export default function LawFirmApplication() {
                     <button
                       onClick={() => setBillingCycle('yearly')}
                       className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${billingCycle === 'yearly'
-                        ? 'bg-white text-teal-900 shadow'
-                        : 'text-slate-500 hover:text-teal-900'
+                        ? 'bg-white dark:bg-slate-700 text-teal-900 dark:text-teal-300 shadow'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-teal-900 dark:hover:text-teal-400'
                         }`}
                     >
                       Yearly
-                      <span className="ml-1 text-xs text-green-600 font-bold">Save 17%</span>
+                      <span className="ml-1 text-xs text-green-600 dark:text-green-400 font-bold">Save 17%</span>
                     </button>
                   </div>
                 </div>
@@ -761,8 +775,8 @@ export default function LawFirmApplication() {
                       key={plan.id}
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all ${selectedPlan === plan.id
-                        ? 'border-teal-700 bg-teal-50/50'
-                        : 'border-slate-200 hover:border-teal-200 bg-white/50'
+                        ? 'border-teal-700 bg-teal-50/50 dark:bg-teal-900/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-teal-200 dark:hover:border-teal-800 bg-white/50 dark:bg-slate-900/50'
                         }`}
                     >
                       {plan.popular && (
@@ -774,20 +788,20 @@ export default function LawFirmApplication() {
                       )}
 
                       <div className="text-center mb-4">
-                        <h3 className="text-lg font-bold text-slate-800">{plan.name}</h3>
-                        <p className="text-xs text-slate-500">{plan.description}</p>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">{plan.name}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{plan.description}</p>
                       </div>
 
                       <div className="text-center mb-4">
-                        <span className="text-3xl font-bold text-slate-900">
+                        <span className="text-3xl font-bold text-slate-900 dark:text-white">
                           ₹{(billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice).toLocaleString()}
                         </span>
-                        <span className="text-slate-500 text-sm">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                        <span className="text-slate-500 dark:text-slate-400 text-sm">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
                       </div>
 
                       <ul className="space-y-2 mb-4">
                         {plan.features.slice(0, 5).map((feature, idx) => (
-                          <li key={idx} className="flex items-center text-xs text-slate-600">
+                          <li key={idx} className="flex items-center text-xs text-slate-600 dark:text-slate-300">
                             <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
                             {feature}
                           </li>
@@ -873,12 +887,12 @@ export default function LawFirmApplication() {
           </AnimatePresence>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-4 border-t border-slate-100">
+          <div className="flex justify-between items-center mt-8 pt-4 border-t border-slate-100 dark:border-slate-800">
             {step > 1 ? (
               <Button
                 variant="ghost"
                 onClick={() => setStep(step - 1)}
-                className="text-slate-600 hover:text-teal-700 hover:bg-teal-50 -ml-4"
+                className="text-slate-600 dark:text-slate-400 hover:text-teal-700 dark:hover:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/20 -ml-4"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -890,7 +904,7 @@ export default function LawFirmApplication() {
             {step < 6 ? (
               <Button
                 onClick={handleNext}
-                className="bg-teal-700 text-white hover:bg-teal-800 shadow-lg shadow-teal-200 rounded-xl px-8"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/30 dark:shadow-teal-900/40 rounded-xl px-8"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -899,7 +913,7 @@ export default function LawFirmApplication() {
               <Button
                 onClick={processPayment}
                 disabled={paymentProcessing}
-                className="bg-teal-700 text-white hover:bg-teal-800 shadow-lg shadow-teal-200 rounded-xl px-8"
+                className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/30 dark:shadow-teal-900/40 rounded-xl px-8"
               >
                 {paymentProcessing ? (
                   <>

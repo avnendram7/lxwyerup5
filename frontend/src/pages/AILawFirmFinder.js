@@ -3,44 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Scale, Send, Sparkles, MessageSquare, MapPin, Users, Calendar, ArrowRight, Building2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
-
-const SimpleNavbar = ({ navigate }) => {
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-[#0F2944]" />
-            <span className="text-xl font-bold text-[#0F2944]">Lxwyer Up</span>
-          </button>
-
-          <div className="flex items-center space-x-4">
-            <Button
-              onClick={() => navigate('/browse-firms')}
-              variant="ghost"
-              className="text-[#0F2944] hover:text-[#0F2944]/80"
-            >
-              Browse Law Firms
-            </Button>
-            <Button
-              onClick={() => navigate('/login')}
-              variant="ghost"
-              className="text-[#0F2944] hover:text-[#0F2944]/80"
-            >
-              Login
-            </Button>
-            <Button
-              onClick={() => navigate('/role-selection')}
-              className="bg-[#0F2944] hover:bg-[#0F2944]/90 text-white"
-            >
-              Sign Up
-            </Button>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
+import { WaveLayout } from '../components/WaveLayout';
 
 const AILawFirmFinder = () => {
   const navigate = useNavigate();
@@ -83,10 +46,8 @@ const AILawFirmFinder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      <SimpleNavbar navigate={navigate} />
-
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+    <WaveLayout>
+      <div className="pt-28 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div
@@ -96,14 +57,14 @@ const AILawFirmFinder = () => {
             className="text-center mb-12"
           >
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <Sparkles className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-[#0F2944] mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
               AI Law Firm Finder
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-slate-600 dark:text-slate-400">
               Tell me about your legal needs and I'll find the perfect law firm for you
             </p>
           </motion.div>
@@ -115,15 +76,15 @@ const AILawFirmFinder = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden h-full">
-                <div className="p-6">
+              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl border-slate-100 overflow-hidden h-full flex flex-col">
+                <div className="p-6 flex-1">
                   <div className="flex items-start space-x-3 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg">
                       <MessageSquare className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="bg-gray-50 rounded-2xl p-4">
-                        <p className="text-gray-700">
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl rounded-tl-none p-4 border border-slate-100 dark:border-slate-700">
+                        <p className="text-slate-700 dark:text-slate-300">
                           Hello! I'm your AI assistant. I can help you find the perfect law firm for your legal needs. Tell me about your case or what type of legal assistance you're looking for.
                         </p>
                       </div>
@@ -137,18 +98,18 @@ const AILawFirmFinder = () => {
                       onChange={(e) => setMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                       placeholder="Describe your legal needs..."
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F2944]/20 focus:border-[#0F2944] text-gray-900 placeholder:text-gray-400"
+                      className="w-full px-4 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
                     />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       Try: "I need help with a divorce case" or "Looking for corporate lawyers"
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 p-4">
+                <div className="border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-800/30">
                   <Button
                     onClick={handleSend}
-                    className="w-full bg-[#0F2944] hover:bg-[#0F2944]/90 text-white py-3 rounded-xl font-semibold"
+                    className="w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white py-6 rounded-xl font-semibold shadow-lg shadow-slate-900/20 dark:shadow-blue-500/20 transition-all"
                   >
                     <Send className="w-5 h-5 mr-2" />
                     Send
@@ -164,9 +125,9 @@ const AILawFirmFinder = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <div className="space-y-4">
-                <div className="flex items-center space-x-2 mb-6">
-                  <Sparkles className="w-5 h-5 text-blue-400" />
-                  <h2 className="text-2xl font-bold text-[#0F2944]">Top Law Firms</h2>
+                <div className="flex items-center space-x-2 mb-6 ml-1">
+                  <Sparkles className="w-5 h-5 text-amber-500" />
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Top Law Firms</h2>
                 </div>
 
                 {topFirms.map((firm, index) => (
@@ -175,22 +136,23 @@ const AILawFirmFinder = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                    className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+                    whileHover={{ y: -5 }}
+                    className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl p-6 shadow-xl shadow-blue-900/5 dark:shadow-blue-900/20"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-start space-x-3">
-                        <div className="w-12 h-12 bg-[#0F2944]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Building2 className="w-6 h-6 text-[#0F2944]" />
+                        <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-800">
+                          <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-[#0F2944] mb-1">{firm.name}</h3>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{firm.name}</h3>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-4">{firm.description}</p>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm mb-4">{firm.description}</p>
 
-                    <div className="flex flex-wrap gap-3 mb-4 text-xs text-gray-600">
+                    <div className="flex flex-wrap gap-3 mb-4 text-xs text-slate-500 dark:text-slate-400">
                       <div className="flex items-center">
                         <MapPin className="w-3 h-3 mr-1" />
                         <span>{firm.location}</span>
@@ -209,20 +171,20 @@ const AILawFirmFinder = () => {
                       {firm.areas.map((area, idx) => (
                         <span
                           key={idx}
-                          className="px-3 py-1 bg-[#0F2944]/10 text-[#0F2944] text-xs rounded-full font-medium"
+                          className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-full font-medium border border-slate-200 dark:border-slate-700"
                         >
                           {area}
                         </span>
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                       <div>
-                        <p className="text-xs text-gray-500">Consultation</p>
-                        <p className="text-lg font-bold text-[#0F2944]">{firm.consultation}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Consultation</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white">{firm.consultation}</p>
                       </div>
                       <Button
-                        className="bg-[#0F2944] hover:bg-[#0F2944]/90 text-white px-6 py-3 rounded-xl font-semibold group"
+                        className="bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-slate-900/20 dark:shadow-blue-500/20 group transition-all"
                       >
                         Join Firm
                         <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -235,7 +197,7 @@ const AILawFirmFinder = () => {
           </div>
         </div>
       </div>
-    </div>
+    </WaveLayout>
   );
 };
 

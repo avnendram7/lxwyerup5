@@ -44,31 +44,29 @@ export default function LawFirmDashboard() {
   const clientApplications = [];
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-
-      // Fetch Dashboard Data
+    const fetchDashboardData = (token) => {
       axios.get(`${API}/dashboard/law-firm`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => setDashboardData(res.data))
         .catch(err => console.error("Dashboard fetch error", err));
-    }
-  }, []);
+    };
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const token = sessionStorage.getItem('token');
+    const storedUser = sessionStorage.getItem('user');
+
+    if (!token || !storedUser) {
+      navigate('/lawfirm-login');
+      return;
     }
-  }, []);
+
+    setUser(JSON.parse(storedUser));
+    fetchDashboardData(token);
+  }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     toast.success('Logged out successfully');
     navigate('/');
   };

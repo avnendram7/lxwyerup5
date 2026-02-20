@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -227,9 +227,9 @@ export default function UserDashboard() {
       setUser(JSON.parse(storedUser));
       fetchData();
     }
-  }, []);
+  }, [fetchData]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [casesRes, docsRes, bookingsRes, lawyersRes, dashboardRes, messagesRes] = await Promise.all([
@@ -249,11 +249,13 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
+  }, [token]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('userRole');
+    toast.success('Logged out successfully');
     navigate('/');
   };
 

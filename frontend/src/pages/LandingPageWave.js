@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionValueEvent, useInView, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import {
@@ -10,6 +11,7 @@ import {
 import { NavbarWave } from '../components/NavbarWave';
 import { GradientOrbs } from '../components/GradientOrbs';
 import { Button } from '../components/ui/button';
+import MagicButton from '../components/ui/MagicButton';
 
 /* ─────────────────────────────────────────────
    CSS KEYFRAMES
@@ -291,7 +293,7 @@ const ScalesOfJusticeIntro = React.memo(() => {
     const filterVal = useTransform(blurVal, (v) => `blur(${v}px)`);
 
     return (
-        <section ref={ref} className="relative" style={{ height: '160vh', background: '#f8faff' }}>
+        <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500" style={{ height: '160vh' }}>
             <div
                 className="sticky top-0 flex items-center justify-center"
                 style={{ height: '100vh', zIndex: 20, pointerEvents: 'none', overflow: 'visible' }}
@@ -370,14 +372,11 @@ const ScalesOfJusticeIntro = React.memo(() => {
                                         fontWeight: 500,
                                         fontFamily: "'Outfit', sans-serif",
                                         color: '#3b82f6',
-                                        background: 'rgba(248,250,255,0.85)',
-                                        padding: '2px 8px',
-                                        borderRadius: '10px',
-                                        border: '1px solid rgba(59,130,246,0.15)',
                                         backdropFilter: 'blur(4px)',
                                         animation: `labelFloat ${item.dur}s ease-in ${item.delay}s infinite`,
                                         letterSpacing: '0.3px',
                                     }}
+                                    className="bg-[rgba(248,250,255,0.85)] dark:bg-[rgba(15,23,42,0.85)] border border-[rgba(59,130,246,0.15)] dark:border-blue-900/30 px-2 py-0.5 rounded-[10px]"
                                 >
                                     {item.label}
                                 </div>
@@ -475,7 +474,7 @@ const ScalesOfJusticeIntro = React.memo(() => {
 
                         {/* Crown/top */}
                         <circle cx="50" cy="16" r="5" fill="url(#crownGrad)" />
-                        <circle cx="50" cy="16" r="3" fill="#f8faff" />
+                        <circle cx="50" cy="16" r="3" className="fill-[#f8faff] dark:fill-black" />
                         {/* Gradients */}
                         <defs>
                             <linearGradient id="pillarGrad" x1="50" y1="20" x2="50" y2="85" gradientUnits="userSpaceOnUse">
@@ -499,15 +498,15 @@ const ScalesOfJusticeIntro = React.memo(() => {
                     </svg>
 
                     <h2
-                        className="text-3xl font-bold tracking-tight"
-                        style={{ fontFamily: "'Outfit', sans-serif", color: '#1e293b', position: 'relative', zIndex: 5 }}
+                        className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100 transition-colors"
+                        style={{ fontFamily: "'Outfit', sans-serif", position: 'relative', zIndex: 5 }}
                     >
                         Lxwyer Up
                     </h2>
-                    <p className="text-sm" style={{ color: '#94a3b8', position: 'relative', zIndex: 5 }}>Scroll to explore</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500 transition-colors" style={{ position: 'relative', zIndex: 5 }}>Scroll to explore</p>
                 </motion.div>
-            </div>
-        </section>
+            </div >
+        </section >
     );
 });
 
@@ -641,6 +640,9 @@ const serviceLabels = [
 
 /* ── Glass Fragment (a single piece of the shattered sphere) ─── */
 const GlassFragment = ({ progress, fragment, index, total }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     const baseAngle = fragment.angle;
     const finalDist = fragment.dist;
 
@@ -670,10 +672,14 @@ const GlassFragment = ({ progress, fragment, index, total }) => {
             width: fragment.size,
             height: fragment.size * 0.45,
             borderRadius: `${fragment.size * 0.5}px ${fragment.size * 0.15}px`,
-            background: `linear-gradient(${135 + index * 15}deg, rgba(147,197,253,${0.4 + fragment.brightness * 0.3}), rgba(96,165,250,${0.15 + fragment.brightness * 0.15}), rgba(219,234,254,${0.3 + fragment.brightness * 0.2}))`,
+            background: isDark
+                ? `linear-gradient(${135 + index * 15}deg, rgba(30,58,138,${0.6 + fragment.brightness * 0.2}), rgba(15,23,42,${0.4 + fragment.brightness * 0.1}), rgba(30,58,138,${0.5 + fragment.brightness * 0.2}))`
+                : `linear-gradient(${135 + index * 15}deg, rgba(147,197,253,${0.4 + fragment.brightness * 0.3}), rgba(96,165,250,${0.15 + fragment.brightness * 0.15}), rgba(219,234,254,${0.3 + fragment.brightness * 0.2}))`,
             backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.3)',
-            boxShadow: `0 0 ${12 + fragment.size * 0.3}px rgba(96,165,250,${0.2 + fragment.brightness * 0.15}), inset 0 0 ${fragment.size * 0.2}px rgba(255,255,255,0.2)`,
+            border: isDark ? '1px solid rgba(59,130,246,0.2)' : '1px solid rgba(255,255,255,0.3)',
+            boxShadow: isDark
+                ? `0 0 ${12 + fragment.size * 0.3}px rgba(37,99,235,${0.15 + fragment.brightness * 0.1}), inset 0 0 ${fragment.size * 0.2}px rgba(255,255,255,0.05)`
+                : `0 0 ${12 + fragment.size * 0.3}px rgba(96,165,250,${0.2 + fragment.brightness * 0.15}), inset 0 0 ${fragment.size * 0.2}px rgba(255,255,255,0.2)`,
         }}>
             {/* Service label on larger fragments */}
             {fragment.hasLabel && (
@@ -686,8 +692,8 @@ const GlassFragment = ({ progress, fragment, index, total }) => {
                     fontWeight: 800,
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
-                    color: '#1e3a8a', // Darker blue for contrast
-                    textShadow: '0 2px 10px rgba(255,255,255,0.8)',
+                    color: isDark ? '#bfdbfe' : '#1e3a8a', // Light blue in dark mode, Dark blue in light mode
+                    textShadow: isDark ? '0 2px 10px rgba(0,0,0,0.8)' : '0 2px 10px rgba(255,255,255,0.8)',
                     fontFamily: "'Outfit', sans-serif",
                 }}>
                     {fragment.label}
@@ -725,6 +731,9 @@ const FragmentRing = ({ progress }) => {
 
 /* ── Mist Particles (ethereal sparkles during explosion) ─── */
 const MistParticle = ({ progress, config }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     const x = useTransform(progress, [0, 1], [0, config.dx]);
     const y = useTransform(progress, [0, 1], [0, config.dy]);
     const opacity = useTransform(progress, [0, 0.1, 0.4, 0.8], [0, config.peak, config.peak * 0.6, 0]);
@@ -736,7 +745,9 @@ const MistParticle = ({ progress, config }) => {
             width: config.size,
             height: config.size,
             borderRadius: '50%',
-            background: `radial-gradient(circle, rgba(147,197,253,${config.peak}) 0%, transparent 70%)`,
+            background: isDark
+                ? `radial-gradient(circle, rgba(59,130,246,${config.peak * 0.8}) 0%, transparent 70%)`
+                : `radial-gradient(circle, rgba(147,197,253,${config.peak}) 0%, transparent 70%)`,
             filter: `blur(${config.blur}px)`,
         }} />
     );
@@ -783,18 +794,7 @@ const EasyEfficientReveal = ({ scrollProgress }) => {
             y,
             pointerEvents: 'none'
         }}>
-            <div style={{
-                padding: '32px 56px',
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(24px)',
-                borderRadius: '28px',
-                border: '2px solid rgba(59, 130, 246, 0.15)',
-                boxShadow: '0 25px 80px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(255,255,255,0.6), 0 0 120px rgba(96,165,250,0.15)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '10px'
-            }}>
+            <div className="flex flex-col items-center gap-2.5 px-14 py-8 rounded-[28px] border-2 border-blue-500/15 dark:border-blue-500/30 bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl shadow-[0_25px_80px_rgba(37,99,235,0.25),0_0_0_1px_rgba(255,255,255,0.6),0_0_120px_rgba(96,165,250,0.15)] dark:shadow-[0_25px_80px_rgba(30,58,138,0.4),0_0_0_1px_rgba(255,255,255,0.1),0_0_120px_rgba(30,58,138,0.2)]">
                 <span style={{
                     fontSize: '0.9rem',
                     fontWeight: 600,
@@ -952,19 +952,21 @@ const SphereExplosion = () => {
 
 const ScrollReactiveSphere = () => {
     const { scrollYProgress } = useScroll();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     // Position: Right-center -> Center 
     const xRaw = useTransform(scrollYProgress, [0, 0.25, 0.35], [72, 72, 50]);
     const yRaw = useTransform(scrollYProgress, [0, 0.25, 0.35], [45, 45, 50]);
 
-    // Size: Start medium, grow before burst
-    const size = useTransform(scrollYProgress, [0, 0.30, 0.40], [180, 220, 500]);
+    // Size: Start medium, grow before burst - Smoother expansion
+    const size = useTransform(scrollYProgress, [0, 0.30, 0.50], [180, 220, 800]);
 
-    // Opacity: Fade in -> out at burst
-    const opacity = useTransform(scrollYProgress, [0, 0.06, 0.38, 0.40], [0, 1, 1, 0]);
+    // Opacity: Fade in -> out at burst - Smoother fade out (extended range)
+    const opacity = useTransform(scrollYProgress, [0, 0.06, 0.35, 0.55], [0, 1, 1, 0]);
 
     // Blur increases slightly before burst (tension)
-    const blurVal = useTransform(scrollYProgress, [0.35, 0.40], [0, 8]);
+    const blurVal = useTransform(scrollYProgress, [0.35, 0.50], [0, 12]);
     const sphereFilter = useTransform(blurVal, v => `blur(${v}px)`);
 
     // Glow intensity grows
@@ -981,7 +983,9 @@ const ScrollReactiveSphere = () => {
                 position: 'absolute', top: yPos, left: xPos,
                 transform: 'translate(-50%, -50%)',
                 width: glowSize, height: glowSize,
-                background: 'radial-gradient(circle, rgba(147,197,253,0.25) 0%, rgba(96,165,250,0.08) 40%, transparent 70%)',
+                background: isDark
+                    ? 'radial-gradient(circle, rgba(30,58,138,0.15) 0%, rgba(15,23,42,0.0) 50%, transparent 70%)'
+                    : 'radial-gradient(circle, rgba(147,197,253,0.25) 0%, rgba(96,165,250,0.08) 40%, transparent 70%)',
                 opacity,
             }} />
 
@@ -990,8 +994,12 @@ const ScrollReactiveSphere = () => {
                 position: 'absolute', top: yPos, left: xPos,
                 transform: 'translate(-50%, -50%)',
                 width: size, height: size, borderRadius: '50%',
-                background: 'radial-gradient(circle at 35% 30%, rgba(219,234,254,0.7) 0%, rgba(147,197,253,0.35) 30%, rgba(96,165,250,0.2) 55%, rgba(59,130,246,0.08) 80%, transparent 100%)',
-                boxShadow: '0 0 60px rgba(96,165,250,0.15), 0 0 120px rgba(147,197,253,0.08), inset 0 0 60px rgba(255,255,255,0.3)',
+                background: isDark
+                    ? 'radial-gradient(circle at 35% 30%, rgba(59,130,246,0.2) 0%, rgba(30,58,138,0.1) 40%, rgba(15,23,42,0.05) 80%, transparent 100%)'
+                    : 'radial-gradient(circle at 35% 30%, rgba(219,234,254,0.7) 0%, rgba(147,197,253,0.35) 30%, rgba(96,165,250,0.2) 55%, rgba(59,130,246,0.08) 80%, transparent 100%)',
+                boxShadow: isDark
+                    ? '0 0 60px rgba(30,58,138,0.1), 0 0 120px rgba(15,23,42,0.1), inset 0 0 60px rgba(255,255,255,0.05)'
+                    : '0 0 60px rgba(96,165,250,0.15), 0 0 120px rgba(147,197,253,0.08), inset 0 0 60px rgba(255,255,255,0.3)',
                 opacity,
                 filter: sphereFilter,
             }} />
@@ -1002,7 +1010,9 @@ const ScrollReactiveSphere = () => {
                 transform: 'translate(-50%, -50%)',
                 width: useTransform(size, s => s * 0.65), height: useTransform(size, s => s * 0.65),
                 borderRadius: '50%',
-                background: 'radial-gradient(circle at 40% 35%, rgba(255,255,255,0.5) 0%, rgba(219,234,254,0.15) 50%, transparent 75%)',
+                background: isDark
+                    ? 'radial-gradient(circle at 40% 35%, rgba(255,255,255,0.1) 0%, rgba(59,130,246,0.05) 50%, transparent 75%)'
+                    : 'radial-gradient(circle at 40% 35%, rgba(255,255,255,0.5) 0%, rgba(219,234,254,0.15) 50%, transparent 75%)',
                 opacity,
             }} />
 
@@ -1012,7 +1022,7 @@ const ScrollReactiveSphere = () => {
                 transform: 'translate(-50%, -50%)',
                 width: useTransform(size, s => s * 0.85), height: useTransform(size, s => s * 0.85),
                 borderRadius: '50%',
-                border: '1px solid rgba(147,197,253,0.2)',
+                border: isDark ? '1px solid rgba(59,130,246,0.1)' : '1px solid rgba(147,197,253,0.2)',
                 animation: 'spinSlow 25s linear infinite',
                 opacity: useTransform(opacity, v => v * 0.5),
             }} />
@@ -1023,7 +1033,7 @@ const ScrollReactiveSphere = () => {
                 transform: 'translate(-50%, -50%)',
                 width: useTransform(size, s => s * 1.1), height: useTransform(size, s => s * 1.1),
                 borderRadius: '50%',
-                border: '1px dashed rgba(96,165,250,0.1)',
+                border: isDark ? '1px dashed rgba(30,58,138,0.1)' : '1px dashed rgba(96,165,250,0.1)',
                 animation: 'spinSlow 35s linear infinite reverse',
                 opacity: useTransform(opacity, v => v * 0.3),
             }} />
@@ -1034,7 +1044,9 @@ const ScrollReactiveSphere = () => {
                 transform: 'translate(-50%, -50%)',
                 width: size, height: size,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 70%)',
+                background: isDark
+                    ? 'radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 70%)'
+                    : 'radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 70%)',
                 animation: 'pulseGlow 3s ease-in-out infinite',
                 opacity,
             }} />
@@ -1044,7 +1056,7 @@ const ScrollReactiveSphere = () => {
 
 const ExplosionSpacer = () => {
     return (
-        <section className="relative w-full" style={{ height: '280vh', background: '#f8faff' }}>
+        <section className="relative w-full bg-[#f8faff] dark:bg-black transition-colors duration-500" style={{ height: '280vh' }}>
             {/* Dedicated scroll space — extended for blast + Easy & Efficient + breathing room */}
         </section>
     );
@@ -1058,7 +1070,7 @@ const HeroSection = () => {
     const navigate = useNavigate();
 
     return (
-        <section className="relative py-24 px-6 lg:px-8" style={{ background: '#f8faff' }}>
+        <section className="relative py-24 px-6 lg:px-8 bg-[#f8faff] dark:bg-black transition-colors duration-500">
             <div className="relative z-10 max-w-5xl mx-auto text-center">
                 <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: 'easeOut' }}>
                     {/* Pill badge */}
@@ -1066,57 +1078,63 @@ const HeroSection = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-10"
-                        style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.15)' }}
+                        className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-10 bg-blue-500/10 border border-blue-500/20 dark:bg-slate-900/50 dark:border-blue-500/30 backdrop-blur-sm"
                     >
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75" />
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
                         </span>
-                        <span className="text-xs font-medium tracking-wide uppercase" style={{ color: '#2563eb' }}>India's Modern Legal Platform</span>
+                        <span className="text-xs font-medium tracking-wide uppercase text-blue-600 dark:text-blue-400">India's First Legal Tech Ecosystem</span>
                     </motion.div>
 
-                    <h1
-                        className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-[1.08] tracking-tight"
-                        style={{ fontFamily: "'Outfit', sans-serif", color: '#0f172a' }}
+                    <h2
+                        className="text-6xl md:text-8xl font-bold mb-8 tracking-tight text-slate-900 dark:text-slate-100 transition-colors leading-tight"
+                        style={{ fontFamily: "'Outfit', sans-serif" }}
                     >
                         Justice You Understand,{' '}
                         <br className="hidden sm:block" />
-                        <span style={{ color: '#2563eb' }}>Technology</span> You Trust
-                    </h1>
+                        <span className="text-blue-600 dark:text-blue-500">Technology</span> You Trust
+                    </h2>
 
-                    <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-12 leading-relaxed" style={{ color: '#64748b' }}>
+                    <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-12 leading-relaxed text-slate-500 dark:text-slate-400 transition-colors">
                         Connect with verified lawyers, get instant AI-powered legal guidance, and navigate the Indian legal system with confidence.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                            <Button
+                            <button
                                 onClick={() => navigate('/role-selection')}
-                                className="h-14 px-10 rounded-full text-white text-lg font-semibold transition-all"
-                                style={{
-                                    background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
-                                    boxShadow: '0 8px 30px rgba(37,99,235,0.3)',
-                                }}
+                                className="group relative inline-flex items-center gap-3 h-14 px-10 rounded-full text-lg font-bold transition-all duration-300 
+                                bg-gradient-to-br from-gray-50 to-gray-200 dark:from-slate-800 dark:to-slate-950
+                                text-slate-800 dark:text-white
+                                border-t border-l border-white/50 dark:border-white/10
+                                shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),4px_4px_10px_rgba(0,0,0,0.1)] 
+                                dark:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_10px_rgba(0,0,0,0.5)]
+                                hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] dark:hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]
+                                hover:scale-105 active:scale-95"
                             >
                                 Get Started
-                                <ArrowRight className="ml-2 w-5 h-5" />
-                            </Button>
+                                <span className="flex items-center justify-center w-8 h-8 rounded-full 
+                                    bg-slate-200 dark:bg-slate-800 
+                                    group-hover:bg-blue-500 dark:group-hover:bg-cyan-500 
+                                    group-hover:text-white transition-all duration-300
+                                    shadow-inner group-hover:translate-x-1">
+                                    <ArrowRight className="w-4 h-4" />
+                                </span>
+                            </button>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                            <Button
+                            <button
                                 onClick={() => navigate('/quick-chat')}
-                                className="h-14 px-10 rounded-full text-lg font-medium transition-all"
+                                className="ai-btn-glow ai-btn-shimmer group relative inline-flex items-center gap-2.5 h-14 px-9 rounded-full text-lg font-bold text-white overflow-hidden transition-all duration-300 active:scale-95"
                                 style={{
-                                    background: 'rgba(255,255,255,0.8)',
-                                    color: '#1e293b',
-                                    border: '1px solid rgba(0,0,0,0.1)',
-                                    backdropFilter: 'blur(12px)',
+                                    background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 60%, #5b21b6 100%)',
+                                    border: '1px solid rgba(196,181,253,0.5)',
                                 }}
                             >
-                                <Zap className="mr-2 w-5 h-5" style={{ color: '#2563eb' }} />
+                                <span className="text-base" style={{ filter: 'drop-shadow(0 0 6px rgba(216,180,254,1))' }}>✦</span>
                                 LxwyerAI
-                            </Button>
+                            </button>
                         </motion.div>
                     </div>
 
@@ -1143,13 +1161,7 @@ const BentoCard = ({ number, icon: Icon, title, description, span = 1, index }) 
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: index * 0.08 }}
-            className={`group relative p-8 rounded-3xl transition-all duration-500 cursor-default ${span === 2 ? 'md:col-span-2' : ''}`}
-            style={{
-                background: 'rgba(255,255,255,0.70)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(0,0,0,0.06)',
-                boxShadow: '0 4px 30px rgba(0,0,0,0.03)',
-            }}
+            className={`group relative p-8 rounded-3xl transition-all duration-500 cursor-default ${span === 2 ? 'md:col-span-2' : ''} bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-sm`}
             onMouseEnter={(e) => {
                 e.currentTarget.style.border = '1px solid rgba(59,130,246,0.2)';
                 e.currentTarget.style.boxShadow = '0 8px 40px rgba(59,130,246,0.08)';
@@ -1174,15 +1186,12 @@ const BentoCard = ({ number, icon: Icon, title, description, span = 1, index }) 
             </div>
 
             <div className="flex flex-col items-center text-center gap-4">
-                <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.06))' }}
-                >
-                    <Icon className="w-6 h-6" style={{ color: '#2563eb' }} />
+                <div className="bg-blue-100 dark:bg-blue-900/30 rounded-xl w-12 h-12 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold mb-2" style={{ fontFamily: "'Outfit', sans-serif", color: '#0f172a' }}>{title}</h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{description}</p>
+                    <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100 transition-colors" style={{ fontFamily: "'Outfit', sans-serif" }}>{title}</h3>
+                    <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400 transition-colors">{description}</p>
                 </div>
             </div>
         </motion.div>
@@ -1205,8 +1214,7 @@ const FeaturesSection = () => {
         <section
             id="features"
             ref={ref}
-            className="relative py-28 px-6 lg:px-8"
-            style={{ background: 'rgba(248,250,255,0.8)' }}
+            className="relative py-28 px-6 lg:px-8 bg-slate-50/80 dark:bg-black transition-colors duration-500"
         >
             <div className="relative z-10 max-w-6xl mx-auto">
                 <motion.div
@@ -1215,11 +1223,11 @@ const FeaturesSection = () => {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-20"
                 >
-                    <span className="text-xs uppercase tracking-[0.2em] font-semibold mb-4 block" style={{ color: '#2563eb' }}>Features</span>
-                    <h2 className="text-4xl sm:text-5xl font-bold mb-5" style={{ fontFamily: "'Outfit', sans-serif", color: '#0f172a' }}>
+                    <span className="text-xs uppercase tracking-[0.2em] font-semibold mb-4 block text-blue-600 dark:text-blue-500">Features</span>
+                    <h2 className="text-4xl sm:text-5xl font-bold mb-5 text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         Everything You Need
                     </h2>
-                    <p className="text-lg max-w-2xl mx-auto" style={{ color: '#64748b' }}>
+                    <p className="text-lg max-w-2xl mx-auto text-slate-500 dark:text-slate-400">
                         Comprehensive legal solutions designed for modern India
                     </p>
                 </motion.div>
@@ -1293,7 +1301,7 @@ const ServicesSection = () => {
             id="services"
             ref={ref}
             className="relative py-28 px-6 lg:px-8"
-            style={{ background: '#0a0f1e' }}
+            style={{ background: '#000000' }}
         >
             <div className="relative z-10 max-w-6xl mx-auto">
                 <motion.div
@@ -1339,8 +1347,7 @@ const EcosystemSection = () => {
     return (
         <section
             ref={ref}
-            className="relative py-28 px-6 lg:px-8"
-            style={{ background: '#f8faff' }}
+            className="relative py-28 px-6 lg:px-8 bg-[#f8faff] dark:bg-black transition-colors duration-500"
         >
             <div className="relative z-10 max-w-4xl mx-auto">
                 <div className="flex flex-col gap-16 items-center">
@@ -1425,12 +1432,12 @@ const EcosystemSection = () => {
                         transition={{ duration: 0.7, delay: 0.15 }}
                         className="text-center order-1 lg:order-2"
                     >
-                        <span className="text-xs uppercase tracking-[0.2em] font-semibold mb-4 block" style={{ color: '#2563eb' }}>Why Lxwyer Up</span>
-                        <h2 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Outfit', sans-serif", color: '#0f172a' }}>
+                        <span className="text-xs uppercase tracking-[0.2em] font-semibold mb-4 block text-blue-600 dark:text-blue-500">Why Lxwyer Up</span>
+                        <h2 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight text-slate-900 dark:text-slate-100 transition-colors" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             Legal Services
-                            <span className="block" style={{ color: '#2563eb' }}>Designed for India</span>
+                            <span className="block text-blue-600 dark:text-blue-500">Designed for India</span>
                         </h2>
-                        <p className="text-lg mb-10 leading-relaxed max-w-2xl mx-auto" style={{ color: '#64748b' }}>
+                        <p className="text-lg mb-10 leading-relaxed max-w-2xl mx-auto text-slate-500 dark:text-slate-400 transition-colors">
                             We understand the complexities of the Indian legal system. Our platform bridges the gap between citizens and quality legal representation.
                         </p>
 
@@ -1441,15 +1448,14 @@ const EcosystemSection = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: i * 0.12 + 0.3 }}
-                                    className="flex items-center gap-4 bg-white/50 p-4 rounded-xl border border-blue-100"
+                                    className="flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-blue-100 dark:border-slate-800"
                                 >
                                     <div
-                                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                        style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.1)' }}
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/10 dark:border-blue-500/30"
                                     >
                                         <p.icon className="w-5 h-5" style={{ color: '#2563eb' }} />
                                     </div>
-                                    <span className="text-sm font-medium" style={{ color: '#475569' }}>{p.label}</span>
+                                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors">{p.label}</span>
                                 </motion.li>
                             ))}
                         </ul>
@@ -1499,8 +1505,8 @@ const StatsSection = () => {
     return (
         <section
             ref={ref}
-            className="relative py-20 px-6 lg:px-8"
-            style={{ background: 'rgba(248,250,255,0.85)' }}
+
+            className="relative py-20 px-6 lg:px-8 bg-[rgba(248,250,255,0.85)] dark:bg-black/85 transition-colors duration-500"
         >
             <div className="relative z-10 max-w-3xl mx-auto">
                 <motion.div
@@ -1512,18 +1518,12 @@ const StatsSection = () => {
                     {stats.map((s, i) => (
                         <div
                             key={i}
-                            className="text-center py-8 px-4 rounded-3xl transition-all duration-500"
-                            style={{
-                                background: 'rgba(255,255,255,0.7)',
-                                backdropFilter: 'blur(16px)',
-                                border: '1px solid rgba(0,0,0,0.05)',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-                            }}
+                            className="text-center py-8 px-4 rounded-3xl transition-all duration-500 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-sm"
                         >
-                            <div className="text-3xl md:text-4xl font-bold mb-2" style={{ fontFamily: "'Outfit', sans-serif", color: '#0f172a' }}>
+                            <div className="text-3xl md:text-4xl font-bold mb-2 text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 <AnimatedCounter target={s.value} suffix={s.suffix} />
                             </div>
-                            <div className="text-xs uppercase tracking-[0.15em] font-medium" style={{ color: '#94a3b8' }}>{s.label}</div>
+                            <div className="text-xs uppercase tracking-[0.15em] font-medium text-slate-400 dark:text-slate-500">{s.label}</div>
                         </div>
                     ))}
                 </motion.div>
@@ -1545,7 +1545,7 @@ const CTASection = () => {
         <section
             ref={ref}
             className="relative py-32 px-6 lg:px-8 overflow-hidden"
-            style={{ background: '#0a0f1e' }}
+            style={{ background: '#000000' }}
         >
             {/* Glow behind CTA */}
             <div
@@ -1605,8 +1605,7 @@ const Footer = () => {
     const navigate = useNavigate();
     return (
         <footer
-            className="relative py-16 px-6 lg:px-8"
-            style={{ background: '#060a14', borderTop: '1px solid rgba(255,255,255,0.04)' }}
+            className="relative py-16 px-6 lg:px-8 bg-[#060a14] dark:bg-black border-t border-white/5 dark:border-white/5 transition-colors duration-500"
         >
             <div className="max-w-7xl mx-auto">
                 <div className="grid md:grid-cols-4 gap-12 mb-12">

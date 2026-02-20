@@ -21,6 +21,11 @@ async def register_user(user_data: UserCreate):
     user_obj = User(**user_dict)
     
     doc = user_obj.model_dump()
+    
+    # Assign Unique Display ID (e.g. USR-1001)
+    from services.id_generator import generate_unique_id
+    doc['unique_id'] = await generate_unique_id(user_obj.user_type)
+    
     doc['password'] = hashed_pwd
     doc['created_at'] = doc['created_at'].isoformat()
     

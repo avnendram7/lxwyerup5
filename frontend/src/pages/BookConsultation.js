@@ -11,7 +11,7 @@ export default function BookConsultation() {
   const location = useLocation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  
+
   const [bookingData, setBookingData] = useState({
     fullName: '',
     email: '',
@@ -41,13 +41,13 @@ export default function BookConsultation() {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validate booking data
     if (!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.date || !bookingData.time) {
       toast.error('Please fill all required fields');
       return;
     }
-    
+
     setStep(2); // Move to payment
   };
 
@@ -72,13 +72,13 @@ export default function BookConsultation() {
       const response = await axios.post(`${API}/bookings/guest`, bookingPayload);
 
       toast.success('Payment Successful! Booking Confirmed');
-      
+
       // Move to success step
       setStep(3);
-      
-      // Store booking ID for later
-      localStorage.setItem('lastBookingId', response.data.id || 'dummy-id');
-      
+
+      // Store booking ID for later using sessionStorage
+      sessionStorage.setItem('lastBookingId', response.data.id || 'dummy-id');
+
     } catch (error) {
       toast.error('Booking failed. Please try again.');
     } finally {
@@ -87,11 +87,11 @@ export default function BookConsultation() {
   };
 
   const handleLoginRedirect = () => {
-    navigate('/user-login', { 
-      state: { 
+    navigate('/user-login', {
+      state: {
         message: 'Login to view your consultation booking',
-        bookingEmail: bookingData.email 
-      } 
+        bookingEmail: bookingData.email
+      }
     });
   };
 
@@ -103,15 +103,13 @@ export default function BookConsultation() {
           <div className="flex items-center justify-center">
             {[1, 2, 3].map((num) => (
               <div key={num} className="flex items-center">
-                <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold transition-all ${
-                  step >= num ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500'
-                }`}>
+                <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold transition-all ${step >= num ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500'
+                  }`}>
                   {step > num ? <Check className="w-6 h-6" /> : num}
                 </div>
                 {num < 3 && (
-                  <div className={`w-24 h-1 mx-2 transition-all ${
-                    step > num ? 'bg-blue-600' : 'bg-slate-800'
-                  }`} />
+                  <div className={`w-24 h-1 mx-2 transition-all ${step > num ? 'bg-blue-600' : 'bg-slate-800'
+                    }`} />
                 )}
               </div>
             ))}
@@ -428,7 +426,7 @@ export default function BookConsultation() {
             <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Check className="w-10 h-10 text-green-400" />
             </div>
-            
+
             <h2 className="text-3xl font-bold text-white mb-2">Booking Confirmed!</h2>
             <p className="text-slate-400 mb-8">Your consultation has been successfully booked and payment is complete</p>
 

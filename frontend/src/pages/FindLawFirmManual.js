@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Search, Filter, MapPin, Users, ArrowRight, Star, Globe, Phone, Mail, Award, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -12,7 +14,7 @@ const FloatingCard = ({ children, delay = 0, className = "" }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay }}
     whileHover={{ y: -5, transition: { duration: 0.2 } }}
-    className={`bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl shadow-blue-900/5 rounded-2xl ${className}`}
+    className={`bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl shadow-blue-900/5 dark:shadow-blue-900/20 rounded-2xl ${className}`}
   >
     {children}
   </motion.div>
@@ -31,16 +33,49 @@ export default function FindLawFirmManual() {
   const [selectedFirm, setSelectedFirm] = useState(null);
   const firmsPerPage = 9;
 
+  // Fetch verified law firms from backend
+  const [dbFirms, setDbFirms] = useState([]);
+  useEffect(() => {
+    const fetchFirms = async () => {
+      try {
+        const response = await axios.get(`${API}/lawfirms`);
+        setDbFirms(response.data);
+      } catch (error) {
+        console.error('Error fetching law firms:', error);
+      }
+    };
+    fetchFirms();
+  }, []);
+
+  // Map DB firms to match dummy data structure
+  const formattedDbFirms = dbFirms.map(firm => ({
+    ...firm,
+    id: firm.id || firm._id,
+    name: firm.firm_name || firm.name,
+    city: firm.city,
+    state: firm.state,
+    practiceAreas: firm.practice_areas || [],
+    lawyersCount: firm.total_lawyers || 0,
+    description: firm.description || 'No description provided',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200', // Fallback
+    unique_id: firm.unique_id,
+    consultation_fee: firm.consultation_fee || firm.min_fee || firm.fee, // Ensure fee is mapped
+    feeMin: firm.min_fee || firm.consultation_fee,
+    feeRange: firm.fee_range || firm.price_range
+  }));
+
+  const allFirms = [...formattedDbFirms, ...dummyLawFirms];
+
   // Search and filter logic
-  const filteredFirms = dummyLawFirms.filter(firm => {
+  const filteredFirms = allFirms.filter(firm => {
     const matchesSearch =
-      firm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      firm.practiceAreas.some(area => area.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      firm.city.toLowerCase().includes(searchQuery.toLowerCase());
+      (firm.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (firm.practiceAreas || []).some(area => area.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (firm.city || '').toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesState = !filters.state || firm.state === filters.state;
     const matchesCity = !filters.city || firm.city === filters.city;
-    const matchesArea = !filters.practiceArea || firm.practiceAreas.includes(filters.practiceArea);
+    const matchesArea = !filters.practiceArea || (firm.practiceAreas || []).includes(filters.practiceArea);
 
     return matchesSearch && matchesState && matchesCity && matchesArea;
   });
@@ -76,25 +111,25 @@ export default function FindLawFirmManual() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-full mb-6"
           >
-            <Building2 className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-600">Top Legal Firms</span>
+            <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-300">Top Legal Firms</span>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-bold text-slate-900 mb-6"
+            className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6"
           >
-            Partner with Leading <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Law Firms</span>
+            Partner with Leading <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Law Firms</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg text-slate-600 max-w-2xl mx-auto"
+            className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto"
           >
             Discover and connect with prestigious law firms specialized in handling complex legal matters for businesses and individuals.
           </motion.p>
@@ -110,14 +145,14 @@ export default function FindLawFirmManual() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by firm name, practice area, or location..."
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
 
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className={`min-w-[120px] h-[50px] border-slate-200 ${showFilters ? 'bg-blue-50 border-blue-200 text-blue-700' : 'text-slate-600'}`}
+              className={`min-w-[120px] h-[50px] border-slate-200 dark:border-slate-700 ${showFilters ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-300'}`}
             >
               <Filter className="w-4 h-4 mr-2" />
               Filters
@@ -132,16 +167,16 @@ export default function FindLawFirmManual() {
                 exit={{ height: 0, opacity: 0, marginTop: 0 }}
                 className="overflow-hidden"
               >
-                <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">State</label>
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">State</label>
                     <select
                       value={filters.state}
                       onChange={(e) => {
                         handleFilterChange('state', e.target.value);
                         handleFilterChange('city', '');
                       }}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-blue-500"
+                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
                     >
                       <option value="">All States</option>
                       {Object.keys(states).map(state => (
@@ -151,12 +186,12 @@ export default function FindLawFirmManual() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">City</label>
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">City</label>
                     <select
                       value={filters.city}
                       onChange={(e) => handleFilterChange('city', e.target.value)}
                       disabled={!filters.state}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50"
                     >
                       <option value="">All Cities</option>
                       {getCities().map(city => (
@@ -166,11 +201,11 @@ export default function FindLawFirmManual() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Practice Area</label>
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Practice Area</label>
                     <select
                       value={filters.practiceArea}
                       onChange={(e) => handleFilterChange('practiceArea', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-blue-500"
+                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
                     >
                       <option value="">All Practice Areas</option>
                       {practiceAreas.map(area => (
@@ -194,8 +229,8 @@ export default function FindLawFirmManual() {
         </FloatingCard>
 
         {/* Results Grid */}
-        <div className="mb-8 flex items-center justify-between text-slate-600 px-2">
-          <p>Showing <span className="font-semibold text-slate-900">{startIndex + 1}-{Math.min(endIndex, filteredFirms.length)}</span> of <span className="font-semibold text-slate-900">{filteredFirms.length}</span> firms</p>
+        <div className="mb-8 flex items-center justify-between text-slate-600 dark:text-slate-400 px-2">
+          <p>Showing <span className="font-semibold text-slate-900 dark:text-white">{startIndex + 1}-{Math.min(endIndex, filteredFirms.length)}</span> of <span className="font-semibold text-slate-900 dark:text-white">{filteredFirms.length}</span> firms</p>
         </div>
 
         {currentFirms.length > 0 ? (
@@ -223,29 +258,37 @@ export default function FindLawFirmManual() {
                 <div className="p-6 flex-1 flex flex-col">
                   <div className="flex flex-wrap gap-2 mb-4">
                     {firm.practiceAreas.slice(0, 3).map((area, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-md">
+                      <span key={idx} className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-xs font-medium rounded-md">
                         {area}
                       </span>
                     ))}
                     {firm.practiceAreas.length > 3 && (
-                      <span className="px-2.5 py-1 bg-slate-50 text-slate-500 text-xs font-medium rounded-md">
+                      <span className="px-2.5 py-1 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-medium rounded-md">
                         +{firm.practiceAreas.length - 3}
                       </span>
                     )}
                   </div>
 
-                  <p className="text-slate-600 text-sm line-clamp-3 mb-6 flex-1">
+                  <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 mb-6 flex-1">
                     {firm.description}
                   </p>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
-                    <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    {firm.unique_id && (
+                      <span className="text-xs font-mono bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
+                        ID: {firm.unique_id}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700 mt-auto">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                       <Users className="w-4 h-4" />
                       <span>{firm.lawyersCount} Lawyers</span>
                     </div>
                     <Button
                       onClick={() => setSelectedFirm(firm)}
-                      className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20"
+                      className="bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white shadow-lg shadow-slate-900/20 dark:shadow-blue-500/20"
                     >
                       View Details
                     </Button>
@@ -256,12 +299,12 @@ export default function FindLawFirmManual() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-              <Search className="w-10 h-10 text-slate-300" />
+            <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+              <Search className="w-10 h-10 text-slate-300 dark:text-slate-500" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No firms found</h3>
-            <p className="text-slate-500 max-w-sm mb-8">We couldn't find any law firms matching your current criteria.</p>
-            <Button onClick={clearFilters} variant="outline">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No firms found</h3>
+            <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-8">We couldn't find any law firms matching your current criteria.</p>
+            <Button onClick={clearFilters} variant="outline" className="dark:text-white dark:border-slate-700 dark:hover:bg-slate-700">
               Clear All Filters
             </Button>
           </div>
@@ -275,7 +318,7 @@ export default function FindLawFirmManual() {
               size="icon"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="w-10 h-10 rounded-xl disabled:opacity-50"
+              className="w-10 h-10 rounded-xl disabled:opacity-50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -299,7 +342,7 @@ export default function FindLawFirmManual() {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`w-10 h-10 rounded-xl text-sm font-medium transition-all ${currentPage === pageNum
                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-110'
-                      : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                       }`}
                   >
                     {pageNum}
@@ -313,7 +356,7 @@ export default function FindLawFirmManual() {
               size="icon"
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="w-10 h-10 rounded-xl disabled:opacity-50"
+              className="w-10 h-10 rounded-xl disabled:opacity-50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -337,7 +380,7 @@ export default function FindLawFirmManual() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
             >
               <div className="relative h-64">
                 <img
@@ -365,15 +408,15 @@ export default function FindLawFirmManual() {
               <div className="grid md:grid-cols-3 gap-8 p-8">
                 <div className="md:col-span-2 space-y-8">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-3">About the Firm</h3>
-                    <p className="text-slate-600 leading-relaxed">{selectedFirm.description}</p>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">About the Firm</h3>
+                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{selectedFirm.description}</p>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-3">Practice Areas</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Practice Areas</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedFirm.practiceAreas.map((area, idx) => (
-                        <div key={idx} className="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-100">
+                        <div key={idx} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-lg border border-blue-100 dark:border-blue-800">
                           {area}
                         </div>
                       ))}
@@ -381,14 +424,14 @@ export default function FindLawFirmManual() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-3">Achievements</h3>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Achievements</h3>
                     <div className="grid sm:grid-cols-2 gap-4">
                       {[1, 2, 3].map((_, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                        <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
                           <Award className="w-5 h-5 text-amber-500 mt-0.5" />
                           <div>
-                            <p className="font-semibold text-slate-900 text-sm">Top Legal Firm 2025</p>
-                            <p className="text-slate-500 text-xs">Awarded for excellence in corporate law</p>
+                            <p className="font-semibold text-slate-900 dark:text-white text-sm">Top Legal Firm 2025</p>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs">Awarded for excellence in corporate law</p>
                           </div>
                         </div>
                       ))}
@@ -396,43 +439,25 @@ export default function FindLawFirmManual() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="p-6 bg-slate-50 rounded-2xl space-y-4">
-                    <h3 className="font-bold text-slate-900">Contact Information</h3>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-slate-600">
-                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-                          <Phone className="w-4 h-4" />
-                        </div>
-                        <span className="text-sm font-medium">+91 98765 43210</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-600">
-                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-                          <Mail className="w-4 h-4" />
-                        </div>
-                        <span className="text-sm font-medium">contact@{selectedFirm.name.toLowerCase().replace(/\s/g, '')}.com</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-600">
-                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-                          <Globe className="w-4 h-4" />
-                        </div>
-                        <span className="text-sm font-medium">www.{selectedFirm.name.toLowerCase().replace(/\s/g, '')}.com</span>
-                      </div>
-                    </div>
-
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-                      Contact Firm
-                    </Button>
-                  </div>
-
-                  <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-                    <h3 className="font-bold text-indigo-900 mb-2">Book Consultation</h3>
-                    <p className="text-sm text-indigo-700 mb-4">Schedule a meeting with senior partners or specialized teams.</p>
-                    <Button variant="outline" className="w-full bg-white text-indigo-700 border-indigo-200 hover:bg-indigo-50">
-                      Request Availability
-                    </Button>
-                  </div>
+                <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-800">
+                  <h3 className="font-bold text-indigo-900 dark:text-indigo-300 mb-2">Book Consultation</h3>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-400 mb-4">Schedule a meeting with senior partners or specialized teams.</p>
+                  <Button
+                    onClick={() => navigate('/book-consultation-signup', {
+                      state: {
+                        lawyer: {
+                          ...selectedFirm,
+                          // Map firm specific fields to what booking page expects
+                          consultation_fee: selectedFirm.consultation_fee || selectedFirm.feeMin || 5000,
+                          fee: selectedFirm.feeRange || "₹5,000 - ₹15,000",
+                          specialization: selectedFirm.practiceAreas?.[0] || "Corporate Law"
+                        }
+                      }
+                    })}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
+                  >
+                    Book Consultation
+                  </Button>
                 </div>
               </div>
             </motion.div>

@@ -15,6 +15,14 @@ export default function BookConsultationWithSignup() {
   const [loading, setLoading] = useState(false);
 
   const selectedLawyer = location.state?.lawyer || null;
+  // const selectedLawyer = location.state?.lawyer || {
+  //   name: "Verification Firm",
+  //   specialization: "Corporate Law",
+  //   experience: 15,
+  //   city: "New Delhi",
+  //   consultation_fee: 7500,
+  //   feeMin: 7500
+  // };
 
   const [signupData, setSignupData] = useState({
     full_name: '',
@@ -36,27 +44,58 @@ export default function BookConsultationWithSignup() {
     cvv: ''
   });
 
-  useEffect(() => {
-    if (!selectedLawyer) {
-      toast.error('Please select a lawyer first');
-      navigate('/find-lawyer');
-    }
-  }, [selectedLawyer, navigate]);
-
-  if (!selectedLawyer) return null;
+  // if (!selectedLawyer) return null;
 
   const getFeeAmount = () => {
-    if (selectedLawyer.consultation_fee) {
-      return selectedLawyer.consultation_fee;
-    }
-    if (selectedLawyer.fee) {
-      const feeStr = selectedLawyer.fee.toString();
-      const match = feeStr.match(/₹?([\d,]+)/);
+    // Helper to parse string "₹5,000" -> 5000
+    const parseFeeString = (str) => {
+      if (!str) return null;
+      const match = str.toString().match(/₹?([\d,]+)/);
       if (match) {
         return parseInt(match[1].replace(/,/g, ''));
       }
+      return null;
+    };
+
+    // 0. Explicit check for Law Firm generic fee if present
+    if (selectedLawyer.firm_fee) { // specific field for firms if used
+      const parsed = parseFeeString(selectedLawyer.firm_fee);
+      if (parsed) return parsed;
     }
-    return 999;
+
+    // 1. Direct consultation_fee (backend/formatted)
+    if (selectedLawyer.consultation_fee) {
+      if (typeof selectedLawyer.consultation_fee === 'number') return selectedLawyer.consultation_fee;
+      const parsed = parseFeeString(selectedLawyer.consultation_fee);
+      if (parsed) return parsed;
+    }
+
+    // 2. Generic fee (formatted)
+    if (selectedLawyer.fee) {
+      if (typeof selectedLawyer.fee === 'number') return selectedLawyer.fee;
+      const parsed = parseFeeString(selectedLawyer.fee);
+      if (parsed) return parsed;
+    }
+
+    // 3. Fee Range (backend raw) - take the lower bound
+    if (selectedLawyer.fee_range) {
+      const parsed = parseFeeString(selectedLawyer.fee_range);
+      if (parsed) return parsed;
+    }
+
+    // 4. Dummy Data (feeMin)
+    if (selectedLawyer.feeMin) {
+      return selectedLawyer.feeMin;
+    }
+
+    // 5. Fallback for law firms if they have 'price' or 'cost'
+    if (selectedLawyer.price) {
+      const parsed = parseFeeString(selectedLawyer.price);
+      if (parsed) return parsed;
+    }
+
+    // Default fallback
+    return 2000; // Reasonable default for a firm/lawyer
   };
 
   const consultationFee = getFeeAmount();
@@ -93,8 +132,8 @@ export default function BookConsultationWithSignup() {
 
       const signupResponse = await axios.post(`${API}/auth/signup`, userPayload);
 
-      localStorage.setItem('token', signupResponse.data.token);
-      localStorage.setItem('user', JSON.stringify(signupResponse.data.user));
+      sessionStorage.setItem('token', signupResponse.data.token);
+      sessionStorage.setItem('user', JSON.stringify(signupResponse.data.user));
 
       const bookingPayload = {
         lawyer_id: selectedLawyer.id,
@@ -142,14 +181,14 @@ export default function BookConsultationWithSignup() {
           <div className="flex items-center justify-between mb-8">
             <button
               onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)}
-              className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors font-medium bg-white/50 px-4 py-2 rounded-full backdrop-blur-md border border-white/60 shadow-sm"
+              className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium bg-white/50 dark:bg-slate-800/50 px-4 py-2 rounded-full backdrop-blur-md border border-white/60 dark:border-slate-700 shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
             </button>
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-slate-800">Booking Consultation</p>
-              <p className="text-xs text-slate-500">Step {step} of 4</p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-white">Booking Consultation</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Step {step} of 4</p>
             </div>
           </div>
 
@@ -159,7 +198,7 @@ export default function BookConsultationWithSignup() {
             <div className="lg:col-span-1 space-y-6">
 
               {/* Progress Steps (Vertical on large screens) */}
-              <div className="bg-white/60 backdrop-blur-md border border-white/60 rounded-3xl p-6 shadow-sm">
+              <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-white/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
                 <div className="flex lg:flex-col justify-between lg:gap-8">
                   {[
                     { num: 1, label: 'Signup', icon: User },
@@ -170,17 +209,17 @@ export default function BookConsultationWithSignup() {
                     <div key={s.num} className="flex items-center gap-3 relative">
                       <div className={`
                         w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all relative z-10
-                        ${step >= s.num ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25' : 'bg-white border-2 border-slate-100 text-slate-300'}
+                        ${step > s.num ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-slate-300 dark:text-slate-600'}
                       `}>
                         {step > s.num ? <Check className="w-5 h-5" /> : s.icon && <s.icon className="w-4 h-4" />}
                       </div>
-                      <span className={`hidden lg:block font-medium ${step >= s.num ? 'text-slate-800' : 'text-slate-400'}`}>
+                      <span className={`hidden lg:block font-medium ${step >= s.num ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
                         {s.label}
                       </span>
                       {s.num < 4 && (
                         <div className={`
                           hidden lg:block absolute left-5 top-10 w-0.5 h-8 -ml-px transition-all
-                          ${step > s.num ? 'bg-blue-600' : 'bg-slate-100'}
+                          ${step > s.num ? 'bg-blue-600' : 'bg-slate-100 dark:bg-slate-800'}
                         `} />
                       )}
                     </div>
@@ -189,46 +228,46 @@ export default function BookConsultationWithSignup() {
               </div>
 
               {/* Selected Lawyer Card */}
-              <div className="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-lg shadow-blue-900/5 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-2xl -mr-16 -mt-16" />
+              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-slate-800 rounded-3xl p-6 shadow-lg shadow-blue-900/5 dark:shadow-blue-900/20 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
 
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 flex items-center justify-center shadow-sm">
-                      <Scale className="w-8 h-8 text-blue-600" />
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 border border-blue-100 dark:border-slate-700 flex items-center justify-center shadow-sm">
+                      <Scale className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                    <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-bold border border-blue-100 dark:border-blue-800">
                       Top Rated
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">{selectedLawyer.name}</h3>
-                  <p className="text-blue-600 font-medium text-sm mb-4">{selectedLawyer.specialization}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{selectedLawyer.name}</h3>
+                  <p className="text-blue-600 dark:text-blue-400 font-medium text-sm mb-4">{selectedLawyer.specialization}</p>
 
-                  <div className="space-y-3 pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Briefcase className="w-4 h-4 text-slate-400" />
-                      <span>{selectedLawyer.experience} years experience</span>
+                  <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <Briefcase className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      <span>{selectedLawyer.experience || '10+'} years experience</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <MapPin className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <MapPin className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                       <span>{selectedLawyer.city}</span>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Consultation Fee</p>
-                    <p className="text-2xl font-bold text-slate-900">₹{consultationFee}</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">₹{consultationFee}</p>
                   </div>
                 </div>
               </div>
 
               {/* Security Badge */}
-              <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
-                <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex items-start gap-3">
+                <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-bold text-blue-900">Secure Booking</h4>
-                  <p className="text-xs text-slate-500 mt-1">Your personal information is encrypted and secure.</p>
+                  <h4 className="text-sm font-bold text-blue-900 dark:text-blue-200">Secure Booking</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Your personal information is encrypted and secure.</p>
                 </div>
               </div>
 
@@ -242,20 +281,20 @@ export default function BookConsultationWithSignup() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 h-full"
+                className="bg-white/70 dark:bg-slate-900/50 backdrop-blur-xl border border-white/80 dark:border-white/10 rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 dark:shadow-none h-full"
               >
 
                 {/* Step 1: Signup Form */}
                 {step === 1 && (
                   <div className="max-w-lg mx-auto">
                     <div className="mb-8">
-                      <h2 className="text-3xl font-bold text-slate-900 mb-2 font-outfit">Create Account</h2>
-                      <p className="text-slate-500">Enter your details to create an account and proceed with booking.</p>
+                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 font-outfit">Create Account</h2>
+                      <p className="text-slate-500 dark:text-slate-400">Enter your details to create an account and proceed with booking.</p>
                     </div>
 
                     <form onSubmit={handleSignupSubmit} className="space-y-5">
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Full Name</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
                         <div className="relative group">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                           <input
@@ -263,14 +302,14 @@ export default function BookConsultationWithSignup() {
                             required
                             value={signupData.full_name}
                             onChange={(e) => setSignupData({ ...signupData, full_name: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                             placeholder="John Doe"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Email Address</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
                         <div className="relative group">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                           <input
@@ -278,14 +317,14 @@ export default function BookConsultationWithSignup() {
                             required
                             value={signupData.email}
                             onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                             placeholder="john@example.com"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Phone Number</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Phone Number</label>
                         <div className="relative group">
                           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                           <input
@@ -293,14 +332,14 @@ export default function BookConsultationWithSignup() {
                             required
                             value={signupData.phone}
                             onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                             placeholder="+91 98765 43210"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Password</label>
                         <div className="relative group">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                           <input
@@ -309,7 +348,7 @@ export default function BookConsultationWithSignup() {
                             minLength={6}
                             value={signupData.password}
                             onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                             placeholder="••••••••"
                           />
                         </div>
@@ -339,14 +378,14 @@ export default function BookConsultationWithSignup() {
                 {step === 2 && (
                   <div className="max-w-lg mx-auto">
                     <div className="mb-8">
-                      <h2 className="text-3xl font-bold text-slate-900 mb-2 font-outfit">Select Date & Time</h2>
-                      <p className="text-slate-500">Choose a suitable slot for your consultation.</p>
+                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 font-outfit">Select Date & Time</h2>
+                      <p className="text-slate-500 dark:text-slate-400">Choose a suitable slot for your consultation.</p>
                     </div>
 
                     <form onSubmit={handleBookingSubmit} className="space-y-6">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-1">
-                          <label className="text-sm font-semibold text-slate-700 ml-1">Date</label>
+                          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Date</label>
                           <div className="relative">
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input
@@ -355,20 +394,20 @@ export default function BookConsultationWithSignup() {
                               min={new Date().toISOString().split('T')[0]}
                               value={bookingData.date}
                               onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
-                              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
+                              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-sm font-semibold text-slate-700 ml-1">Time</label>
+                          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Time</label>
                           <div className="relative">
                             <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <select
                               required
                               value={bookingData.time}
                               onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
-                              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm appearance-none"
+                              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm appearance-none"
                             >
                               <option value="">Select Time</option>
                               <option value="10:00 AM">10:00 AM</option>
@@ -407,31 +446,31 @@ export default function BookConsultationWithSignup() {
                 {step === 3 && (
                   <div className="max-w-lg mx-auto">
                     <div className="mb-8">
-                      <h2 className="text-3xl font-bold text-slate-900 mb-2 font-outfit">Payment Details</h2>
-                      <p className="text-slate-500">Complete payment to confirm your booking.</p>
+                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 font-outfit">Payment Details</h2>
+                      <p className="text-slate-500 dark:text-slate-400">Complete payment to confirm your booking.</p>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 mb-8">
-                      <h4 className="font-semibold text-slate-900 mb-3 border-b border-slate-200 pb-2">Order Summary</h4>
+                    <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 mb-8">
+                      <h4 className="font-semibold text-slate-900 dark:text-white mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">Order Summary</h4>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between text-slate-600">
+                        <div className="flex justify-between text-slate-600 dark:text-slate-400">
                           <span>Consultation with</span>
-                          <span className="font-medium text-slate-900">{selectedLawyer.name}</span>
+                          <span className="font-medium text-slate-900 dark:text-white">{selectedLawyer.name}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600">
+                        <div className="flex justify-between text-slate-600 dark:text-slate-400">
                           <span>Date & Time</span>
-                          <span className="font-medium text-slate-900">{bookingData.date}, {bookingData.time}</span>
+                          <span className="font-medium text-slate-900 dark:text-white">{bookingData.date}, {bookingData.time}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600 pt-2 border-t border-slate-200 mt-2">
+                        <div className="flex justify-between text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800 mt-2">
                           <span className="font-semibold">Total Amount</span>
-                          <span className="font-bold text-blue-600 text-lg">₹{consultationFee}</span>
+                          <span className="font-bold text-blue-600 dark:text-blue-400 text-lg">₹{consultationFee}</span>
                         </div>
                       </div>
                     </div>
 
                     <form onSubmit={handlePaymentSubmit} className="space-y-5">
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Card Number</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Card Number</label>
                         <div className="relative group">
                           <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                           <input
@@ -443,20 +482,20 @@ export default function BookConsultationWithSignup() {
                               const value = e.target.value.replace(/\D/g, '');
                               setPaymentData({ ...paymentData, cardNumber: value });
                             }}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                             placeholder="0000 0000 0000 0000"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Cardholder Name</label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Cardholder Name</label>
                         <input
                           type="text"
                           required
                           value={paymentData.cardName}
                           onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
-                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                          className="w-full px-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                           placeholder="NAME ON CARD"
                         />
                       </div>

@@ -60,7 +60,9 @@ async def submit_lawyer_application(application: LawyerApplicationCreate):
         lawyer_type=application.lawyer_type,
         office_address=application.office_address,
         law_firm_id=application.law_firm_id,
-        law_firm_name=application.law_firm_name
+        law_firm_name=application.law_firm_name,
+        practice_start_date=application.practice_start_date,
+        education_details=application.education_details
     )
     
     await db.lawyer_applications.insert_one(app_data.model_dump())
@@ -93,10 +95,42 @@ async def upload_profile_photo(file: UploadFile = File(...), user: dict = Depend
     # in production this should be a full URL or relative to static mount
     photo_url = f"/uploads/{filename}"
     
+    # Check edit limit
+    current_count = user.get('photo_edit_count', 0)
+    if current_count >= 3:
+        raise HTTPException(status_code=400, detail="You have reached the limit of 3 profile photo updates.")
+
     # Update user in database
     await db.users.update_one(
         {'id': user['id']},
-        {'$set': {'photo': photo_url}}
+        {
+            '$set': {'photo': photo_url},
+            '$inc': {'photo_edit_count': 1}
+        }
     )
     
-    return {'photo_url': photo_url}
+    return {'photo_url': photo_url, 'photo_edit_count': current_count + 1}
+
+
+from pydantic import BaseModel
+
+class BioUpdate(BaseModel):
+    bio: str
+
+@router.put("/me/bio")
+async def update_bio(data: BioUpdate, user: dict = Depends(get_current_user)):
+    """Update lawyer bio with 3-time limit"""
+    # Check word limit
+    word_count = len(data.bio.strip().split())
+    if word_count > 300:
+        raise HTTPException(status_code=400, detail=f"Bio exceeds the 300-word limit. Current count: {word_count}")
+        
+    await db.users.update_one(
+        {'id': user['id']},
+        {
+            '$set': {'bio': data.bio},
+            '$inc': {'bio_edit_count': 1}
+        }
+    )
+    
+    return {'message': 'Bio updated successfully', 'bio': data.bio, 'bio_edit_count': current_count + 1}

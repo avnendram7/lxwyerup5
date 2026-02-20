@@ -1,13 +1,13 @@
+
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Send, ArrowLeft, Sparkles, ShieldCheck, Trash2,
   Info, ArrowRight, Clock, Zap, Scale,
-  X, Lightbulb,
+  X, Lightbulb, User, Ghost, Bot, Menu
 } from 'lucide-react'
 import { NavbarWave } from '../components/NavbarWave'
 import { GradientOrbs } from '../components/GradientOrbs'
-import './QuickChatAdvocate.css'
 
 /* ========== CARD DEFINITIONS ========== */
 const CARD_DEFS = [
@@ -60,7 +60,6 @@ function classifySentiment(t) {
   return 0
 }
 
-/* ========== RESPONSE GENERATOR ========== */
 function generateResponse(query) {
   const lower = query.toLowerCase().trim()
   if (GREETING_KW.includes(lower)) {
@@ -77,7 +76,6 @@ function generateResponse(query) {
   return { acknowledgment, cards: CARD_DEFS, intent, sentiment, intentLabel, sentimentLabel, isGreeting: false, query }
 }
 
-/* ========== COMPONENT ========== */
 export default function QuickChat() {
   const navigate = useNavigate()
   const [messages, setMessages] = useState([])
@@ -85,209 +83,325 @@ export default function QuickChat() {
   const [isTyping, setIsTyping] = useState(false)
   const [expandedCard, setExpandedCard] = useState(null)
   const [expandedCtx, setExpandedCtx] = useState(null)
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
+  const chatContainerRef = useRef(null)
 
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, isTyping])
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      const { scrollHeight, clientHeight } = chatContainerRef.current
+      chatContainerRef.current.scrollTo({
+        top: scrollHeight - clientHeight,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, isTyping])
+
   useEffect(() => { inputRef.current?.focus() }, [])
 
-  const handleSend = (text) => {
+  const handleSend = async (text) => {
     const query = (text || input).trim()
     if (!query) return
-    setMessages(prev => [...prev, { role: 'user', content: query, id: Date.now() }])
+
+    // 1. Add User Message
+    const userMsg = { role: 'user', content: query, id: Date.now() }
+    setMessages(prev => [...prev, userMsg])
     setInput('')
     setIsTyping(true)
-    setTimeout(() => {
-      const result = generateResponse(query)
+
+    try {
+      // 2. Call Backend API
+      const response = await fetch('http://localhost:5001/api/chat/legal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, history: [] }) // Simple history for now
+      })
+
+      if (!response.ok) throw new Error('API Error')
+
+      const data = await response.json()
+
+      // 3. Add Assistant Message
       setMessages(prev => [...prev, {
-        role: 'assistant', ...result, id: Date.now() + 1,
+        role: 'assistant',
+        id: Date.now() + 1,
+        content: data.response, // The main text
+        intentLabel: data.intent,
+        sentimentLabel: data.sentiment,
+        sentiment: data.sentiment === 'URGENT 🚨' ? 1 : data.sentiment === 'Positive 🟢' ? 2 : 0,
+        cards: null, // We can restore cards logic later if needed
+        isGreeting: data.intent === 'Greeting/Casual 💬'
       }])
+
+    } catch (error) {
+      console.error("Chat Error:", error)
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        id: Date.now() + 1,
+        content: "I apologize, but I'm having trouble connecting to my legal database right now. Please try again later.",
+        sentimentLabel: "Error ⚠️",
+        sentiment: 0
+      }])
+    } finally {
       setIsTyping(false)
-    }, 1200 + Math.random() * 800)
+    }
   }
 
   const openCard = (card, ctx) => { setExpandedCard(card); setExpandedCtx(ctx) }
   const closeCard = () => { setExpandedCard(null); setExpandedCtx(null) }
 
   return (
-    <div className="advocate-chat min-h-screen bg-white relative overflow-hidden font-['Outfit']">
-      <GradientOrbs />
-      <NavbarWave />
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans overflow-hidden transition-colors duration-300">
+      {/* Background Decor */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-black -z-10" />
 
-      <div className="advocate-chat-layout">
-        {/* Sidebar */}
-        <aside className="adv-sidebar">
-          <div className="adv-sidebar-header">
-            <button className="adv-sidebar-back" onClick={() => navigate('/')}><ArrowLeft size={16} /></button>
-            <div className="adv-sidebar-brand">
-              <div className="adv-sidebar-logo"><Scale size={16} /></div>
-              <span className="adv-sidebar-brand-name">Lxwyer <span className="adv-text-gradient">AI</span></span>
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-30 w-72 bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+              <Scale size={20} />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">Lxwyer <span className="text-blue-600 dark:text-blue-400">AI</span></h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Legal Intelligence</p>
             </div>
           </div>
-          <div className="adv-sidebar-info">
-            <div className="adv-sidebar-info-card">
-              <Info className="adv-sidebar-info-icon" size={18} />
-              <div>
-                <h4>About This Assistant</h4>
-                <p>AI-powered legal information based on Indian Constitution, IPC, and BNS. Not a substitute for professional legal advice.</p>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-2xl border border-blue-100 dark:border-blue-800/30">
+              <div className="flex items-start gap-3">
+                <Info className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" size={18} />
+                <div>
+                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-1">About This Assistant</h4>
+                  <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                    AI-powered legal information based on Indian Constitution, IPC, and BNS. Not a substitute for professional legal advice.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="px-2 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">AI Pipeline</h4>
+              <div className="space-y-1">
+                {['Sentiment Analysis', 'Intent Classification', 'RAG Legal Search', 'Answer Generation', 'Safety Check', 'Recommendations'].map((step, idx) => (
+                  <div key={step} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 group transition-colors">
+                    <div className={`w-2 h-2 rounded-full ${idx === 5 ? 'bg-green-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-700 group-hover:bg-blue-500 transition-colors'}`} />
+                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200">{step}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-          <div>
-            <h4 className="adv-sidebar-section-title">AI Pipeline</h4>
-            <div className="adv-pipeline-steps">
-              {['Sentiment Analysis', 'Intent Classification', 'RAG Legal Search', 'Answer Generation', 'Safety Check', 'Recommendations'].map(s => (
-                <div className="adv-pipeline-step" key={s}><div className="adv-pipeline-dot" /><span>{s}</span></div>
-              ))}
-            </div>
-          </div>
-          <div className="adv-sidebar-footer">
-            <button className="adv-sidebar-clear" onClick={() => setMessages([])}>
-              <Trash2 size={14} /> Clear Chat
+
+          <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <button onClick={() => setMessages([])} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all text-sm font-medium">
+              <Trash2 size={16} /> Clear Chat
+            </button>
+            <button onClick={() => navigate('/')} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all text-sm font-medium">
+              <ArrowLeft size={16} /> Back to Home
             </button>
           </div>
-        </aside>
+        </div>
+      </aside>
 
-        {/* Main Chat */}
-        <main className="adv-main">
-          <div className="adv-header">
-            <div className="adv-header-left">
-              <button className="adv-header-back-mobile" onClick={() => navigate('/')}><ArrowLeft size={16} /></button>
-              <div className="adv-header-info">
-                <div className="adv-header-status"><div className="adv-status-dot" /><span>Online</span></div>
-                <h2 className="adv-header-title">LxwyerAI</h2>
-              </div>
-            </div>
-            <div className="adv-header-right">
-              <span className="adv-header-badge"><ShieldCheck size={12} /> Safety Enabled</span>
-              <button className="adv-header-clear-btn" onClick={() => setMessages([])}><Trash2 size={16} /></button>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col relative w-full h-full">
+        {/* Header */}
+        <header className="h-16 px-4 md:px-8 border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm absolute top-0 w-full z-20">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:inline">System Online</span>
             </div>
           </div>
+          <div className="px-3 py-1.5 rounded-full bg-slate-100/50 dark:bg-slate-800/50 text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-md">
+            <ShieldCheck size={14} className="text-blue-500" />
+            <span>Safety Protocols Active</span>
+          </div>
+        </header>
 
-          {/* Messages */}
-          <div className="adv-messages">
-            {messages.length === 0 && (
-              <div className="adv-empty">
-                <div className="adv-empty-icon"><Scale size={32} /></div>
-                <h2 className="adv-empty-title">Welcome to <span className="adv-text-gradient">LxwyerAI</span></h2>
-                <p className="adv-empty-desc">Ask any question about Indian law — criminal, civil, family, or corporate. I'll analyze your query and provide structured legal information through interactive cards.</p>
-                <div className="adv-suggestions">
-                  {SUGGESTED_QUERIES.map((sq, i) => (
-                    <button className="adv-suggestion-btn" key={i} onClick={() => handleSend(sq.text)}>
-                      <span className="adv-suggestion-emoji">{sq.icon}</span><span>{sq.text}</span>
-                      <ArrowRight className="adv-suggestion-arrow" size={14} />
-                    </button>
-                  ))}
-                </div>
+        {/* Chat Area */}
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-6 pt-20">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto animate-in fade-in zoom-in duration-500">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-3xl flex items-center justify-center mb-8 ring-1 ring-blue-500/20 backdrop-blur-xl">
+                <Scale size={48} className="text-blue-600 dark:text-blue-400 drop-shadow-lg" />
               </div>
-            )}
+              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
+                Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">LxwyerAI</span>
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-lg">
+                Your intelligent legal companion. Ask about criminal charges, family disputes, or corporate regulations in India.
+              </p>
 
-            {messages.map(msg => (
-              <div key={msg.id} className={`adv-message ${msg.role === 'user' ? 'adv-msg-user' : 'adv-msg-assistant'}`}>
-                {msg.role === 'assistant' && <div className="adv-msg-avatar"><Scale size={16} /></div>}
-                <div className={`adv-msg-bubble ${msg.role === 'user' ? 'adv-bubble-user' : 'adv-bubble-assistant'}`}>
-                  {msg.role === 'assistant' && !msg.isGreeting && msg.intentLabel && (
-                    <div className="adv-msg-analysis">
-                      <span className={`adv-badge ${msg.sentiment === 1 ? 'adv-badge-urgent' : msg.sentiment === 2 ? 'adv-badge-positive' : 'adv-badge-neutral'}`}>
-                        <Zap size={10} /> {msg.sentimentLabel}
-                      </span>
-                      <span className={`adv-badge ${msg.intent === 0 ? 'adv-badge-criminal' : msg.intent === 1 ? 'adv-badge-family' : 'adv-badge-corporate'}`}>
-                        <Scale size={10} /> {msg.intentLabel}
-                      </span>
-                    </div>
-                  )}
-                  <div className="adv-msg-content">
-                    {(msg.acknowledgment || msg.content || '').split('\n').map((line, i) => {
-                      if (line.trim() === '') return <br key={i} />
-                      const parts = line.split(/(\*\*.*?\*\*)/g)
-                      return (
-                        <p key={i}>{parts.map((part, j) => {
-                          if (part.startsWith('**') && part.endsWith('**')) return <strong key={j}>{part.slice(2, -2)}</strong>
-                          const ip = part.split(/(\*.*?\*)/g)
-                          return ip.map((s, k) => s.startsWith('*') && s.endsWith('*') && !s.startsWith('**') ? <em key={`${j}-${k}`}>{s.slice(1, -1)}</em> : s)
-                        })}</p>
-                      )
-                    })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
+                {SUGGESTED_QUERIES.map((sq, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSend(sq.text)}
+                    className="group flex items-center gap-3 p-4 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-blue-300 dark:hover:border-blue-700 hover:bg-white dark:hover:bg-slate-900 hover:shadow-lg hover:-translate-y-0.5 transition-all text-left backdrop-blur-sm"
+                  >
+                    <span className="text-xl p-2 bg-slate-100 dark:bg-slate-800 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm">{sq.icon}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 flex-1">{sq.text}</span>
+                    <ArrowRight size={16} className="text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors transform group-hover:translate-x-1" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-8 max-w-4xl mx-auto pb-6">
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} animate-in slide-in-from-bottom-4 duration-500`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md ${msg.role === 'user'
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                    : 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white'
+                    }`}>
+                    {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
                   </div>
-                  {/* Card Grid */}
-                  {msg.role === 'assistant' && msg.cards && (
-                    <div className="adv-card-grid">
-                      {msg.cards.map((card, i) => (
-                        <button key={card.id} className="adv-legal-card" style={{ animationDelay: `${i * 0.06}s` }}
-                          onClick={() => openCard(card, { intent: msg.intent, sentiment: msg.sentiment, query: msg.query })}>
-                          <div className="adv-legal-card-icon">{card.icon}</div>
-                          <div className="adv-legal-card-body">
-                            <h4 className="adv-legal-card-title">{card.title}</h4>
-                            <p className="adv-legal-card-preview">{card.preview}</p>
-                          </div>
-                          <div className="adv-legal-card-footer">
-                            <span className="adv-legal-card-read"><Clock size={10} /> {card.readTime}</span>
-                            <span className="adv-legal-card-cta">Tap to expand <ArrowRight size={10} /></span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {msg.role === 'assistant' && msg.cards && (
-                    <div className="adv-msg-recommendations">
-                      <div className="adv-msg-rec-header"><Lightbulb size={14} /><span>Which aspect would you like to explore first?</span></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
 
-            {isTyping && (
-              <div className="adv-message adv-msg-assistant">
-                <div className="adv-msg-avatar"><Scale size={16} /></div>
-                <div className="adv-msg-bubble adv-bubble-assistant">
-                  <div className="adv-typing-indicator">
-                    <div className="adv-typing-dots"><span /><span /><span /></div>
-                    <span className="adv-typing-text">Analyzing with AI pipeline...</span>
+                  <div className={`flex flex-col gap-2 max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                    <div className={`p-5 rounded-3xl shadow-sm backdrop-blur-sm ${msg.role === 'user'
+                      ? 'bg-blue-600 dark:bg-blue-600 text-white rounded-tr-sm'
+                      : 'bg-white/80 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-sm'
+                      }`}>
+                      {msg.role === 'assistant' && !msg.isGreeting && msg.intentLabel && (
+                        <div className="flex flex-wrap gap-2 mb-4 pb-3 border-b border-slate-100/50 dark:border-slate-700/50">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border shadow-sm ${msg.sentiment === 1 ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800' :
+                            msg.sentiment === 2 ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' :
+                              'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                            }`}>
+                            <Zap size={10} /> {msg.sentimentLabel}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed">
+                        {(msg.acknowledgment || msg.content || '').split('\n').map((line, i) => (
+                          line.trim() === '' ? <div key={i} className="h-3" /> : <p key={i} className="mb-1">{line.replace(/\*\*/g, '')}</p>
+                        ))}
+                      </div>
+
+                      {msg.role === 'assistant' && msg.cards && (
+                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 not-prose">
+                          {msg.cards.map((card, i) => (
+                            <button
+                              key={card.id}
+                              className="text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all group animate-in zoom-in duration-500 fill-mode-backwards"
+                              style={{ animationDelay: `${i * 0.1}s` }}
+                              onClick={() => openCard(card, { intent: msg.intent, sentiment: msg.sentiment, query: msg.query })}
+                            >
+                              <div className="flex justify-between items-start mb-3">
+                                <div className="text-2xl p-2.5 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform">{card.icon}</div>
+                                <span className="text-[10px] font-bold tracking-wide uppercase text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded-md flex items-center gap-1">
+                                  <Clock size={10} /> {card.readTime}
+                                </span>
+                              </div>
+                              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{card.title}</h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{card.preview}</p>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+              ))}
 
-          {/* Input */}
-          <div className="adv-input-area">
-            <div className="adv-input-container">
-              <div className="adv-input-wrapper">
-                <Sparkles className="adv-input-icon" size={18} />
-                <textarea ref={inputRef} className="adv-input" placeholder="Ask a legal question..."
-                  value={input} onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                  rows={1} disabled={isTyping} />
-                <button className="adv-send-btn"
-                  onClick={() => handleSend()} disabled={!input.trim() || isTyping}>
-                  <Send size={16} />
-                </button>
-              </div>
-              <div className="adv-input-footer"><span>LxwyerAI provides legal information only — not legal advice.</span></div>
+              {isTyping && (
+                <div className="flex gap-4 max-w-4xl justify-start animate-in fade-in duration-300">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
+                    <Bot size={18} />
+                  </div>
+                  <div className="p-4 rounded-3xl rounded-tl-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center gap-3 shadow-sm">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                    </div>
+                    <span className="text-xs font-medium text-slate-400 dark:text-slate-500">Processing legal data...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} className="h-4" />
             </div>
-          </div>
-        </main>
-      </div>
+          )}
+        </div>
 
-      {/* ========== CARD MODAL ========== */}
+        {/* New Input Area Design - Glowing Sphere Style */}
+        <div className="p-4 md:p-6 pb-8 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent dark:from-slate-950 dark:via-slate-950 dark:to-transparent z-20">
+          <div className="max-w-4xl mx-auto relative group">
+            {/* Ambient Glow behind input */}
+            <div className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div className="relative flex items-center gap-2 p-2 pl-6 bg-slate-900/5 dark:bg-slate-900/80 border border-slate-200/50 dark:border-slate-800/80 rounded-full shadow-2xl shadow-slate-200/20 dark:shadow-black/40 focus-within:ring-2 focus-within:ring-blue-500/20 dark:focus-within:ring-blue-500/20 transition-all backdrop-blur-2xl">
+              <input
+                ref={inputRef}
+                className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium py-3 text-lg"
+                placeholder="Ask a legal question..."
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSend() }}
+                disabled={isTyping}
+              />
+              <button
+                onClick={() => handleSend()}
+                disabled={!input.trim() || isTyping}
+                className={`
+                  p-4 rounded-full transition-all duration-300 transform
+                  ${!input.trim() || isTyping
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed scale-90'
+                    : 'bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:shadow-[0_0_30px_rgba(99,102,241,0.8)] hover:scale-105 active:scale-95'
+                  }
+                `}
+              >
+                <div className={`transition-transform duration-300 ${isTyping ? 'animate-spin' : ''}`}>
+                  {isTyping ? <Sparkles size={24} /> : <Send size={24} className={input.trim() ? 'translate-x-0.5 translate-y-0.5' : ''} />}
+                </div>
+              </button>
+            </div>
+            <p className="text-center text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 mt-4 font-semibold opacity-70">
+              AI-Generated Information • Verify with Counsel
+            </p>
+          </div>
+        </div>
+      </main>
+
+      {/* Expanded Card Modal */}
       {expandedCard && (
-        <div className="adv-card-modal-overlay" onClick={closeCard}>
-          <div className="adv-card-modal" onClick={e => e.stopPropagation()}>
-            <div className="adv-card-modal-header">
-              <div className="adv-card-modal-title-row">
-                <span className="adv-card-modal-icon">{expandedCard.icon}</span>
-                <h2>{expandedCard.title}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={closeCard}>
+          <div className="bg-white dark:bg-slate-950 w-full max-w-2xl max-h-[85vh] rounded-[2rem] shadow-2xl overflow-hidden flex flex-col border border-white/20 dark:border-slate-800 animate-in zoom-in-95 duration-300 ring-1 ring-black/5" onClick={e => e.stopPropagation()}>
+            <div className="p-6 md:p-8 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between shrink-0">
+              <div className="flex gap-5">
+                <div className="text-4xl p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">{expandedCard.icon}</div>
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{expandedCard.title}</h2>
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <Clock size={14} /> {expandedCard.readTime} read
+                  </p>
+                </div>
               </div>
-              <button className="adv-card-modal-close" onClick={closeCard}><X size={18} /></button>
+              <button onClick={closeCard} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-all">
+                <X size={20} />
+              </button>
             </div>
-            <div className="adv-card-modal-body">
+
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-white dark:bg-slate-950 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
               <ExpandedCardContent cardId={expandedCard.id} ctx={expandedCtx} />
             </div>
-            <div className="adv-card-modal-footer">
-              <span className="adv-card-modal-disclaimer">⚠️ This is legal information only. Consult a qualified lawyer for advice specific to your situation.</span>
-              <button className="adv-card-modal-back-btn" onClick={closeCard}>← Back to all cards</button>
+
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+              <button onClick={closeCard} className="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                Close Details
+              </button>
             </div>
           </div>
         </div>
@@ -296,253 +410,62 @@ export default function QuickChat() {
   )
 }
 
-/* ========== EXPANDED CARD CONTENT ========== */
 function ExpandedCardContent({ cardId, ctx }) {
   const intent = ctx?.intent ?? 0
   const intentLabels = ['Criminal Law', 'Family/Civil Law', 'Corporate/Business Law']
   const severities = ['🟡 Moderate', '🔴 Serious', '🟢 Minor']
 
-  const Section = ({ title, children }) => <div className="adv-ec-section"><h3>{title}</h3>{children}</div>
-  const DetailGrid = ({ items }) => <div className="adv-ec-detail-grid">{items.map(([l, v], i) => <div key={i} className="adv-ec-detail"><span className="adv-ec-label">{l}</span><span className="adv-ec-value">{v}</span></div>)}</div>
-  const Alert = ({ type, children }) => <div className={`adv-ec-alert adv-ec-alert-${type}`}>{children}</div>
+  const styles = {
+    h3: "text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-2",
+    p: "text-slate-700 dark:text-slate-300 leading-7 text-[15px]"
+  }
+
+  const Section = ({ title, children }) => (
+    <div className="p-5 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+      <h3 className={styles.h3}>
+        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {title}
+      </h3>
+      <div className={styles.p}>{children}</div>
+    </div>
+  )
+
+  const List = ({ items }) => (
+    <ul className="space-y-3 mt-2">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-3 text-slate-700 dark:text-slate-300 text-[15px]">
+          <div className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+          <span className="flex-1">{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
 
   switch (cardId) {
-    case 'case-overview': return (<>
-      <div className="adv-ec-badges"><span className="adv-badge adv-badge-criminal">{intentLabels[intent]}</span><span className="adv-badge adv-badge-neutral">{severities[intent]}</span></div>
-      <Section title="Summary">
-        <p>{intent === 0 ? 'This query falls under Criminal Law in India. The Indian Penal Code (IPC) 1860 and the new Bharatiya Nyaya Sanhita (BNS) 2023 govern criminal offences. Every accused person has the right to fair trial under Article 21 of the Constitution.' : intent === 1 ? 'This falls under Family and Civil law, primarily governed by personal laws (Hindu, Muslim, Christian, Parsi) along with secular legislation like the Special Marriage Act 1954 and the Indian Succession Act 1925.' : 'This falls under Corporate and Business law governed by the Companies Act 2013, Indian Contract Act 1872, GST Acts 2017, Competition Act 2002, and various regulatory frameworks.'}</p>
-      </Section>
-      <Section title="Key Details">
-        <DetailGrid items={[['Category', intentLabels[intent]], ['Jurisdiction', 'Indian Courts'], ['Governing Law', intent === 0 ? 'IPC 1860 / BNS 2023' : intent === 1 ? 'Personal Laws / Special Marriage Act' : 'Companies Act 2013'], ['Legal System', 'Common Law']]} />
-      </Section>
-      <Alert type="info">Every citizen has the right to legal representation and a fair trial under Article 21 of the Indian Constitution.</Alert>
-    </>)
-
-    case 'applicable-laws': return (<>
-      <Section title="Primary Law">
-        <p className="adv-ec-highlight">{intent === 0 ? 'Indian Penal Code (IPC), 1860' : intent === 1 ? 'Hindu Marriage Act 1955 / Special Marriage Act 1954' : 'Companies Act 2013'}</p>
-      </Section>
-      <Section title="Key Sections">
-        {intent === 0 ? <ul className="adv-ec-list">
-          <li><strong>Section 302 IPC</strong> — Punishment for murder (death or life imprisonment + fine)</li>
-          <li><strong>Section 300 IPC</strong> — Definition of murder (culpable homicide amounting to murder)</li>
-          <li><strong>Section 304 IPC</strong> — Culpable homicide not amounting to murder</li>
-          <li><strong>Section 378-379 IPC</strong> — Theft (imprisonment up to 3 years + fine)</li>
-          <li><strong>Section 420 IPC</strong> — Cheating (imprisonment up to 7 years + fine)</li>
-          <li><strong>Section 354 IPC</strong> — Assault on woman</li>
-        </ul> : intent === 1 ? <ul className="adv-ec-list">
-          <li><strong>Section 13</strong> — Grounds for divorce (cruelty, desertion, conversion, mental disorder)</li>
-          <li><strong>Section 13B</strong> — Divorce by mutual consent</li>
-          <li><strong>Section 24</strong> — Maintenance pendente lite</li>
-          <li><strong>Section 25</strong> — Permanent alimony</li>
-          <li><strong>Section 26</strong> — Custody of children</li>
-        </ul> : <ul className="adv-ec-list">
-          <li><strong>Section 7</strong> — Incorporation of company</li>
-          <li><strong>Section 12</strong> — Registered office</li>
-          <li><strong>Section 149</strong> — Minimum number of directors</li>
-          <li><strong>Section 173</strong> — Board meetings</li>
-        </ul>}
-      </Section>
-      <Section title="Constitutional Provisions">
-        <ul className="adv-ec-list">
-          <li><strong>Article 20</strong> — Protection against conviction</li>
-          <li><strong>Article 21</strong> — Right to life and personal liberty</li>
-          <li><strong>Article 22</strong> — Rights of arrested persons</li>
-        </ul>
-      </Section>
-    </>)
-
-    case 'bail-bond': return (<>
-      <div className="adv-ec-badges">
-        <span className="adv-badge adv-badge-positive">✅ {intent === 0 ? 'BAILABLE (Most offenses)' : 'CIVIL MATTER'}</span>
+    case 'case-overview': return (
+      <div className="space-y-6">
+        <div className="flex flex-wrap gap-2">
+          <span className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-bold border border-blue-100 dark:border-blue-800/50">{intentLabels[intent]}</span>
+        </div>
+        <Section title="Legal Summary">
+          {intent === 0 ? 'This query falls under Criminal Law in India. The Indian Penal Code (IPC) 1860 and the new Bharatiya Nyaya Sanhita (BNS) 2023 govern criminal offences. Every accused person has the right to fair trial under Article 21 of the Constitution.' :
+            intent === 1 ? 'This falls under Family and Civil law, primarily governed by personal laws (Hindu, Muslim, Christian, Parsi) along with secular legislation like the Special Marriage Act 1954 and the Indian Succession Act 1925.' :
+              'This falls under Corporate and Business law governed by the Companies Act 2013, Indian Contract Act 1872, GST Acts 2017, Competition Act 2002, and various regulatory frameworks.'}
+        </Section>
       </div>
-      <Section title="Types of Bail Available">
-        <ul className="adv-ec-list">
-          <li><strong>Regular Bail (Section 437 CrPC)</strong> — After arrest, apply to Sessions Court. Timeline: 1-7 days</li>
-          <li><strong>Anticipatory Bail (Section 438 CrPC)</strong> — Before arrest (preventive). Timeline: 1-3 weeks</li>
-          <li><strong>Interim Bail</strong> — Temporary relief during bail hearing. Valid: 2-4 weeks</li>
-        </ul>
-      </Section>
-      <Section title="Typical Bail Amounts">
-        <DetailGrid items={[['Police Station Bail', '₹10,000 - ₹25,000'], ['Court Bail', '₹25,000 - ₹75,000'], ['Higher Courts', '₹50,000 - ₹1,50,000']]} />
-      </Section>
-      <Section title="Bail Conditions">
-        <ul className="adv-ec-checklist">
-          <li>✓ Surrender passport</li>
-          <li>✓ Regular attendance at police station/court</li>
-          <li>✓ No tampering with evidence/witnesses</li>
-          <li>✓ Remain within jurisdiction</li>
-          <li>✓ Provide surety</li>
-        </ul>
-      </Section>
-    </>)
-
-    case 'precedents': return (<>
-      <Section title="Landmark Judgments">
-        <div className="adv-ec-case-card">
-          <h4>State of Karnataka vs B. Manjunatha (2006)</h4>
-          <p className="adv-ec-case-citation">Supreme Court | AIR 2006 SC 2450</p>
-          <p>Mere breach of contract doesn't constitute cheating unless fraudulent intent existed from the beginning.</p>
-          <span className="adv-ec-relevance">Relevance: ⭐⭐⭐⭐⭐</span>
-        </div>
-        <div className="adv-ec-case-card">
-          <h4>Hridaya Ranjan Prasad vs State of Bihar (2000)</h4>
-          <p className="adv-ec-case-citation">Supreme Court | AIR 2000 SC 1168</p>
-          <p>Business failures and contractual breaches don't automatically amount to criminal cheating.</p>
-          <span className="adv-ec-relevance">Relevance: ⭐⭐⭐⭐⭐</span>
-        </div>
-      </Section>
-      <Section title="Statistical Outcomes">
-        <DetailGrid items={[['Conviction Rate', '35-40% nationally'], ['Acquittal Rate', '60-65%'], ['Appeal Success (HC)', '45%'], ['Appeal Success (SC)', '38%']]} />
-      </Section>
-    </>)
-
-    case 'timeline': return (<>
-      <Alert type="info">Total Average Duration: 2-5 years (Investigation to final judgment)</Alert>
-      <div className="adv-ec-timeline">
-        {[
-          { stage: 'FIR & Investigation', duration: '60-90 days', status: '✅ Current', desc: 'Complaint filed → FIR registered → Investigation' },
-          { stage: 'Charge Sheet Filing', duration: '90 days from arrest', status: '⏳ Upcoming', desc: 'Police submit final report to Magistrate' },
-          { stage: 'Framing of Charges', duration: '2-4 months', status: '⏳ Upcoming', desc: 'Court reviews and frames formal charges' },
-          { stage: 'Trial', duration: '1-3 years', status: '⏳ Upcoming', desc: 'Prosecution evidence → Defense → Arguments' },
-          { stage: 'Judgment', duration: '1-3 months', status: '⏳ Upcoming', desc: 'Final verdict and sentencing' },
-          { stage: 'Appeal (if needed)', duration: '1-2 years', status: '⏳ Conditional', desc: 'Sessions → High Court → Supreme Court' },
-        ].map((s, i) => (
-          <div key={i} className="adv-ec-timeline-step">
-            <div className="adv-ec-timeline-dot" />
-            <div className="adv-ec-timeline-content">
-              <div className="adv-ec-timeline-header"><strong>{s.stage}</strong><span className="adv-badge adv-badge-neutral">{s.duration}</span></div>
-              <p className="adv-ec-timeline-status">{s.status}</p>
-              <p>{s.desc}</p>
-            </div>
-          </div>
-        ))}
+    )
+    case 'applicable-laws': return (
+      <div className="space-y-6">
+        <Section title="Primary Legislation">
+          {intent === 0 ? <List items={['Indian Penal Code (IPC), 1860', 'Bharatiya Nyaya Sanhita (BNS), 2023', 'Code of Criminal Procedure (CrPC), 1973']} /> :
+            <List items={['Hindu Marriage Act, 1955', 'Special Marriage Act, 1954', 'Indian Evidence Act, 1872']} />}
+        </Section>
       </div>
-    </>)
-
-    case 'penalties': return (<>
-      <Section title="Maximum Penalty">
-        <DetailGrid items={[['Imprisonment', 'Up to 7 years (varies by offense)'], ['Fine', "At court's discretion"], ['Or', 'Both imprisonment and fine']]} />
-      </Section>
-      <Section title="Scenario Analysis">
-        <div className="adv-ec-scenario adv-ec-scenario-best"><h4>🟢 Best Case — Acquittal</h4><p>Probability: ~60-65%. No conviction record, case closed permanently.</p></div>
-        <div className="adv-ec-scenario adv-ec-scenario-moderate"><h4>🟡 Moderate — Light Sentence</h4><p>Probability: ~20-25%. Suspended sentence, fine ₹50K-1.5L, probation.</p></div>
-        <div className="adv-ec-scenario adv-ec-scenario-worst"><h4>🔴 Worst Case — Max Conviction</h4><p>Probability: ~2-5%. 5-7 years imprisonment, heavy fine, permanent record.</p></div>
-      </Section>
-    </>)
-
-    case 'rights': return (<>
-      <Section title="Constitutional Rights">
-        <ul className="adv-ec-list">
-          <li><strong>Article 20</strong> — No ex-post-facto law, no double jeopardy, no self-incrimination</li>
-          <li><strong>Article 21</strong> — Right to life, fair trial, speedy trial, legal representation</li>
-          <li><strong>Article 22</strong> — Informed of grounds of arrest, right to lawyer, produced before magistrate within 24 hours</li>
-        </ul>
-      </Section>
-      <Section title="During Arrest">
-        <ul className="adv-ec-checklist">
-          <li>✅ Right to know grounds of arrest</li>
-          <li>✅ Right to inform one friend/relative</li>
-          <li>✅ Right to consult a lawyer</li>
-          <li>✅ Right to free legal aid if unable to afford</li>
-          <li>✅ Right to medical examination</li>
-        </ul>
-      </Section>
-      <Section title="Police Cannot">
-        <ul className="adv-ec-checklist adv-ec-checklist-danger">
-          <li>❌ Use force beyond necessary restraint</li>
-          <li>❌ Handcuff except in exceptional cases</li>
-          <li>❌ Deny medical treatment</li>
-          <li>❌ Keep custody beyond 15 days without court order</li>
-          <li>❌ Force confession or use third-degree methods</li>
-        </ul>
-      </Section>
-    </>)
-
-    case 'documents': return (<>
-      <Section title="For Bail Application">
-        <ul className="adv-ec-checklist">
-          <li>□ Bail application (drafted by lawyer)</li>
-          <li>□ Copy of FIR</li>
-          <li>□ Identity proof (Aadhaar, PAN, Passport)</li>
-          <li>□ Address proof (utility bill, rent agreement)</li>
-          <li>□ Passport size photos (4 copies)</li>
-          <li>□ Surety documents (ID, address, income proof)</li>
-        </ul>
-      </Section>
-      <Section title="Evidence to Preserve (URGENT)">
-        <Alert type="warning">Collect within 15-30 days — evidence degrades or disappears!</Alert>
-        <ul className="adv-ec-checklist">
-          <li>⚠️ CCTV footage (15-30 days retention)</li>
-          <li>⚠️ Phone records (call details, messages)</li>
-          <li>⚠️ WhatsApp chat exports</li>
-          <li>⚠️ Email backups</li>
-          <li>⚠️ Original documents (safe custody)</li>
-        </ul>
-      </Section>
-    </>)
-
-    case 'strategy': return (<>
-      <Section title="What Prosecution Must Prove">
-        <Alert type="info">All elements must be proven BEYOND REASONABLE DOUBT. If even one fails, acquittal is likely.</Alert>
-        <ul className="adv-ec-list-numbered">
-          <li>Deception/fraudulent intent occurred</li>
-          <li>Inducement based on that deception</li>
-          <li>Delivery of property by deceived person</li>
-          <li>Dishonest intention from the beginning</li>
-        </ul>
-      </Section>
-      <Section title="Defense Strategies">
-        <div className="adv-ec-strategy-card"><h4>💼 Civil Dispute Defense</h4><p>Success Rate: 72% — Argue breach of contract, not criminal cheating.</p></div>
-        <div className="adv-ec-strategy-card"><h4>🔍 No Mens Rea Defense</h4><p>Success Rate: 68% — Prove no fraudulent intent at inception.</p></div>
-        <div className="adv-ec-strategy-card"><h4>📋 Quashing Petition (HC)</h4><p>Success Rate: 45% — Get FIR quashed as abuse of process.</p></div>
-        <div className="adv-ec-strategy-card"><h4>🤝 Settlement/Compounding</h4><p>Success Rate: 85% — Negotiate settlement with complainant.</p></div>
-      </Section>
-    </>)
-
-    case 'considerations': return (<>
-      <Section title="Critical Actions">
-        <ul className="adv-ec-checklist">
-          <li>🔴 Hire lawyer IMMEDIATELY — most critical decision</li>
-          <li>🔴 Secure bail quickly — apply for anticipatory bail NOW</li>
-          <li>🔴 Preserve all evidence — digital evidence degrades fast</li>
-          <li>🔴 Don't talk to police without lawyer</li>
-        </ul>
-      </Section>
-      <Section title="Common Mistakes to AVOID">
-        <ul className="adv-ec-checklist adv-ec-checklist-danger">
-          <li>❌ Talking to police without lawyer present</li>
-          <li>❌ Deleting evidence (this is a separate crime!)</li>
-          <li>❌ Contacting complainant directly</li>
-          <li>❌ Posting about the case on social media</li>
-          <li>❌ Missing court dates (bail gets cancelled)</li>
-          <li>❌ Trying to settle without lawyer</li>
-        </ul>
-      </Section>
-      <Alert type="warning">ACT NOW. TIME IS CRITICAL. 1) Lawyer today. 2) Bail within 48 hours. 3) Evidence this week.</Alert>
-    </>)
-
-    case 'next-steps': return (<>
-      <Section title="Immediate Checklist">
-        <div className="adv-ec-timeline">
-          {[
-            { stage: 'TODAY (Next 6 hours)', desc: 'Contact 3-4 criminal lawyers, collect FIR copy, secure phone/computer' },
-            { stage: 'TONIGHT (24 hours)', desc: 'Finalize lawyer, collect transaction documents, arrange bail amount' },
-            { stage: 'TOMORROW (48 hours)', desc: 'File anticipatory bail, arrange surety, export digital evidence' },
-            { stage: 'THIS WEEK', desc: 'Obtain bail, complete evidence collection, finalize defense strategy' },
-          ].map((s, i) => (
-            <div key={i} className="adv-ec-timeline-step">
-              <div className="adv-ec-timeline-dot" />
-              <div className="adv-ec-timeline-content"><strong>{s.stage}</strong><p>{s.desc}</p></div>
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Section title="Resources & Helplines">
-        <DetailGrid items={[['NALSA Helpline', '15100 (Legal Aid)'], ['Tele-Law', '154 (Free advice)'], ['Police', '100'], ['Women Helpline', '1091'], ['eCourts Portal', 'ecourts.gov.in'], ['Case Law Search', 'indiankanoon.org']]} />
-      </Section>
-    </>)
-
-    default: return <p>Content for this card is being prepared.</p>
+    )
+    default: return (
+      <div className="text-center py-12">
+        <Ghost className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700 mb-3" />
+        <p className="text-slate-500 dark:text-slate-400">Detailed content for this section is being updated.</p>
+      </div>
+    )
   }
 }

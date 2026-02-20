@@ -14,18 +14,18 @@ export default function LawyerLoginPage() {
     password: ''
   });
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const payload = { email: formData.email, password: formData.password, user_type: 'lawyer' };
       const response = await axios.post(`${API}/auth/login`, payload);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
+
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
       toast.success('Welcome back!');
       navigate('/lawyer-dashboard');
     } catch (error) {
@@ -34,7 +34,7 @@ export default function LawyerLoginPage() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black flex flex-col">
       {/* Navigation Bar */}
@@ -61,7 +61,7 @@ export default function LawyerLoginPage() {
           backgroundSize: '40px 40px'
         }} />
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,13 +75,13 @@ export default function LawyerLoginPage() {
             </div>
             <span className="text-2xl font-bold text-white">Lxwyer Up</span>
           </Link>
-          
+
           <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-2xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white mb-2">Lawyer Login</h2>
               <p className="text-slate-400">Access your professional dashboard</p>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <CorporateInput
                 label="Email Address"
@@ -93,7 +93,7 @@ export default function LawyerLoginPage() {
                 icon={Mail}
                 required
               />
-              
+
               <CorporateInput
                 label="Password"
                 type="password"
@@ -104,7 +104,7 @@ export default function LawyerLoginPage() {
                 icon={Lock}
                 required
               />
-              
+
               <CorporateButton
                 type="submit"
                 variant="primary"
@@ -119,7 +119,7 @@ export default function LawyerLoginPage() {
                 )}
               </CorporateButton>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-slate-400">
                 Not registered yet?{' '}
@@ -128,7 +128,7 @@ export default function LawyerLoginPage() {
                 </Link>
               </p>
             </div>
-            
+
             <div className="mt-4 text-center">
               <Link to="/role-selection?mode=login" className="text-slate-500 hover:text-slate-400 text-sm transition-colors">
                 Login as different role

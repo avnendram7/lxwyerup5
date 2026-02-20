@@ -13,23 +13,23 @@ export default function LawFirmLawyerLogin() {
     password: ''
   });
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const payload = { 
-        email: formData.email, 
-        password: formData.password, 
-        user_type: 'firm_lawyer' 
+      const payload = {
+        email: formData.email,
+        password: formData.password,
+        user_type: 'firm_lawyer'
       };
       const response = await axios.post(`${API}/firm-lawyers/login`, payload);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('userRole', 'firm_lawyer');
-      
+
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('userRole', 'firm_lawyer');
+
       toast.success('Welcome back!');
       navigate('/firm-lawyer-dashboard');
     } catch (error) {
@@ -38,7 +38,7 @@ export default function LawFirmLawyerLogin() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
       {/* Navigation Bar */}
@@ -58,7 +58,7 @@ export default function LawFirmLawyerLogin() {
           <span>Home</span>
         </button>
       </nav>
-      
+
       <div className="flex-1 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -72,13 +72,13 @@ export default function LawFirmLawyerLogin() {
             </div>
             <span className="text-2xl font-bold text-[#0F2944]">Lxwyer Up</span>
           </Link>
-          
+
           <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-[#0F2944] mb-2">Firm Lawyer Login</h2>
               <p className="text-gray-500">Access your firm workspace</p>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
@@ -95,7 +95,7 @@ export default function LawFirmLawyerLogin() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                 <div className="relative">
@@ -111,7 +111,7 @@ export default function LawFirmLawyerLogin() {
                   />
                 </div>
               </div>
-              
+
               <button
                 type="submit"
                 disabled={loading}
@@ -125,7 +125,7 @@ export default function LawFirmLawyerLogin() {
                 )}
               </button>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-gray-500">
                 Not registered yet?{' '}
@@ -134,7 +134,7 @@ export default function LawFirmLawyerLogin() {
                 </Link>
               </p>
             </div>
-            
+
             <div className="mt-4 text-center">
               <Link to="/login" className="text-gray-400 hover:text-gray-600 text-sm transition-colors">
                 Back to login options

@@ -92,11 +92,12 @@ export default function JoinLawFirmWithSignup() {
       const response = await axios.post(`${API}/firm-clients/register-paid`, clientPayload);
 
       // Store token
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('userRole', 'firm_client');
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('userRole', 'firm_client');
 
-      toast.success('Account created and payment successful!');
+      toast.success('Successfully joined firm!');
+      navigate('/firm-lawyer-dashboard');
       setStep(4); // Success
 
     } catch (error) {

@@ -65,15 +65,23 @@ async def approve_lawyer_application(app_id: str, admin: dict = Depends(get_admi
         if application.get('status') != 'pending':
             raise HTTPException(status_code=400, detail='Application already processed')
         
+        # Create lawyer user account
+        from services.id_generator import generate_unique_id
+        unique_id = await generate_unique_id('lawyer')
+
         # Update application status
         await db.lawyer_applications.update_one(
             {'_id': ObjectId(app_id)},
-            {'$set': {'status': 'approved'}}
+            {'$set': {'status': 'approved', 'unique_id': unique_id}}
         )
         
         # Create lawyer user account
+        from services.id_generator import generate_unique_id
+        unique_id = await generate_unique_id('lawyer')
+
         user_data = {
             'id': str(uuid.uuid4()),
+            'unique_id': unique_id,
             'email': application['email'],
             'password': application.get('password_hash') or application.get('password'),
             'full_name': application.get('full_name') or application.get('name'),
@@ -96,7 +104,9 @@ async def approve_lawyer_application(app_id: str, admin: dict = Depends(get_admi
             'bio': application.get('bio', 'Experienced lawyer'),
             'office_address': application.get('office_address'),
             'rating': 4.5,
-            'is_verified': True
+            'is_verified': True,
+            'practice_start_date': application.get('practice_start_date'),
+            'education_details': application.get('education_details')
         }
         
         await db.users.insert_one(user_data)
@@ -162,15 +172,19 @@ async def approve_lawfirm_application(app_id: str, admin: dict = Depends(get_adm
     if application.get('status') != 'pending':
         raise HTTPException(status_code=400, detail='Application already processed')
     
+    # Create law firm user account
+    from services.id_generator import generate_unique_id
+    unique_id = await generate_unique_id('law_firm')
+
     # Update application status
     await db.lawfirm_applications.update_one(
         {'_id': ObjectId(app_id)},
-        {'$set': {'status': 'approved'}}
+        {'$set': {'status': 'approved', 'unique_id': unique_id}}
     )
-    
-    # Create law firm user account
+
     user_data = {
         'id': str(uuid.uuid4()),
+        'unique_id': unique_id,
         'email': application['contact_email'],
         'password_hash': application['password_hash'],
         'full_name': application['contact_name'],

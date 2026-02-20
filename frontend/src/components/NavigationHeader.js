@@ -13,7 +13,7 @@ import { useState } from 'react';
  * @param {boolean} transparent - Transparent background (default: false)
  * @param {string} variant - 'dark' | 'light' (default: 'dark')
  */
-export default function NavigationHeader({ 
+export default function NavigationHeader({
   title,
   backPath,
   showBack = true,
@@ -25,6 +25,14 @@ export default function NavigationHeader({
 }) {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleBack = () => {
     if (backPath) {
@@ -39,21 +47,21 @@ export default function NavigationHeader({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    navigate('/login');
   };
 
-  const bgClass = transparent 
-    ? 'bg-transparent' 
-    : variant === 'dark' 
-      ? 'bg-black border-b border-slate-800' 
+  const bgClass = transparent
+    ? 'bg-transparent'
+    : variant === 'dark'
+      ? 'bg-black border-b border-slate-800'
       : 'bg-white border-b border-gray-200';
 
   const textClass = variant === 'dark' ? 'text-white' : 'text-gray-900';
   const subTextClass = variant === 'dark' ? 'text-slate-400' : 'text-gray-600';
-  const buttonClass = variant === 'dark' 
-    ? 'text-slate-400 hover:text-white hover:bg-slate-800' 
+  const buttonClass = variant === 'dark'
+    ? 'text-slate-400 hover:text-white hover:bg-slate-800'
     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100';
 
   return (
@@ -71,8 +79,8 @@ export default function NavigationHeader({
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            
-            <button 
+
+            <button
               onClick={handleHome}
               className={`flex items-center space-x-3 ${textClass} hover:opacity-80 transition-opacity`}
             >
@@ -104,7 +112,7 @@ export default function NavigationHeader({
                   <span className="text-sm">Home</span>
                 </button>
               )}
-              
+
               {showLogout && (
                 <button
                   onClick={handleLogout}
@@ -136,7 +144,7 @@ export default function NavigationHeader({
                   {title}
                 </div>
               )}
-              
+
               {showHome && (
                 <button
                   onClick={() => { handleHome(); setMobileMenuOpen(false); }}
@@ -146,7 +154,7 @@ export default function NavigationHeader({
                   <span>Home</span>
                 </button>
               )}
-              
+
               {showBack && (
                 <button
                   onClick={() => { handleBack(); setMobileMenuOpen(false); }}
@@ -156,7 +164,7 @@ export default function NavigationHeader({
                   <span>Go Back</span>
                 </button>
               )}
-              
+
               {showLogout && (
                 <button
                   onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
@@ -179,7 +187,7 @@ export default function NavigationHeader({
  */
 export function BackButton({ path, label = 'Back', variant = 'dark', className = '' }) {
   const navigate = useNavigate();
-  
+
   const handleClick = () => {
     if (path) {
       navigate(path);
@@ -208,7 +216,7 @@ export function BackButton({ path, label = 'Back', variant = 'dark', className =
  */
 export function Breadcrumb({ items, variant = 'dark' }) {
   const navigate = useNavigate();
-  
+
   const textClass = variant === 'dark' ? 'text-slate-400' : 'text-gray-500';
   const activeClass = variant === 'dark' ? 'text-white' : 'text-gray-900';
   const hoverClass = variant === 'dark' ? 'hover:text-white' : 'hover:text-gray-900';
@@ -221,7 +229,7 @@ export function Breadcrumb({ items, variant = 'dark' }) {
       >
         <Home className="w-4 h-4" />
       </button>
-      
+
       {items.map((item, index) => (
         <React.Fragment key={index}>
           <span className={textClass}>/</span>

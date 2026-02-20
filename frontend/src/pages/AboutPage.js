@@ -26,7 +26,7 @@ const AboutPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden font-['Outfit']">
+    <div className="min-h-screen bg-white dark:bg-slate-950 relative overflow-hidden font-['Outfit']">
       <GradientOrbs />
       <NavbarWave />
 
@@ -65,18 +65,18 @@ const AboutHero = ({ fadeInUp }) => {
           variants={fadeInUp}
         >
           <motion.h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             Making Legal Services
             <br />
-            <span className="text-slate-600">Accessible to All Indians</span>
+            <span className="text-slate-600 dark:text-slate-400">Accessible to All Indians</span>
           </motion.h1>
 
           <motion.p
-            className="text-xl sm:text-2xl text-slate-600 max-w-3xl mx-auto font-light"
+            className="text-xl sm:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -95,7 +95,7 @@ const MissionVision = ({ fadeInUp }) => {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 relative z-10 bg-white/80 backdrop-blur-md border border-slate-200 shadow-2xl m-4 rounded-3xl animate-float">
+    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 relative z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-2xl m-4 rounded-3xl animate-float">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
@@ -126,9 +126,9 @@ const MissionVision = ({ fadeInUp }) => {
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
                   <Target className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900">Our Mission</h2>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Our Mission</h2>
               </div>
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
                 To democratize access to legal services in India by leveraging technology to connect citizens with qualified lawyers, provide transparent pricing, and simplify complex legal processes through AI-powered assistance.
               </p>
             </div>
@@ -138,9 +138,9 @@ const MissionVision = ({ fadeInUp }) => {
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
                   <Eye className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900">Our Vision</h2>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Our Vision</h2>
               </div>
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
                 A future where every Indian has immediate access to affordable, quality legal assistance—transforming the legal system into a transparent, efficient, and citizen-friendly service powered by cutting-edge technology.
               </p>
             </div>
@@ -180,7 +180,7 @@ const WhyWeExist = ({ fadeInUp, staggerContainer }) => {
   ];
 
   return (
-    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50 backdrop-blur-sm">
+    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
@@ -188,10 +188,10 @@ const WhyWeExist = ({ fadeInUp, staggerContainer }) => {
           variants={fadeInUp}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Why We Exist
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
             The traditional legal system in India faces significant challenges that prevent ordinary citizens from accessing justice
           </p>
         </motion.div>
@@ -206,13 +206,13 @@ const WhyWeExist = ({ fadeInUp, staggerContainer }) => {
             <motion.div
               key={index}
               variants={fadeInUp}
-              className="bg-white/80 backdrop-blur-md p-8 rounded-2xl border border-slate-200 hover:shadow-xl transition-all duration-300"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300"
             >
               <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-blue-600/20">
                 <problem.icon className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{problem.title}</h3>
-              <p className="text-slate-600">{problem.description}</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{problem.title}</h3>
+              <p className="text-slate-600 dark:text-slate-300">{problem.description}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -253,10 +253,10 @@ const OurApproach = ({ fadeInUp }) => {
           variants={fadeInUp}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Our Approach
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Combining technology, ethics, and client-centric values to revolutionize legal services
           </p>
         </motion.div>
@@ -268,11 +268,11 @@ const OurApproach = ({ fadeInUp }) => {
               initial={{ opacity: 0, y: 50 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="relative bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-slate-100"
+              className="relative bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-8 rounded-3xl border border-slate-100 dark:border-slate-700"
             >
-              <div className="text-6xl font-bold text-blue-100 mb-4">{approach.number}</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">{approach.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{approach.description}</p>
+              <div className="text-6xl font-bold text-blue-100 dark:text-blue-900/50 mb-4">{approach.number}</div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{approach.title}</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{approach.description}</p>
             </motion.div>
           ))}
         </div>
@@ -287,7 +287,7 @@ const TrustSection = ({ fadeInUp }) => {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+    <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/50 dark:bg-slate-900/50">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
@@ -295,10 +295,10 @@ const TrustSection = ({ fadeInUp }) => {
           variants={fadeInUp}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Built on Trust & Credibility
           </h2>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-slate-600 dark:text-slate-400">
             Professional, verified, and committed to excellence
           </p>
         </motion.div>

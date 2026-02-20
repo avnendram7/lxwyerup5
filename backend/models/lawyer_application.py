@@ -25,6 +25,8 @@ class LawyerApplicationCreate(BaseModel):
     lawyer_type: str = 'independent'  # independent, law_firm
     law_firm_id: Optional[str] = None
     law_firm_name: Optional[str] = None
+    practice_start_date: Optional[str] = None
+    education_details: Optional[dict] = None
 
 
 class LawyerApplication(BaseModel):
@@ -51,6 +53,8 @@ class LawyerApplication(BaseModel):
     lawyer_type: str = 'independent'
     law_firm_id: Optional[str] = None
     law_firm_name: Optional[str] = None
+    practice_start_date: Optional[str] = None
+    education_details: Optional[dict] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
