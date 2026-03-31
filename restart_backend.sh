@@ -18,7 +18,7 @@ fi
 echo ""
 echo "Stopping existing backend processes..."
 # Find and kill the process
-pids=$(ps aux | grep "uvicorn backend.server:app" | grep -v grep | awk '{print $2}')
+pids=$(ps aux | grep "uvicorn backend.main:app" | grep -v grep | awk '{print $2}')
 if [ -z "$pids" ]; then
     echo "No running backend found."
 else
@@ -34,7 +34,7 @@ echo "Starting backend server..."
 # But since this is a one-shot agent, `run_command` with background might be better.
 # However, for a shell script, I'll use nohup.
 
-nohup python3 -m uvicorn backend.server:app --reload --host 0.0.0.0 --port 8000 > backend/server.log 2>&1 &
+nohup python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 > backend/main.log 2>&1 &
 NEW_PID=$!
 
 echo "Backend started with PID $NEW_PID"
