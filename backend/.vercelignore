@@ -1,15 +1,23 @@
 # Exclude dev/full requirements files — Vercel should only use requirements.txt
 reqs2.txt
 
-# Exclude local DB data, logs, and test files
+# CRITICAL: Exclude the local emergentintegrations stub folder.
+# This is a LOCAL Python package stub (not on PyPI). If Vercel's uv resolver
+# sees this directory, it tries to install 'emergentintegrations' from PyPI and fails.
+emergentintegrations/
+
+# Exclude local DB data, logs, test files, and temporary data
 db_data/
 *.log
 venv/
 __pycache__/
 *.pyc
 *.pyo
+*.pyo
+*.pyd
+*.egg-info/
 
-# Exclude dev/test scripts
+# Exclude dev/test scripts (not needed at runtime)
 test_*.py
 seed_*.py
 check_*.py
@@ -19,6 +27,13 @@ ensure_admin.py
 add_pending_lawfirm.py
 undo_seed_*.py
 update_notifications.py
+legal_assistant_api.py
+main_assistant_copied.py
 
 # Exclude large static assets not needed at runtime
 uploads/
+node_modules/
+
+# Exclude local backup files
+*.bak
+server.py.bak
