@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
-
+import { useLang } from '../context/LanguageContext';
 /* ─── Signup Form ─────────────────────────────────────────── */
 const VisionaryForm = memo(function VisionaryForm() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', role: '', message: '' });
@@ -97,6 +97,7 @@ const VisionaryForm = memo(function VisionaryForm() {
 
 /* ─── Main ────────────────────────────────────────────────── */
 export default function RevolutionisingSoon() {
+  const { t } = useLang();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
@@ -150,15 +151,15 @@ export default function RevolutionisingSoon() {
     };
   }, []);
 
-  const goDemo = () => { 
+  const goDemo = () => {
     if (transitioning) return;
     setTransitioning(true);
     // Start the triangle zoom animation after a short delay (let overlay appear first)
     setTimeout(() => setTrianglePhase('zoom'), 50);
     // Navigate to /home after the triangle animation completes (~2.2s)
     setTimeout(() => {
-        sessionStorage.setItem('fromLanding', 'true');
-        navigate('/home');
+      sessionStorage.setItem('fromLanding', 'true');
+      navigate('/home');
     }, 2200);
   };
 
@@ -264,7 +265,7 @@ export default function RevolutionisingSoon() {
           SECTION 1 — HERO
       ══════════════════════════════════════ */}
       <section
-        style={{ position:'relative', width:'100%', height:'100dvh', background:'#000', overflow:'hidden', cursor:'default' }}
+        style={{ position: 'relative', width: '100%', height: '100dvh', background: '#000', overflow: 'hidden', cursor: 'default' }}
         onMouseMove={onMouseMove}
       >
 
@@ -326,13 +327,12 @@ export default function RevolutionisingSoon() {
 
         {/* Center foreground — minimal text stack */}
         {/* Top brand bar — always visible, anchors the page */}
-        <div style={{
+        <div className="w-full mx-auto px-4 md:px-6 xl:px-12" style={{
           position: 'absolute', top: 0, left: 0, right: 0, zIndex: 11,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '1.25rem 1.5rem',
+          height: '3.5rem',
         }}>
-          <span style={{
-            fontSize: '1rem', fontWeight: 800, letterSpacing: '-0.02em',
+          <span className="text-base md:text-lg font-bold tracking-tight select-none" style={{
             fontFamily: "'Outfit','Inter',sans-serif",
             color: '#fff', opacity: 0.85,
           }}>Lxwyer Up</span>
@@ -343,82 +343,56 @@ export default function RevolutionisingSoon() {
           }}>Legal Tech Platform</span>
         </div>
 
-        {/* Center content — perfectly centered vertically */}
-        <div style={{
-          position:'absolute', inset:0, zIndex:10,
-          display:'flex', flexDirection:'column',
-          alignItems:'center', justifyContent:'center',
-          textAlign:'center',
-          padding:'0 1.5rem',
-          gap:0,
-        }}>
-
-          {/* COMING SOON + Mirror reflection block */}
-          <div style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center' }}>
+        {/* Center content — perfectly anchored so 'Coming Soon' sits exactly at the 50% vertical center */}
+        <div className="absolute inset-x-0 z-10 flex flex-col items-center text-center px-6 top-[50%] transform -translate-y-[60px] md:-translate-y-[80px]">
+          {/* COMING SOON block */}
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
             {/* Primary COMING SOON text */}
             <h1 style={{
-              fontSize:'clamp(2.4rem, 6vw, 6rem)',
-              fontWeight:900,
+              fontSize: 'clamp(2.5rem, 7vw, 6rem)',
+              fontWeight: 900,
               letterSpacing: mounted ? '-0.02em' : '0.12em',
               filter: mounted ? 'blur(0px)' : 'blur(12px)',
               transform: mounted ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.96)',
               opacity: mounted ? 1 : 0,
               transition: 'all 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s',
-              lineHeight:1,
-              textTransform:'uppercase',
-              color:'#ffffff',
-              margin:0,
-              padding:0,
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              color: '#ffffff',
+              margin: 0,
+              padding: 0,
             }}>Coming Soon</h1>
 
-            {/* Thin divider line — mirror horizon */}
+            {/* Subtle underline instead of reflection */}
             <div style={{
-              width:'100%',
-              height:'1px',
-              background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.12),rgba(37,99,235,0.35),rgba(255,255,255,0.12),transparent)',
-              marginTop:'clamp(4px,1vw,8px)',
+              width: '120px',
+              height: '3px',
+              borderRadius: '3px',
+              background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.8), transparent)',
+              marginTop: '1.5rem',
               opacity: mounted ? 1 : 0,
-              transition: 'opacity 1.2s ease 0.8s',
+              transition: 'opacity 1.2s ease 0.8s, transform 1.2s ease 0.8s',
+              transform: mounted ? 'scaleX(1)' : 'scaleX(0)',
             }} />
-
-            {/* Mirror reflection — flipped, fades out downward */}
-            <div style={{
-              fontSize:'clamp(2.4rem, 6vw, 6rem)',
-              fontWeight:900,
-              letterSpacing:'-0.02em',
-              lineHeight:1,
-              textTransform:'uppercase',
-              color:'#ffffff',
-              transform:'scaleY(-1)',
-              opacity: mounted ? 1 : 0,
-              transition: 'opacity 1.8s cubic-bezier(0.2,0.8,0.2,1) 0.5s',
-              maskImage:'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 65%)',
-              WebkitMaskImage:'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 65%)',
-              pointerEvents:'none',
-              userSelect:'none',
-              animation: mounted ? 'mirrorShimmer 4s ease-in-out infinite' : 'none',
-              animationDelay:'1.8s',
-              marginTop:'clamp(2px,0.5vw,4px)',
-            }}>Coming Soon</div>
           </div>
 
           {/* Tagline */}
           <p style={{
-            marginTop:'clamp(1.2rem,3vw,2rem)',
-            fontSize:'clamp(0.75rem,1.8vw,0.9rem)',
-            color:'rgba(148,163,184,0.5)',
-            letterSpacing:'0.04em',
-            lineHeight:1.75,
+            marginTop: 'clamp(1.5rem,3vw,2rem)',
+            fontSize: 'clamp(0.85rem,1.8vw,0.95rem)',
+            color: 'rgba(203,213,225,0.8)',
+            letterSpacing: '0.04em',
+            lineHeight: 1.6,
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(8px)',
             transition: 'all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s',
-            maxWidth: '26rem',
+            maxWidth: '32rem',
           }}>India's legal revolution — AI, Dashboard, Apex lawyers, SOS help, transparent fees and more.</p>
 
           {/* Explore Demo */}
           <div style={{
-            marginTop:'clamp(1.6rem,3.5vw,2.4rem)',
+            marginTop: 'clamp(2rem,4vw,2.5rem)',
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(8px)',
             transition: 'all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s',
@@ -426,28 +400,27 @@ export default function RevolutionisingSoon() {
             <button
               onClick={goDemo}
               style={{
-                display:'inline-flex', alignItems:'center', gap:8,
-                padding:'12px 28px',
-                borderRadius:10,
-                border:'1.5px solid rgba(37,99,235,0.55)',
-                background:'rgba(0,0,0,0.35)',
-                backdropFilter:'blur(14px)',
-                WebkitBackdropFilter:'blur(14px)',
-                color:'#fff',
-                fontSize:'0.82rem', fontWeight:700,
-                letterSpacing:'0.1em', textTransform:'uppercase',
-                fontFamily:'inherit',
-                cursor:'pointer',
-                boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
-                transition:'background 0.2s ease, box-shadow 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                animation:'pulse 2.5s ease-out 2.5s infinite',
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '14px 32px',
+                borderRadius: 12,
+                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(30,58,138,0.25) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                color: '#fff',
+                fontSize: '0.85rem', fontWeight: 700,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                fontFamily: "'Outfit', sans-serif",
+                cursor: 'pointer',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                transition: 'all 0.3s cubic-bezier(0.2,0.8,0.2,1)',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background='rgba(37,99,235,0.18)'; e.currentTarget.style.boxShadow='0 0 22px rgba(37,99,235,0.35)'; e.currentTarget.style.transform='translateY(-2px) scale(1.05)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background='rgba(0,0,0,0.35)'; e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.4)'; e.currentTarget.style.transform='none'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(180deg, rgba(37,99,235,0.3) 0%, rgba(30,58,138,0.4) 100%)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(37,99,235,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(30,58,138,0.25) 100%)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'none'; }}
             >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="rgba(37,99,235,0.8)" strokeWidth="1.5" />
-                <polygon points="10 7.5 17 12 10 16.5" fill="white" />
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.9)" strokeWidth="2" />
+                <polygon points="10 8 16 12 10 16" fill="white" />
               </svg>
               Explore Demo
             </button>
@@ -459,25 +432,25 @@ export default function RevolutionisingSoon() {
           SECTION 2 — SIGNUP (same as before)
       ══════════════════════════════════════ */}
       <section style={{
-        position:'relative', background:'rgba(3,8,24,0.92)', zIndex:1,
-        minHeight:'auto', display:'flex', flexDirection:'column',
-        alignItems:'center', justifyContent:'center',
-        padding:'clamp(2.5rem,6vw,5rem) clamp(1rem,4vw,3rem)',
+        position: 'relative', background: 'rgba(3,8,24,0.92)', zIndex: 1,
+        minHeight: 'auto', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: 'clamp(2.5rem,6vw,5rem) clamp(1rem,4vw,3rem)',
       }}>
 
         {/* Ambient blobs */}
-        <div style={{ position:'absolute', top:'15%', left:'8%', width:380, height:380, borderRadius:'50%', background:'radial-gradient(circle,rgba(29,78,216,0.15) 0%,transparent 70%)', animation:'floatOrb 8s ease-in-out infinite', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:'12%', right:'6%', width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%)', animation:'floatOrb 10s ease-in-out 2s infinite', pointerEvents:'none' }} />
+        <div style={{ position: 'absolute', top: '15%', left: '8%', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.15) 0%,transparent 70%)', animation: 'floatOrb 8s ease-in-out infinite', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '12%', right: '6%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%)', animation: 'floatOrb 10s ease-in-out 2s infinite', pointerEvents: 'none' }} />
 
         <div ref={signupRef} className="rs-reveal rs-card">
 
           {/* LEFT — white form panel */}
           <div className="rs-card-left">
-            <p style={{ fontSize:'0.88rem', fontWeight:700, color:'#1e40af', marginBottom:'1.8rem', letterSpacing:'0.01em' }}>Lxwyer Up</p>
-            <h2 style={{ fontSize:'clamp(1.4rem,2.6vw,2rem)', fontWeight:800, color:'#0f172a', lineHeight:1.15, letterSpacing:'-0.02em', marginBottom:'0.5rem' }}>
+            <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e40af', marginBottom: '1.8rem', letterSpacing: '0.01em' }}>Lxwyer Up</p>
+            <h2 style={{ fontSize: 'clamp(1.4rem,2.6vw,2rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
               Sign up for<br />Early Access
             </h2>
-            <p style={{ color:'#64748b', fontSize:'0.85rem', lineHeight:1.7, marginBottom:'1.8rem', maxWidth:340 }}>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.7, marginBottom: '1.8rem', maxWidth: 340 }}>
               Join India's future legal platform. Get priority access and be first to experience smarter justice.
             </p>
             <VisionaryForm />
@@ -485,42 +458,40 @@ export default function RevolutionisingSoon() {
 
           {/* RIGHT — dark brand panel */}
           <div className="rs-card-right">
-            <div style={{ position:'absolute', top:'50%', left:'50%', width:340, height:340, borderRadius:'50%', border:'1px solid rgba(37,99,235,0.1)', transform:'translate(-50%,-50%)', pointerEvents:'none' }} />
-            <div style={{ position:'absolute', top:'50%', left:'50%', width:500, height:500, borderRadius:'50%', border:'1px solid rgba(37,99,235,0.05)', transform:'translate(-50%,-50%)', pointerEvents:'none' }} />
-            <div style={{ position:'absolute', top:'12%', right:'-12%', width:240, height:240, borderRadius:'50%', background:'radial-gradient(circle,rgba(37,99,235,0.28) 0%,transparent 70%)', pointerEvents:'none' }} />
+            <div style={{ position: 'absolute', top: '50%', left: '50%', width: 340, height: 340, borderRadius: '50%', border: '1px solid rgba(37,99,235,0.1)', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '50%', left: '50%', width: 500, height: 500, borderRadius: '50%', border: '1px solid rgba(37,99,235,0.05)', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '12%', right: '-12%', width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle,rgba(37,99,235,0.28) 0%,transparent 70%)', pointerEvents: 'none' }} />
 
-            <div style={{ position:'relative', zIndex:2 }}>
-              <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.35em', textTransform:'uppercase', color:'rgba(147,197,253,0.55)', marginBottom:'1rem' }}>For Visionaries</p>
-              <h3 style={{ fontSize:'clamp(1.4rem,2.5vw,2.1rem)', fontWeight:800, lineHeight:1.1, letterSpacing:'-0.02em', color:'#fff', marginBottom:'1rem' }}>
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'rgba(147,197,253,0.55)', marginBottom: '1rem' }}>For Visionaries</p>
+              <h3 style={{ fontSize: 'clamp(1.4rem,2.5vw,2.1rem)', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: '#fff', marginBottom: '1rem' }}>
                 Revolutionise<br />
-                <span style={{ backgroundImage:'linear-gradient(135deg,#93c5fd,#60a5fa,#818cf8)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', backgroundSize:'200% auto', animation:'shimmer 4s linear infinite' }}>
+                <span style={{ backgroundImage: 'linear-gradient(135deg,#93c5fd,#60a5fa,#818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', backgroundSize: '200% auto', animation: 'shimmer 4s linear infinite' }}>
                   Legal Justice
                 </span>
               </h3>
-              <p style={{ color:'rgba(148,163,184,0.6)', lineHeight:1.8, fontSize:'0.85rem', marginBottom:'1.6rem' }}>
+              <p style={{ color: 'rgba(148,163,184,0.6)', lineHeight: 1.8, fontSize: '0.85rem', marginBottom: '1.6rem' }}>
                 AI-matched lawyers, SOS legal help, transparent fees — justice that truly works.
               </p>
-              <div style={{ display:'flex', flexDirection:'column', gap:11 }}>
-                {['SOS Legal Help — instant 24/7 access','AI Lawyer Matching — perfect fit every time','1000+ Apex Lawyers — coming soon','Transparent Fees — zero hidden charges'].map(tx => (
-                  <div key={tx} style={{ display:'flex', alignItems:'center', gap:12 }}>
-                    <div style={{ width:2, height:14, borderRadius:2, background:'linear-gradient(180deg,#3b82f6,#6366f1)', flexShrink:0 }} />
-                    <span style={{ fontSize:'0.82rem', color:'rgba(203,213,225,0.72)', lineHeight:1.4 }}>{tx}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+                {['SOS Legal Help — instant 24/7 access', 'AI Lawyer Matching — perfect fit every time', '1000+ Apex Lawyers — coming soon', 'Transparent Fees — zero hidden charges'].map(tx => (
+                  <div key={tx} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 2, height: 14, borderRadius: 2, background: 'linear-gradient(180deg,#3b82f6,#6366f1)', flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.82rem', color: 'rgba(203,213,225,0.72)', lineHeight: 1.4 }}>{tx}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <p style={{ fontSize:10, color:'rgba(148,163,184,0.22)', letterSpacing:'0.15em', textTransform:'uppercase', position:'relative', zIndex:2, marginTop:'1.5rem' }}>Made in India — AI-Powered</p>
+            <p style={{ fontSize: 10, color: 'rgba(148,163,184,0.22)', letterSpacing: '0.15em', textTransform: 'uppercase', position: 'relative', zIndex: 2, marginTop: '1.5rem' }}>Made in India — AI-Powered</p>
           </div>
         </div>
 
-        {/* India badge */}
-        <div ref={bannerRef} className="rs-reveal" style={{ position:'absolute', bottom:'2rem', left:0, right:0, textAlign:'center', zIndex:2 }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:12, padding:'9px 24px', borderRadius:999, border:'1px solid rgba(147,197,253,0.22)', background:'rgba(14,20,60,0.45)', backdropFilter:'blur(16px)', WebkitBackdropFilter:'blur(16px)', boxShadow:'0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
-            <div style={{ width:5, height:5, borderRadius:'50%', background:'#3b82f6', boxShadow:'0 0 6px #3b82f6' }} />
-            <span style={{ fontSize:'clamp(0.6rem,1.5vw,0.72rem)', fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', background:'linear-gradient(90deg,#93c5fd,#60a5fa,#818cf8)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', backgroundSize:'200% auto', animation:'shimmer 4s linear infinite' }}>
-              India's First Legal Tech Ecosystem
+        {/* India badge - redesigned to be clean, non-absolute to avoid mobile overlaps */}
+        <div ref={bannerRef} className="rs-reveal" style={{ width: '100%', textAlign: 'center', zIndex: 2, padding: '3rem 1rem 1rem 1rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', padding: '8px 32px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.08)', background: 'transparent' }}>
+            <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(148,163,184,0.8)' }}>
+              {t('landing_hero_badge')}
             </span>
-            <div style={{ width:5, height:5, borderRadius:'50%', background:'#3b82f6', boxShadow:'0 0 6px #3b82f6' }} />
           </div>
         </div>
       </section>

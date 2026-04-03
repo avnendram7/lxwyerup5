@@ -94,12 +94,12 @@ export const Navbar = ({ hideLinks = false, minimal = false }) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#080808]/90 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/[0.06] shadow-sm dark:shadow-black/40 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="w-full mx-auto px-4 md:px-6 xl:px-12">
         <div className="flex justify-between items-center h-14">
 
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none">
+            <span className="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none">
               Lxwyer Up
             </span>
           </Link>

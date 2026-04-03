@@ -11,6 +11,7 @@ import { dummyLawFirms, states, practiceAreas } from '../data/lawFirmsData';
 import { greetings, farewells, thanks, acknowledgements, aboutBot, legalInfo, customQA, fallbackResponses, caseTypeKeywords, locationKeywords, advancedLegalInfo, hindiPhrases, proceduralQA, nameQueryResponses } from '../data/chatbotData';
 import VoiceModeOverlay from '../components/VoiceModeOverlay';
 import { buildKnowledgeBase, lookupByName, getPlatformAwarenessResponse, getSuggestiveChips } from '../utils/lawyerKnowledgeBase';
+import { useLang } from '../context/LanguageContext';
 
 // ── FAQ Data ────────────────────────────────────────────────────────────────
 const FIRM_FAQ = [
@@ -90,6 +91,7 @@ const FAQItem = ({ faq, index }) => {
 const ALLOWED_FIRM_STATES = null; // Law firms are available nationwide
 
 export default function FindLawFirmAI() {
+  const { t, lang, setLang } = useLang();
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -255,9 +257,9 @@ export default function FindLawFirmAI() {
 
   const getConversationalResponse = (message) => {
     const msg = message.toLowerCase().trim();
-    if (greetings.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) return pick(greetings.responses);
-    if (farewells.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) return pick(farewells.responses);
-    if (thanks.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) return pick(thanks.responses);
+    if (greetings.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) return pick(greetings.responses);
+    if (farewells.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) return pick(farewells.responses);
+    if (thanks.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) return pick(thanks.responses);
     if (aboutBot.keywords?.some(kw => msg.includes(kw))) return pick(aboutBot.responses);
     return null;
   };
@@ -476,21 +478,27 @@ export default function FindLawFirmAI() {
                 <Building2 className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-white tracking-wide">AI FIRM MATCHING</h1>
-                <p className="text-[10px] text-slate-500 font-medium">Describe your need · find the right firm</p>
+                <h1 className="text-sm font-bold text-white tracking-wide">{t('ai_firm_matching') || 'AI FIRM MATCHING'}</h1>
+                <p className="text-[10px] text-slate-500 font-medium">{t('ai_describe_firm') || 'Describe your need · find the right firm'}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-slate-300 text-[10px] font-bold uppercase transition hover:text-white"
+              >
+                {lang === 'en' ? 'hi' : 'en'}
+              </button>
               {recommendedFirms.length > 0 && (
                 <>
                   <button
                     onClick={() => setMobileView('results')}
                     className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/30"
                   >
-                    {recommendedFirms.length} Matches <ArrowRight className="w-3 h-3" />
+                    {recommendedFirms.length} {t('ai_matches') || 'Matches'} <ArrowRight className="w-3 h-3" />
                   </button>
                   <span className="hidden lg:inline text-xs font-bold bg-slate-900 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                    {recommendedFirms.length} matches
+                    {recommendedFirms.length} {t('ai_matches') || 'matches'}
                   </span>
                 </>
               )}
@@ -513,7 +521,7 @@ export default function FindLawFirmAI() {
                       <div key={d} className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                     ))}
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">Matching firms...</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('ai_matching_firms') || 'Matching firms...'}</span>
                 </div>
               </motion.div>
             )}

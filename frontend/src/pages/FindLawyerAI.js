@@ -13,6 +13,7 @@ import { WaveLayout } from '../components/WaveLayout';
 import { getLawyerPhoto, onPhotoError } from '../utils/lawyerPhoto';
 import VoiceModeOverlay from '../components/VoiceModeOverlay';
 import { buildKnowledgeBase, lookupByName, getPlatformAwarenessResponse, getSuggestiveChips } from '../utils/lawyerKnowledgeBase';
+import { useLang } from '../context/LanguageContext';
 
 // ── FAQ Data ────────────────────────────────────────────────────────────────
 const LAWYER_FAQ = [
@@ -96,6 +97,7 @@ const FAQItem = ({ faq, index }) => {
 };
 
 export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
+  const { t, lang, setLang } = useLang();
   const navigate = useNavigate();
   const [mobileView, setMobileView] = useState('chat'); // 'chat' | 'matches'
   const chatEndRef = useRef(null);
@@ -116,7 +118,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
   const [followUpQueue, setFollowUpQueue] = useState([]);
   const [followUpIndex, setFollowUpIndex] = useState(0);
   const [showFAQ, setShowFAQ] = useState(false);
-  const [loadingText, setLoadingText] = useState('Searching lawyers...');
+  const [loadingText, setLoadingText] = useState(t('ai_searching') || 'Searching lawyers...');
   // Live-training index built from fetched backend lawyers
   const [liveIndex, setLiveIndex] = useState({ cities: new Set(), specs: new Set(), specCityMap: {} });
   // Full knowledge base — seeded from dummy data immediately, enriched after backend fetch
@@ -395,19 +397,19 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
     const msg = message.toLowerCase().trim();
 
     // Check greetings
-    if (greetings.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) {
+    if (greetings.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) {
       return pick(greetings.responses);
     }
     // Check farewells
-    if (farewells.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) {
+    if (farewells.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) {
       return pick(farewells.responses);
     }
     // Check thanks
-    if (thanks.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) {
+    if (thanks.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) {
       return pick(thanks.responses);
     }
     // Check acknowledgements
-    if (acknowledgements.keywords.some(kw => msg === kw || msg === kw + '!' || msg === kw + '.')) {
+    if (acknowledgements.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msg))) {
       return pick(acknowledgements.responses);
     }
     // Check about bot
@@ -833,11 +835,17 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
             <div className="flex items-center gap-3">
 
               <div>
-                <h1 className="text-sm font-bold text-white tracking-wide">AI LAWYER MATCHING</h1>
-                <p className="text-[10px] text-slate-500 font-medium">Describe your case · find the right advocate</p>
+                <h1 className="text-sm font-bold text-white tracking-wide">{t('ai_lawyer_matching') || 'AI LAWYER MATCHING'}</h1>
+                <p className="text-[10px] text-slate-500 font-medium">{t('ai_describe_case') || 'Describe your case · find the right advocate'}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-slate-300 text-[10px] font-bold uppercase transition hover:text-white"
+              >
+                {lang === 'en' ? 'hi' : 'en'}
+              </button>
               {recommendedLawyers.length > 0 && (
                 <>
                   {/* Mobile toggle — show on small screens only */}
@@ -845,11 +853,11 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                     onClick={() => setMobileView('matches')}
                     className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shadow-lg shadow-blue-600/30"
                   >
-                    {recommendedLawyers.length} Matches <ArrowRight className="w-3 h-3" />
+                    {recommendedLawyers.length} {t('ai_matches') || 'Matches'} <ArrowRight className="w-3 h-3" />
                   </button>
                   {/* Desktop badge */}
                   <span className="hidden lg:inline text-xs font-bold bg-slate-900 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                    {recommendedLawyers.length} matches
+                    {recommendedLawyers.length} {t('ai_matches') || 'matches'}
                   </span>
                 </>
               )}
@@ -888,7 +896,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                       <div key={d} className={`w-2 h-2 bg-slate-400 rounded-full animate-bounce`} style={{ animationDelay: `${d}ms` }} />
                     ))}
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">Searching lawyers...</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('ai_searching') || 'Searching lawyers...'}</span>
                 </div>
               </motion.div>
             )}

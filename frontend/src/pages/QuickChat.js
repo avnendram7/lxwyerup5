@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { dummyLawyers } from '../data/lawyersData'
 import { dummyLawFirms } from '../data/lawFirmsData'
-import { legalInfo, customQA } from '../data/chatbotData'
+import { legalInfo, customQA, greetings, farewells, thanks, acknowledgements, aboutBot } from '../data/chatbotData'
 import { API } from '../App'
 
 import FirmCard from '../components/FirmCard'
@@ -299,6 +299,28 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
 
     // Try chatbotData match first before hitting backend
     const msgLower = query.toLowerCase().trim();
+
+    const conversationalData = [greetings, farewells, thanks, acknowledgements, aboutBot].filter(Boolean);
+    for (const item of conversationalData) {
+      if (item.keywords?.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(msgLower))) {
+         const reply = Array.isArray(item.responses) ? item.responses[Math.floor(Math.random() * item.responses.length)] : item.responses;
+         await new Promise(r => setTimeout(r, 500));
+         setMessages(prev => [...prev, {
+            role: 'assistant',
+            id: Date.now() + 1,
+            intro: reply,
+            cards: [],
+            intentLabel: 'Casual',
+            sentimentLabel: 'Neutral',
+            sentiment: 0,
+            sources: [],
+            is_greeting: true,
+            greeting_text: reply,
+         }]);
+         setIsTyping(false);
+         return;
+      }
+    }
     for (const item of [...legalInfo, ...customQA]) {
       if (item.keywords.some(kw => msgLower.includes(kw))) {
          const reply = Array.isArray(item.responses) ? item.responses[Math.floor(Math.random() * item.responses.length)] : item.responses;

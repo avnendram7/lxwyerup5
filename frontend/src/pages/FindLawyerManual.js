@@ -817,7 +817,7 @@ export default function FindLawyerManual() {
 
 
       {/* Floating AI Lawyer Matching Button */}
-      <div className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-50">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-50">
         <motion.button
           onClick={() => navigate('/find-lawyer/ai')}
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -825,9 +825,8 @@ export default function FindLawyerManual() {
           transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-full bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 transition-all cursor-pointer"
+          className="flex items-center justify-center px-8 py-3.5 rounded-full bg-[#050505] border-[1.5px] border-blue-600 hover:border-blue-400 hover:bg-[#111] text-blue-50 font-bold text-sm tracking-wide shadow-2xl shadow-blue-900/40 transition-all cursor-pointer whitespace-nowrap"
         >
-          <Scale className="w-5 h-5" />
           <span>{t('fl_ai_btn')}</span>
         </motion.button>
       </div>

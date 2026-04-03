@@ -1373,16 +1373,12 @@ const HeroSection = () => {
 
                     {/* Pill badge */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-10 bg-blue-600/8 border border-blue-500/20 dark:bg-blue-600/10 dark:border-blue-500/30 backdrop-blur-sm"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                        className="inline-flex items-center px-5 py-2 rounded-full mb-8 border border-slate-300/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm"
                     >
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-                        </span>
-                        <span className="text-xs font-bold tracking-[0.25em] uppercase text-blue-600 dark:text-blue-400">{t('landing_hero_badge')}</span>
+                        <span className="text-[0.65rem] font-bold tracking-[0.25em] uppercase text-slate-600 dark:text-slate-400">{t('landing_hero_badge')}</span>
                     </motion.div>
 
                     {/* Headline */}

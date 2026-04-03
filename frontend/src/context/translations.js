@@ -14,7 +14,7 @@ const translations = {
     nav_switch_english: 'EN',
 
     // ── Landing Page ────────────────────────────────────────────────
-    landing_hero_badge: "India's First Legal Tech Ecosystem",
+    landing_hero_badge: "India's First Legal Tech Platform",
     landing_hero_title_1: 'Justice You Understand,',
     landing_hero_title_2: 'Technology You Trust.',
     landing_hero_subtitle: 'Connect with verified lawyers, get instant AI legal guidance, and access legal help in your language — all in one platform.',
@@ -335,7 +335,7 @@ const translations = {
     gs_badge: 'Legal Assistance',
     gs_title_1: 'Your right to justice',
     gs_title_2: 'starts here.',
-    gs_sub: 'India\'s most trusted legal platform — find the right expert in minutes.',
+    gs_sub: 'India\'s most trusted legal tech platform — find the right expert in minutes.',
     gs_lawyer_label: 'Individual Counsel',
     gs_lawyer_title: 'Find a Lawyer',
     gs_lawyer_desc: 'Browse verified advocates filtered by specialisation and availability.',
@@ -551,6 +551,15 @@ const translations = {
     bcs_consult_type: 'Consultation Type',
     bcs_yrs_exp: 'years experience',
     bcs_years: 'years',
+    
+    // ── AI Pages ───────────────────────────────────────────────────
+    ai_lawyer_matching: 'AI LAWYER MATCHING',
+    ai_describe_case: 'Describe your case · find the right advocate',
+    ai_firm_matching: 'AI FIRM MATCHING',
+    ai_describe_firm: 'Describe your need · find the right firm',
+    ai_matches: 'Matches',
+    ai_searching: 'Searching lawyers...',
+    ai_matching_firms: 'Matching firms...',
   },
 
   hi: {
@@ -567,7 +576,7 @@ const translations = {
     nav_switch_english: 'EN',
 
     // ── Landing Page ────────────────────────────────────────────────
-    landing_hero_badge: 'भारत का पहला लीगल टेक इकोसिस्टम',
+    landing_hero_badge: 'भारत का पहला लीगल टेक प्लेटफॉर्म',
     landing_hero_title_1: 'न्याय जो आप समझें,',
     landing_hero_title_2: 'तकनीक जिस पर भरोसा करें।',
     landing_hero_subtitle: 'सत्यापित वकीलों से जुड़ें, तत्काल AI कानूनी मार्गदर्शन प्राप्त करें, और अपनी भाषा में कानूनी सहायता पाएं — सब एक ही प्लेटफ़ॉर्म पर।',
@@ -1105,6 +1114,15 @@ const translations = {
     bcs_consult_type: 'परामर्श का प्रकार',
     bcs_yrs_exp: 'वर्ष अनुभव',
     bcs_years: 'वर्ष',
+    
+    // ── AI Pages ───────────────────────────────────────────────────
+    ai_lawyer_matching: 'AI वकील मिलान',
+    ai_describe_case: 'अपना मामला बताएं · सही वकील खोजें',
+    ai_firm_matching: 'AI लॉ फर्म मिलान',
+    ai_describe_firm: 'अपनी ज़रूरत बताएं · सही फर्म खोजें',
+    ai_matches: 'मैचेस',
+    ai_searching: 'वकील खोज रहे हैं...',
+    ai_matching_firms: 'फर्म खोज रहे हैं...',
   },
 };
 

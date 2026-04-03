@@ -225,7 +225,7 @@ export default function JoinLawFirmWithSignup() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-8"
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 md:p-8"
           >
             <h2 className="text-3xl font-bold text-white mb-2">Create Your Account</h2>
             <p className="text-slate-400 mb-6">Sign up to join {selectedFirm.firm_name}</p>
@@ -356,7 +356,7 @@ export default function JoinLawFirmWithSignup() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-8"
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 md:p-8"
           >
             <h2 className="text-3xl font-bold text-white mb-2">Tell Us About Your Case</h2>
             <p className="text-slate-400 mb-8">Provide details to help the firm understand your legal needs</p>
@@ -391,7 +391,7 @@ export default function JoinLawFirmWithSignup() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-8"
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 md:p-8"
           >
             <h2 className="text-3xl font-bold text-white mb-2">Payment Details</h2>
             <p className="text-slate-400 mb-8">Complete your payment to join the law firm <span className="text-blue-500 font-semibold">(Dummy Gateway Test)</span></p>
