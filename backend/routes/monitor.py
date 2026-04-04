@@ -382,3 +382,11 @@ async def activity_feed(admin=Depends(get_monitor), limit: int = 100):
     # Sort all by time desc
     events.sort(key=lambda x: str(x.get("time","")), reverse=True)
     return events[:limit]
+
+
+# ─────────────────── Waitlist (Early Access Signups) ─────────────────────────
+@router.get("/waitlist-full")
+async def waitlist_full(admin=Depends(get_monitor)):
+    """All Early Access signups from the landing page form"""
+    entries = await db.waitlist.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return entries

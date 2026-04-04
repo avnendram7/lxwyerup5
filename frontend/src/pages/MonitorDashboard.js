@@ -30,6 +30,7 @@ const s = {
 const TABS = [
   { id:'live',     icon:'⬡', label:'LIVE FEED',    color:'#ef4444' },
   { id:'overview', icon:'◈', label:'OVERVIEW',     color:'#00ffb2' },
+  { id:'waitlist', icon:'📋', label:'WAITLIST',    color:'#f97316' },
   { id:'messages', icon:'✉', label:'MESSAGES',     color:'#8b5cf6' },
   { id:'threads',  icon:'⇄', label:'THREADS',      color:'#a78bfa' },
   { id:'bookings', icon:'📅', label:'BOOKINGS',    color:'#3b82f6' },
@@ -98,7 +99,7 @@ export default function MonitorDashboard() {
   const token = localStorage.getItem(TK);
   const headers = { Authorization:`Bearer ${token}` };
 
-  const [d, setD] = useState({ overview:null, messages:[], threads:[], bookings:[], sos:[], cases:[], users:[], lawyers:[], lawFirms:[], firmLawyers:[], firmClients:[], lawyerApps:[], clientApps:[], live:[] });
+  const [d, setD] = useState({ overview:null, waitlist:[], messages:[], threads:[], bookings:[], sos:[], cases:[], users:[], lawyers:[], lawFirms:[], firmLawyers:[], firmClients:[], lawyerApps:[], clientApps:[], live:[] });
   const [errors, setErrors] = useState({});
 
   const fetch1 = useCallback(async (key, url) => {
@@ -122,13 +123,14 @@ export default function MonitorDashboard() {
 
   // Tab → URL map
   const TAB_URL = {
+    waitlist:'/monitor/waitlist-full',
     messages:'/monitor/messages-full', threads:'/monitor/message-threads',
     bookings:'/monitor/bookings-full', sos:'/monitor/sos-full',
     cases:'/monitor/cases-full', users:'/monitor/users-full',
     lawyers:'/monitor/lawyers-full', lawfirms:'/monitor/law-firms-full',
     firmlawyers:'/monitor/firm-lawyers-full', firmclients:'/monitor/firm-clients-full',
   };
-  const TAB_KEY = { messages:'messages', threads:'threads', bookings:'bookings', sos:'sos', cases:'cases', users:'users', lawyers:'lawyers', lawfirms:'lawFirms', firmlawyers:'firmLawyers', firmclients:'firmClients' };
+  const TAB_KEY = { waitlist:'waitlist', messages:'messages', threads:'threads', bookings:'bookings', sos:'sos', cases:'cases', users:'users', lawyers:'lawyers', lawfirms:'lawFirms', firmlawyers:'firmLawyers', firmclients:'firmClients' };
 
   useEffect(() => {
     if (!token) { nav('/monitor-login'); return; }
@@ -257,6 +259,28 @@ export default function MonitorDashboard() {
                 <Stat label="PENDING CLIENT APPS" value={ov.pending_firm_client_apps} color={ov.pending_firm_client_apps>0?'#f59e0b':'#10b981'} />
               </div>
             </>}
+          </div>
+        )}
+
+        {/* ── WAITLIST (Early Access Signups) ── */}
+        {tab==='waitlist' && (
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+              <span style={{ color:'#f97316', fontSize:9, letterSpacing:3 }}>📋 EARLY ACCESS WAITLIST</span>
+              <span style={{ marginLeft:'auto', color:'rgba(0,255,180,0.3)', fontSize:9 }}>{d.waitlist.length} SIGNUPS</span>
+            </div>
+            <Search value={search} onChange={setSearch} placeholder="> filter by name / email / role..." />
+            {loading.waitlist ? <div style={{ color:'rgba(0,255,180,0.3)', fontSize:11 }}>LOADING...</div> : (
+              <Table items={d.waitlist} search={search} searchKeys={['full_name','email','phone','role','message']}
+                cols={[
+                  { label:'SIGNED UP', render:r=>fmt(r.created_at) },
+                  { label:'NAME', key:'full_name' },
+                  { label:'EMAIL', key:'email' },
+                  { label:'PHONE', key:'phone' },
+                  { label:'ROLE', render:r=><span style={{ background:'rgba(249,115,22,0.15)', border:'1px solid rgba(249,115,22,0.3)', borderRadius:2, padding:'2px 6px', fontSize:9, color:'#f97316' }}>{(r.role||'—').toUpperCase()}</span> },
+                  { label:'MESSAGE', render:r=><span title={r.message||''}>{String(r.message||'—').slice(0,50)}{String(r.message||'').length>50?'…':''}</span> },
+                ]} />
+            )}
           </div>
         )}
 

@@ -7,11 +7,21 @@ const VisionaryForm = memo(function VisionaryForm() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', role: '', message: '' });
   const [status, setStatus] = useState('idle');
 
-  const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
+  const handleChange = e => {
+    let { name, value } = e.target;
+    if (name === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
+    setForm(p => ({ ...p, [name]: value }));
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
     if (!form.name || !form.email || !form.role) return;
+    if (form.phone && form.phone.length < 10) {
+      setStatus('invalid_phone');
+      return;
+    }
     setStatus('loading');
     try {
       const response = await fetch(`${API}/waitlist`, {
@@ -27,9 +37,11 @@ const VisionaryForm = memo(function VisionaryForm() {
       });
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        const detail = errData?.detail || '';
+        const detail = JSON.stringify(errData?.detail || '');
         if (detail.toLowerCase().includes('already registered')) {
           setStatus('already_registered');
+        } else if (response.status === 422 || detail.toLowerCase().includes('validation') || detail.toLowerCase().includes('email')) {
+          setStatus('invalid_email');
         } else {
           setStatus('error');
         }
@@ -111,6 +123,8 @@ const VisionaryForm = memo(function VisionaryForm() {
         {status === 'loading' ? 'Sending…' : 'Join the Movement →'}
       </button>
       {status === 'error' && <p style={{ fontSize: '0.8rem', color: '#ef4444', textAlign: 'center' }}>Something went wrong. Please try again.</p>}
+      {status === 'invalid_email' && <p style={{ fontSize: '0.8rem', color: '#ef4444', textAlign: 'center' }}>Please enter a valid email address.</p>}
+      {status === 'invalid_phone' && <p style={{ fontSize: '0.8rem', color: '#ef4444', textAlign: 'center' }}>Phone number must be 10 digits.</p>}
       {status === 'already_registered' && <p style={{ fontSize: '0.8rem', color: '#f59e0b', textAlign: 'center' }}>✉️ This email is already registered! We'll reach out when we launch.</p>}
       <p style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', marginTop: 2 }}>
         Questions? <a href="mailto:avnendram.7@gmail.com" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>avnendram.7@gmail.com</a>
