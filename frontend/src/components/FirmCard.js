@@ -1,10 +1,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Building2, MapPin, ArrowRight } from 'lucide-react';
+import { useLang } from '../context/LanguageContext';
+
+const LOCAL_TEXT_FIRM = {
+  en: {
+    lawFirm: 'Law Firm',
+    lawyers: 'lawyers',
+    details: 'Details',
+    bookNow: 'Book Now'
+  },
+  hi: {
+    lawFirm: 'लॉ फर्म',
+    lawyers: 'वकील',
+    details: 'विवरण',
+    bookNow: 'अभी बुक करें'
+  }
+};
 
 export default function FirmCard({ firm, onBook, onDetails, index = 0, dm = true }) {
+  const { lang } = useLang();
+  const d = LOCAL_TEXT_FIRM[lang] || LOCAL_TEXT_FIRM.en;
   // Safe defaults
-  const name = firm.name || firm.firm_name || 'Law Firm';
+  const name = firm.name || firm.firm_name || d.lawFirm;
   const city = firm.city || '';
   const state = firm.state || '';
   const lawyersCount = firm.lawyersCount || firm.total_lawyers || 0;
@@ -41,7 +59,7 @@ export default function FirmCard({ firm, onBook, onDetails, index = 0, dm = true
           </div>
           {lawyersCount > 0 && (
             <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-full">
-              {lawyersCount} lawyers
+              {lawyersCount} {d.lawyers}
             </span>
           )}
         </div>
@@ -61,13 +79,13 @@ export default function FirmCard({ firm, onBook, onDetails, index = 0, dm = true
             className={`py-2 rounded-xl border text-xs font-semibold transition-colors 
               ${dm ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 text-slate-600 hover:bg-slate-100'}`}
           >
-            Details
+            {d.details}
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onBook && onBook(firm); }}
             className="py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1 shadow-md shadow-indigo-600/20"
           >
-            Book Now <ArrowRight className="w-3 h-3" />
+            {d.bookNow} <ArrowRight className="w-3 h-3" />
           </button>
         </div>
       </div>

@@ -7,6 +7,56 @@ import {
   Scale, Star, ArrowRight, Lock, CheckCircle,
   Award, Search, BadgeCheck, ClipboardCheck, Microscope, TrendingUp
 } from 'lucide-react';
+import { useLang } from '../context/LanguageContext';
+
+const TEXT = {
+  en: {
+    heroBadge: 'Trusted Legal Platform · India',
+    heroTitle1: 'Platform Features',
+    heroTitle2: 'Built for Legal Excellence',
+    heroSub: "A comprehensive suite of tools crafted for India's legal ecosystem — connecting citizens, lawyers, and institutions with precision and trust.",
+    querySolved: 'Queries Solved',
+    verifiedLawyers: 'Verified Lawyers',
+    satisfactionRate: 'Satisfaction Rate',
+    cap_sub: 'Platform Capabilities',
+    cap_title: 'Everything in one place',
+    cap_desc: 'A complete legal operating system — for individuals, lawyers, and firms.',
+    apex_title_1: 'Not every lawyer makes it ',
+    apex_title_2: 'through APEX.',
+    apex_desc_1: 'APEX is our proprietary, multi-stage verification framework — the most rigorous evaluation system in Indian legal tech today. Every lawyer on Lxwyer Up has been put through credential checks, peer reviews, conduct audits, and AI-driven performance scoring before they ever appear in your results.',
+    apex_quote: '"We do not promise volume. We promise precision. The right lawyer for your exact situation — verified, accountable, and held to the highest standard we know."',
+    apex_promise: "Our APEX Promise — if a match doesn't serve you, we find you a better one. No compromise, no shortcuts.",
+    pipeline: 'The 6-Stage APEX Verification Pipeline',
+    cta_title: 'Ready to Get Started?',
+    cta_sub: "Join thousands of clients and lawyers already using LxwyerUp to navigate India's legal system with confidence.",
+    cta_consult: 'Consult Now',
+    cta_contact: 'Contact Us',
+    forPre: 'For ',
+  },
+  hi: {
+    heroBadge: 'विश्वसनीय कानूनी मंच · भारत',
+    heroTitle1: 'प्लेटफ़ॉर्म की विशेषताएं',
+    heroTitle2: 'कानूनी उत्कृष्टता के लिए निर्मित',
+    heroSub: "भारत के कानूनी पारिस्थितिकी तंत्र के लिए तैयार किए गए उपकरणों का एक व्यापक सूट - नागरिकों, वकीलों और संस्थानों को सटीकता और विश्वास के साथ जोड़ता है।",
+    querySolved: 'समस्याएं हल की गईं',
+    verifiedLawyers: 'सत्यापित वकील',
+    satisfactionRate: 'संतुष्टि दर',
+    cap_sub: 'प्लेटफॉर्म क्षमताएं',
+    cap_title: 'सब कुछ एक ही स्थान पर',
+    cap_desc: 'एक संपूर्ण कानूनी ऑपरेटिंग सिस्टम — व्यक्तियों, वकीलों और फर्मों के लिए।',
+    apex_title_1: 'हर वकील पास नहीं होता ',
+    apex_title_2: 'APEX के माध्यम से।',
+    apex_desc_1: 'APEX हमारा मालिकाना, बहु-चरणीय सत्यापन ढांचा है — जो आज भारतीय कानूनी तकनीक में सबसे कठोर मूल्यांकन प्रणाली है। Lxwyer Up पर प्रत्येक वकील को आपके परिणामों में प्रदर्शित होने से पहले क्रेडेंशियल जांच, सहकर्मी समीक्षा, आचरण ऑडिट और AI-संचालित प्रदर्शन स्कोरिंग से गुज़रना पड़ता है।',
+    apex_quote: '"हम मात्रा का वादा नहीं करते। हम सटीकता का वादा करते हैं। आपकी सटीक स्थिति के लिए सही वकील — सत्यापित, जवाबदेह, और उच्चतम मानक पर खरा।"',
+    apex_promise: "हमारा APEX वादा - यदि कोई मैच आप की सेवा नहीं कर पाता, तो हम आपको एक बेहतर खोज कर देंगे। कोई समझौता नहीं, कोई शॉर्टकट नहीं।",
+    pipeline: '6-चरणीय APEX सत्यापन पाइपलाइन',
+    cta_title: 'क्या आप शुरू करने के लिए तैयार हैं?',
+    cta_sub: "लीगल सिस्टम को आत्मविश्वास के साथ नेविगेट करने के लिए LxwyerUp का उपयोग कर रहे हजारों ग्राहकों और वकीलों से जुड़ें।",
+    cta_consult: 'अभी परामर्श लें',
+    cta_contact: 'संपर्क करें',
+    forPre: 'के लिए ',
+  }
+};
 
 
 const cardEnterCSS = `
@@ -105,6 +155,19 @@ const FEATURES = [
   },
 ];
 
+const FEATURES_HI = [
+  { icon: Siren, title: 'SOS कानूनी सहायता', description: 'तत्काल कानूनी स्थितियों के दौरान सत्यापित वकीलों तक तत्काल पहुंच प्रदान करता है। एक क्लिक के साथ, जल्दी से जुड़ें, समय पर मार्गदर्शन प्राप्त करें, और अपने अगले कदम को समझें।', tag: 'Clients', color: 'red', badge: 'अभी लाइव', },
+  { icon: Fingerprint, title: 'Lxwyer Up सिग्नेचर', description: 'लॉयर अप सिग्नेचर उपयोगकर्ताओं को प्रमाणित विशेषज्ञता और मजबूत ट्रैक रिकॉर्ड वाले अत्यधिक सत्यापित, प्रीमियम वकीलों तक पहुंच प्रदान करता है।', tag: 'Both', color: 'blue', badge: 'जल्द आ रहा है', },
+  { icon: MessageSquare, title: 'AI कानूनी चैटबॉट', description: 'साधारण भाषा में अपने कानूनी सवालों के तुरंत, संरचित उत्तर पाएं। जेमिनी द्वारा संचालित — 24/7 उपलब्ध।', tag: 'Both', color: 'blue', },
+  { icon: Calendar, title: 'परामर्श बुकिंग', description: 'सेकंडों में सत्यापित वकीलों के साथ वीडियो या व्यक्तिगत परामर्श बुक करें। सभी नियुक्तियों को एक कैलेंडर में प्रबंधित करें।', tag: 'Clients', color: 'blue', },
+  { icon: FileText, title: 'केस ट्रैकिंग', description: 'रीयल-टाइम में अपने केस की स्थिति, चरणों और महत्वपूर्ण समय सीमाओं की निगरानी करें। कभी भी कोई अपडेट या सुनवाई न चूकें।', tag: 'Clients', color: 'blue', },
+  { icon: Shield, title: 'दस्तावेज़ प्रबंधन', description: 'कानूनी दस्तावेज़ सुरक्षित रूप से अपलोड करें, व्यवस्थित करें और साझा करें। सब कुछ एन्क्रिप्टेड और किसी भी डिवाइस से सुलभ है।', tag: 'Both', color: 'blue', },
+  { icon: Users, title: 'क्लाइंट प्रबंधन', description: 'वकील एक ही स्थान पर कई ग्राहकों को प्रबंधित कर सकते हैं, केस की प्रगति को ट्रैक कर सकते हैं, और पेशेवर संवाद बनाए रख सकते हैं।', tag: 'Lawyers', color: 'blue', },
+  { icon: Bell, title: 'स्मार्ट सूचनाएं', description: 'केस अपडेट, आगामी सुनवाई, दस्तावेज़ अनुरोध और महत्वपूर्ण समय सीमाओं के लिए स्वचालित अलर्ट।', tag: 'Both', color: 'blue', },
+  { icon: BarChart, title: 'केस एनालिटिक्स', description: 'केस की प्रगति, सफलता पैटर्न और आपके अगले कदम के लिए AI-संचालित सिफारिशों में अंतर्दृष्टि।', tag: 'Both', color: 'blue', },
+  { icon: Clock, title: '24/7 उपलब्धता', description: 'आपका डैशबोर्ड, दस्तावेज़ और AI सहायक हमेशा चालू रहते हैं — किसी भी डिवाइस से, किसी भी समय।', tag: 'Both', color: 'blue', },
+];
+
 const COLOR = {
   red: { border: 'border-red-500/20', lightHeader: 'bg-red-50', darkHeader: 'bg-red-950', iconBg: 'bg-red-500/15 border-red-500/25', icon: 'text-red-500 dark:text-red-400', tag: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/20', glow: 'bg-red-500/15', ring: 'hover:ring-red-500/30 hover:border-red-500/40', shadow: 'hover:shadow-red-500/10' },
   purple: { border: 'border-purple-500/20', lightHeader: 'bg-purple-50', darkHeader: 'bg-purple-950', iconBg: 'bg-purple-500/15 border-purple-500/25', icon: 'text-purple-500 dark:text-purple-400', tag: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20', glow: 'bg-purple-500/15', ring: 'hover:ring-purple-500/30 hover:border-purple-500/40', shadow: 'hover:shadow-purple-500/10' },
@@ -171,11 +234,13 @@ function StatItem({ target, suffix, label }) {
 }
 
 function TrustCounters() {
+  const { lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
   return (
     <div className="flex items-center justify-center gap-8 flex-wrap text-sm">
-      <StatItem target={10000} suffix="+" label="Queries Solved" />
-      <StatItem target={1000} suffix="+" label="Verified Lawyers" />
-      <StatItem target={98} suffix="%" label="Satisfaction Rate" />
+      <StatItem target={10000} suffix="+" label={d.querySolved} />
+      <StatItem target={1000} suffix="+" label={d.verifiedLawyers} />
+      <StatItem target={98} suffix="%" label={d.satisfactionRate} />
     </div>
   );
 }
@@ -219,7 +284,7 @@ function FeatureCard({ feature, index }) {
             </span>
           )}
           <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${c.tag}`}>
-            For {feature.tag}
+            {lang === 'hi' ? TEXT.hi.forPre : TEXT.en.forPre}{feature.tag === 'Clients' ? (lang === 'hi' ? 'मुवक्किल' : 'Clients') : feature.tag === 'Lawyers' ? (lang === 'hi' ? 'वकील' : 'Lawyers') : (lang === 'hi' ? 'दोनों' : 'Both')}
           </span>
         </div>
 
@@ -253,6 +318,9 @@ function FeatureCard({ feature, index }) {
 
 export default function FeaturesPage() {
   const navigate = useNavigate();
+  const { lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
+  const featuresList = lang === 'hi' ? FEATURES_HI : FEATURES;
 
   return (
     <div className="min-h-screen bg-black text-white transition-colors duration-300">
@@ -264,18 +332,18 @@ export default function FeaturesPage() {
       <section className="pt-36 pb-16 px-6 text-center">
         {/* Formal badge */}
         <div className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-1.5 mb-8">
-          Trusted Legal Platform · India
+          {d.heroBadge}
         </div>
 
         <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
-          Platform Features<br />
+          {d.heroTitle1}<br />
           <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 dark:from-blue-400 dark:via-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
-            Built for Legal Excellence
+            {d.heroTitle2}
           </span>
         </h1>
 
         <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-10">
-          A comprehensive suite of tools crafted for India's legal ecosystem — connecting citizens, lawyers, and institutions with precision and trust.
+          {d.heroSub}
         </p>
 
         {/* Animated trust indicators */}
@@ -291,9 +359,9 @@ export default function FeaturesPage() {
       {/* ── PLATFORM CAPABILITIES ─────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-6 pt-16 pb-24">
         <div className="text-center mb-14">
-          <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.18em]">Platform Capabilities</span>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-3 transition-colors">Everything in one place</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-xl mx-auto">A complete legal operating system — for individuals, lawyers, and firms.</p>
+          <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.18em]">{d.cap_sub}</span>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-3 transition-colors">{d.cap_title}</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-xl mx-auto">{d.cap_desc}</p>
         </div>
 
         {/* ── APEX System Hero Card ── */}
@@ -318,25 +386,25 @@ export default function FeaturesPage() {
               </div>
 
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-5">
-                Not every lawyer makes it{' '}
+                {d.apex_title_1}{' '}
                 <span className="bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 bg-clip-text text-transparent">
-                  through APEX.
+                  {d.apex_title_2}
                 </span>
               </h2>
 
               <p className="text-slate-300 text-[15px] leading-relaxed mb-5">
-                APEX is our proprietary, multi-stage verification framework — the most rigorous evaluation system in Indian legal tech today. Every lawyer on Lxwyer Up has been put through credential checks, peer reviews, conduct audits, and AI-driven performance scoring before they ever appear in your results.
+                {d.apex_desc_1}
               </p>
 
               <p className="text-slate-400 text-sm leading-relaxed mb-8 italic border-l-2 border-emerald-500/40 pl-4">
-                "We do not promise volume. We promise precision. The right lawyer for your exact situation — verified, accountable, and held to the highest standard we know."
+                {d.apex_quote}
                 <span className="block mt-1 text-emerald-600/80 not-italic font-semibold text-xs">— Lxwyer Up</span>
               </p>
 
               <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-emerald-500/8 border border-emerald-500/20 w-fit max-w-sm">
                 <BadgeCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                 <span className="text-emerald-100 text-sm font-medium leading-relaxed">
-                  Our APEX Promise — if a match doesn't serve you, we find you a better one. No compromise, no shortcuts.
+                  {d.apex_promise}
                 </span>
               </div>
             </div>
@@ -344,16 +412,16 @@ export default function FeaturesPage() {
             {/* ── Right: 6-stage pipeline ── */}
             <div className="p-10 lg:p-12 border-t lg:border-t-0 lg:border-l border-emerald-500/10 flex flex-col justify-center gap-5">
               <p className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-1">
-                The 6-Stage APEX Verification Pipeline
+                {d.pipeline}
               </p>
 
               {[
-                { icon: Search,         step: '01', title: 'Document Verification',     desc: 'Bar Council enrollment, law degree, and identity cross-checked against national registries.' },
-                { icon: ClipboardCheck, step: '02', title: 'Specialisation Assessment', desc: 'Case-history analysis confirms that declared expertise is backed by real courtroom track records.' },
-                { icon: Microscope,     step: '03', title: 'Conduct & Ethics Review',   desc: 'Disciplinary records, peer references, and client feedback reviewed by our independent legal panel.' },
-                { icon: TrendingUp,     step: '04', title: 'Performance Scoring',       desc: 'AI-driven scoring across case outcomes, response times, and client satisfaction trends over time.' },
-                { icon: Shield,         step: '05', title: 'Criteria Matching Engine',  desc: 'Smart indexing maps your exact query — budget, location, language, consultation mode — to the best fit.' },
-                { icon: BadgeCheck,     step: '06', title: 'APEX Seal Awarded',         desc: 'Only lawyers who pass every stage earn the APEX seal displayed proudly on their profile.' },
+                { icon: Search,         step: '01', title: lang === 'hi' ? 'दस्तावेज़ सत्यापन' : 'Document Verification',     desc: lang === 'hi' ? 'बार काउंसिल नामांकन, कानून की डिग्री और राष्ट्रीय रजिस्ट्रियों के खिलाफ पहचान की जांच।' : 'Bar Council enrollment, law degree, and identity cross-checked against national registries.' },
+                { icon: ClipboardCheck, step: '02', title: lang === 'hi' ? 'विशेषज्ञता मूल्यांकन' : 'Specialisation Assessment', desc: lang === 'hi' ? 'केस-इतिहास विश्लेषण पुष्टि करता है कि घोषित विशेषज्ञता वास्तविक कोर्टरूम ट्रैक रिकॉर्ड द्वारा समर्थित है।' : 'Case-history analysis confirms that declared expertise is backed by real courtroom track records.' },
+                { icon: Microscope,     step: '03', title: lang === 'hi' ? 'आचरण और नैतिकता की समीक्षा' : 'Conduct & Ethics Review',   desc: lang === 'hi' ? 'अनुशासनात्मक रिकॉर्ड, सहकर्मी संदर्भ और ग्राहक प्रतिक्रिया की समीक्षा हमारे स्वतंत्र कानूनी पैनल द्वारा की जाती है।' : 'Disciplinary records, peer references, and client feedback reviewed by our independent legal panel.' },
+                { icon: TrendingUp,     step: '04', title: lang === 'hi' ? 'प्रदर्शन स्कोरिंग' : 'Performance Scoring',       desc: lang === 'hi' ? 'केस परिणामों, प्रतिक्रिया के समय और समय के साथ ग्राहकों की संतुष्टि के रुझानों पर एआई-संचालित स्कोरिंग।' : 'AI-driven scoring across case outcomes, response times, and client satisfaction trends over time.' },
+                { icon: Shield,         step: '05', title: lang === 'hi' ? 'मानदंड मिलान इंजन' : 'Criteria Matching Engine',  desc: lang === 'hi' ? 'स्मार्ट अनुक्रमणिका आपकी सटीक क्वेरी को मैप करती है - बजट, स्थान, भाषा, परामर्श मोड - सबसे उपयुक्त खोजने के लिए।' : 'Smart indexing maps your exact query — budget, location, language, consultation mode — to the best fit.' },
+                { icon: BadgeCheck,     step: '06', title: lang === 'hi' ? 'APEX सील प्रदान किया गया' : 'APEX Seal Awarded',         desc: lang === 'hi' ? 'केवल हर चरण को पार करने वाले वकीलों को ही उनकी प्रोफ़ाइल पर APEX सील गर्व के साथ प्रदर्शित करने को मिलता है।' : 'Only lawyers who pass every stage earn the APEX seal displayed proudly on their profile.' },
               ].map(({ icon: Icon, step, title, desc }) => (
                 <div key={step} className="flex items-start gap-4 group">
                   <div className="shrink-0 w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/18 transition-colors duration-200">
@@ -373,7 +441,7 @@ export default function FeaturesPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map((f, i) => (
+          {featuresList.map((f, i) => (
             <FeatureCard key={i} feature={f} index={i} />
           ))}
         </div>
@@ -390,23 +458,23 @@ export default function FeaturesPage() {
           </div>
           <div className="relative">
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 text-white">
-              Ready to Get Started?
+              {d.cta_title}
             </h2>
             <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of clients and lawyers already using LxwyerUp to navigate India's legal system with confidence.
+              {d.cta_sub}
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <button
                 onClick={() => navigate('/user-get-started')}
                 className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3.5 rounded-xl flex items-center gap-2 transition-all hover:gap-3 text-sm shadow-lg shadow-blue-600/20"
               >
-                Consult Now <ArrowRight size={16} />
+                {d.cta_consult} <ArrowRight size={16} />
               </button>
               <button
                 onClick={() => navigate('/contact')}
                 className="border border-slate-700 hover:border-blue-500/50 text-slate-400 hover:text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition-all"
               >
-                Contact Us
+                {d.cta_contact}
               </button>
             </div>
           </div>

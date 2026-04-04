@@ -90,8 +90,42 @@ const FAQItem = ({ faq, index }) => {
 
 const ALLOWED_FIRM_STATES = null; // Law firms are available nationwide
 
+const LOCAL_TEXT_FIRM_AI_PAGE = {
+  en: {
+    topMatches: 'TOP MATCHES',
+    found: 'Found',
+    chat: 'Chat',
+    browseAllFirms: 'Browse all law firms',
+    aboutFirm: 'About the Firm',
+    practiceAreas: 'Practice Areas',
+    lawyers: 'lawyers',
+    close: 'Close',
+    bookConsultation: 'Book Consultation',
+    aiFirmMatching: 'AI FIRM MATCHING',
+    describeFirm: 'Describe your need · find the right firm',
+    matches: 'Matches',
+    matchingFirms: 'Matching firms...'
+  },
+  hi: {
+    topMatches: 'शीर्ष मैच',
+    found: 'मिले',
+    chat: 'चैट',
+    browseAllFirms: 'सभी लॉ फर्म ब्राउज़ करें',
+    aboutFirm: 'फर्म के बारे में',
+    practiceAreas: 'अभ्यास क्षेत्र',
+    lawyers: 'वकील',
+    close: 'बंद करें',
+    bookConsultation: 'परामर्श बुक करें',
+    aiFirmMatching: 'एआई फर्म मिलान',
+    describeFirm: 'अपनी आवश्यकता का वर्णन करें · सही फर्म खोजें',
+    matches: 'मैच',
+    matchingFirms: 'फर्में ढूँढ रहे हैं...'
+  }
+};
+
 export default function FindLawFirmAI() {
   const { t, lang, setLang } = useLang();
+  const d = LOCAL_TEXT_FIRM_AI_PAGE[lang] || LOCAL_TEXT_FIRM_AI_PAGE.en;
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -478,8 +512,8 @@ export default function FindLawFirmAI() {
                 <Building2 className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-white tracking-wide">{t('ai_firm_matching') || 'AI FIRM MATCHING'}</h1>
-                <p className="text-[10px] text-slate-500 font-medium">{t('ai_describe_firm') || 'Describe your need · find the right firm'}</p>
+                <h1 className="text-sm font-bold text-white tracking-wide">{d.aiFirmMatching}</h1>
+                <p className="text-[10px] text-slate-500 font-medium">{d.describeFirm}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -495,10 +529,10 @@ export default function FindLawFirmAI() {
                     onClick={() => setMobileView('results')}
                     className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/30"
                   >
-                    {recommendedFirms.length} {t('ai_matches') || 'Matches'} <ArrowRight className="w-3 h-3" />
+                    {recommendedFirms.length} {d.matches} <ArrowRight className="w-3 h-3" />
                   </button>
                   <span className="hidden lg:inline text-xs font-bold bg-slate-900 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                    {recommendedFirms.length} {t('ai_matches') || 'matches'}
+                    {recommendedFirms.length} {d.matches}
                   </span>
                 </>
               )}
@@ -521,7 +555,7 @@ export default function FindLawFirmAI() {
                       <div key={d} className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                     ))}
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">{t('ai_matching_firms') || 'Matching firms...'}</span>
+                  <span className="text-xs text-slate-500 font-medium">{d.matchingFirms}</span>
                 </div>
               </motion.div>
             )}
@@ -632,9 +666,9 @@ export default function FindLawFirmAI() {
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-indigo-400" />
-                  TOP MATCHES
+                  {d.topMatches}
                   <span className="ml-1 text-[10px] bg-slate-900 border border-slate-700 text-slate-400 px-2 py-0.5 rounded-full font-bold">
-                    {recommendedFirms.length} Found
+                    {recommendedFirms.length} {d.found}
                   </span>
                 </h3>
                 <div className="flex items-center gap-2">
@@ -642,7 +676,7 @@ export default function FindLawFirmAI() {
                     onClick={() => setMobileView('chat')}
                     className="lg:hidden flex items-center gap-1.5 text-slate-400 text-xs font-semibold hover:text-white transition-colors"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Chat
+                    <ArrowLeft className="w-3.5 h-3.5" /> {d.chat}
                   </button>
                   {/* X / Close button — all screens */}
                   <button
@@ -672,7 +706,7 @@ export default function FindLawFirmAI() {
                   onClick={() => navigate('/find-lawfirm/manual')}
                   className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors border border-slate-800"
                 >
-                  Browse all law firms <ArrowRight className="w-4 h-4" />
+                  {d.browseAllFirms} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </motion.div>
@@ -713,19 +747,19 @@ export default function FindLawFirmAI() {
                   <h2 className="text-2xl font-bold text-white">{selectedFirm.name}</h2>
                   <p className="text-slate-400 text-sm flex items-center gap-1.5 mt-1">
                     <MapPin className="w-3.5 h-3.5" /> {selectedFirm.city}{selectedFirm.state ? `, ${selectedFirm.state}` : ''}
-                    {selectedFirm.lawyersCount > 0 && <span className="ml-2">· {selectedFirm.lawyersCount} lawyers</span>}
+                    {selectedFirm.lawyersCount > 0 && <span className="ml-2">· {selectedFirm.lawyersCount} {d.lawyers}</span>}
                   </p>
                 </div>
               </div>
 
               <div className="p-6 space-y-5">
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">About the Firm</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">{d.aboutFirm}</h3>
                   <p className="text-slate-300 text-sm leading-relaxed">{selectedFirm.description}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Practice Areas</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">{d.practiceAreas}</h3>
                   <div className="flex flex-wrap gap-2">
                     {(selectedFirm.practiceAreas || []).map((area, idx) => (
                       <span key={idx} className="px-3 py-1.5 bg-indigo-900/30 text-indigo-300 text-xs font-medium rounded-lg border border-indigo-800/40">{area}</span>
@@ -738,13 +772,13 @@ export default function FindLawFirmAI() {
                     onClick={() => { setSelectedFirm(null); }}
                     className="py-3 rounded-xl border border-slate-700 text-slate-300 text-sm font-semibold hover:bg-slate-800 transition-colors"
                   >
-                    Close
+                    {d.close}
                   </button>
                   <button
                     onClick={() => { setSelectedFirm(null); handleBook(selectedFirm); }}
                     className="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
                   >
-                    Book Consultation <ArrowRight className="w-4 h-4" />
+                    {d.bookConsultation} <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

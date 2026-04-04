@@ -95,9 +95,76 @@ const FAQItem = ({ faq, index }) => {
     </motion.div>
   );
 };
+const LOCAL_TEXT_AI = {
+  en: {
+    topMatches: 'TOP MATCHES',
+    found: 'Found',
+    chat: 'Chat',
+    verified: 'Verified',
+    experience: 'Experience',
+    years: 'Years',
+    location: 'Location',
+    consultationFee: 'Consultation Fee',
+    contactForFee: 'Contact for fee',
+    viewProfile: 'View Profile',
+    bookNow: 'Book Now',
+    showLess: 'Show Less',
+    showAllMatches: 'Show all matches',
+    browseAllLawyers: 'Browse all lawyers',
+    education: 'Education',
+    notSpecified: 'Not specified',
+    about: 'About',
+    noBio: 'No bio available.',
+    milestones: 'Milestones & Achievements',
+    featured: 'Featured',
+    courtExp: 'Court Experience',
+    mode: 'Mode',
+    videoInPerson: 'Video & In-Person',
+    inPerson: 'In-Person',
+    videoCall: 'Video Call',
+    bookConsultation: 'Book Consultation',
+    aiLawyerMatching: 'AI LAWYER MATCHING',
+    describeCase: 'Describe your case · find the right advocate',
+    matches: 'Matches',
+    searchingLawyers: 'Searching lawyers...',
+  },
+  hi: {
+    topMatches: 'शीर्ष मैच',
+    found: 'मिले',
+    chat: 'चैट',
+    verified: 'सत्यापित',
+    experience: 'अनुभव',
+    years: 'वर्ष',
+    location: 'स्थान',
+    consultationFee: 'परामर्श शुल्क',
+    contactForFee: 'शुल्क के लिए संपर्क करें',
+    viewProfile: 'प्रोफ़ाइल देखें',
+    bookNow: 'अभी बुक करें',
+    showLess: 'कम दिखाएं',
+    showAllMatches: 'सभी मैच दिखाएं',
+    browseAllLawyers: 'सभी वकील ब्राउज़ करें',
+    education: 'शिक्षा',
+    notSpecified: 'उल्लेखित नहीं है',
+    about: 'के बारे में',
+    noBio: 'कोई बायो उपलब्ध नहीं है।',
+    milestones: 'मील के पत्थर और उपलब्धियां',
+    featured: 'विशेष रुप से प्रदर्शित',
+    courtExp: 'अदालत का अनुभव',
+    mode: 'मोड',
+    videoInPerson: 'वीडियो और व्यक्तिगत रूप से',
+    inPerson: 'व्यक्तिगत रूप से',
+    videoCall: 'वीडियो कॉल',
+    bookConsultation: 'परामर्श बुक करें',
+    aiLawyerMatching: 'एआई वकील मिलान',
+    describeCase: 'अपने मामले का वर्णन करें · सही वकील खोजें',
+    matches: 'मैच',
+    searchingLawyers: 'वकील खोज रहे हैं...',
+  }
+};
 
 export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
   const { t, lang, setLang } = useLang();
+  const d = LOCAL_TEXT_AI[lang] || LOCAL_TEXT_AI.en;
   const navigate = useNavigate();
   const [mobileView, setMobileView] = useState('chat'); // 'chat' | 'matches'
   const chatEndRef = useRef(null);
@@ -835,8 +902,8 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
             <div className="flex items-center gap-3">
 
               <div>
-                <h1 className="text-sm font-bold text-white tracking-wide">{t('ai_lawyer_matching') || 'AI LAWYER MATCHING'}</h1>
-                <p className="text-[10px] text-slate-500 font-medium">{t('ai_describe_case') || 'Describe your case · find the right advocate'}</p>
+                <h1 className="text-sm font-bold text-white tracking-wide">{d.aiLawyerMatching}</h1>
+                <p className="text-[10px] text-slate-500 font-medium">{d.describeCase}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -853,11 +920,11 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                     onClick={() => setMobileView('matches')}
                     className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shadow-lg shadow-blue-600/30"
                   >
-                    {recommendedLawyers.length} {t('ai_matches') || 'Matches'} <ArrowRight className="w-3 h-3" />
+                    {recommendedLawyers.length} {d.matches} <ArrowRight className="w-3 h-3" />
                   </button>
                   {/* Desktop badge */}
                   <span className="hidden lg:inline text-xs font-bold bg-slate-900 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                    {recommendedLawyers.length} {t('ai_matches') || 'matches'}
+                    {recommendedLawyers.length} {d.matches}
                   </span>
                 </>
               )}
@@ -1004,9 +1071,9 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
 
-                  TOP MATCHES
+                  {d.topMatches}
                   <span className="ml-1 text-[10px] bg-slate-900 border border-slate-700 text-slate-400 px-2 py-0.5 rounded-full font-bold">
-                    {recommendedLawyers.length} Found
+                    {recommendedLawyers.length} {d.found}
                   </span>
                 </h3>
                 <div className="flex items-center gap-2">
@@ -1015,7 +1082,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                     onClick={() => setMobileView('chat')}
                     className="lg:hidden flex items-center gap-1.5 text-slate-400 text-xs font-semibold hover:text-white transition-colors"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Chat
+                    <ArrowLeft className="w-3.5 h-3.5" /> {d.chat}
                   </button>
                   {/* Close / dismiss panel — visible on all screens */}
                   <button
@@ -1067,32 +1134,32 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                         <div className="mb-3">
                           <div className="flex items-center justify-between">
                             <h4 className="font-bold text-white text-sm">{lawyer.name}</h4>
-                            {lawyer.verified && <span className="text-[9px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full font-semibold">✓ Verified</span>}
+                            {lawyer.verified && <span className="text-[9px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full font-semibold">✓ {d.verified}</span>}
                           </div>
                           {lawyer.specialization && <p className="text-xs font-semibold mt-0.5 text-blue-400">{lawyer.specialization}</p>}
                         </div>
                         <div className="grid grid-cols-2 gap-2 mb-3">
                           <div className="rounded-xl px-3 py-2 border bg-slate-800 border-slate-700">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Experience</p>
-                            <p className="text-sm font-bold text-slate-100">{lawyer.experience} Years</p>
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">{d.experience}</p>
+                            <p className="text-sm font-bold text-slate-100">{lawyer.experience} {d.years}</p>
                           </div>
                           <div className="rounded-xl px-3 py-2 border bg-slate-800 border-slate-700">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Location</p>
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">{d.location}</p>
                             <p className="text-sm font-bold text-slate-100 truncate">{lawyer.city || lawyer.state || 'India'}</p>
                           </div>
                           <div className="rounded-xl px-3 py-2 border col-span-2 bg-slate-800 border-slate-700">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Consultation Fee</p>
-                            <p className="text-sm font-bold text-slate-100">{lawyer.feeMin ? `₹${lawyer.feeMin.toLocaleString()}/hr` : (lawyer.fee || 'Contact for fee')}</p>
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">{d.consultationFee}</p>
+                            <p className="text-sm font-bold text-slate-100">{lawyer.feeMin ? `₹${lawyer.feeMin.toLocaleString()}/hr` : (lawyer.fee || d.contactForFee)}</p>
                           </div>
                         </div>
                         <div className="flex gap-2">
                           <button onClick={(e) => { e.stopPropagation(); setSelectedLawyer(lawyer); }}
                             className="flex-1 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all border border-slate-700">
-                            View Profile
+                            {d.viewProfile}
                           </button>
                           <button onClick={(e) => { e.stopPropagation(); handleBookConsultation(lawyer); }}
                             className={`flex-1 py-2 rounded-2xl bg-gradient-to-r ${grad} hover:opacity-90 text-white text-xs font-bold transition-all shadow-sm`}>
-                            Book Now →
+                            {d.bookNow} →
                           </button>
                         </div>
                       </div>
@@ -1102,12 +1169,12 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                 {recommendedLawyers.length > 5 && (
                   <button onClick={() => setShowAllLawyers(!showAllLawyers)}
                     className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800 transition-all">
-                    {showAllLawyers ? 'Show Less' : `Show all ${recommendedLawyers.length} matches`} <ArrowRight className="w-4 h-4" />
+                    {showAllLawyers ? d.showLess : `${d.showAllMatches} (${recommendedLawyers.length})`} <ArrowRight className="w-4 h-4" />
                   </button>
                 )}
                 <button onClick={() => navigate('/find-lawyer/manual', { state: { specialization: memory.caseType || '', location: memory.location ? (memory.location.city || memory.location.state) : '', budget: memory.budget ? memory.budget.max : '' } })}
                   className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800 transition-all">
-                  Browse all lawyers <ArrowRight className="w-4 h-4" />
+                  {d.browseAllLawyers} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </motion.div>
@@ -1160,7 +1227,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   </div>
                   {selectedLawyer.verified && (
                     <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-semibold rounded-lg border border-green-100 dark:border-green-800 shrink-0">
-                      <Check className="w-4 h-4" /> Verified
+                      <Check className="w-4 h-4" /> {d.verified}
                     </span>
                   )}
                 </div>
@@ -1168,31 +1235,31 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                 {/* Info tiles */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold"><Briefcase className="w-4 h-4 text-blue-500" /> Experience</div>
-                    <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.experience} Years</div>
+                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold"><Briefcase className="w-4 h-4 text-blue-500" /> {d.experience}</div>
+                    <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.experience} {d.years}</div>
                   </div>
                   <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold"><MapPin className="w-4 h-4 text-blue-500" /> Location</div>
+                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold"><MapPin className="w-4 h-4 text-blue-500" /> {d.location}</div>
                     <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.city || selectedLawyer.state || 'India'}</div>
                   </div>
                 </div>
 
                 {/* Education */}
                 <div className="mb-6 p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center gap-2 text-slate-400 mb-3 text-xs uppercase tracking-wider font-bold"><GraduationCap className="w-4 h-4 text-blue-500" /> Education</div>
-                  <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">{selectedLawyer.education || 'Not specified'}</div>
+                  <div className="flex items-center gap-2 text-slate-400 mb-3 text-xs uppercase tracking-wider font-bold"><GraduationCap className="w-4 h-4 text-blue-500" /> {d.education}</div>
+                  <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">{selectedLawyer.education || d.notSpecified}</div>
                 </div>
 
                 {/* About */}
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                      About <div className="h-px flex-1 bg-slate-100 dark:bg-[#2A2A2A]" />
+                      {d.about} <div className="h-px flex-1 bg-slate-100 dark:bg-[#2A2A2A]" />
                     </h3>
                     {selectedLawyer.bio ? (
                       <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">{selectedLawyer.bio}</p>
                     ) : (
-                      <p className="text-slate-400 dark:text-slate-500 italic text-base">No bio available.</p>
+                      <p className="text-slate-400 dark:text-slate-500 italic text-base">{d.noBio}</p>
                     )}
                   </div>
 
@@ -1200,7 +1267,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   {selectedLawyer?.achievements && Array.isArray(selectedLawyer.achievements) && selectedLawyer.achievements.length > 0 && (
                     <div className="p-6 sm:p-8 bg-gradient-to-br from-blue-50/50 to-indigo-100/50 dark:from-[#0a0f1a] dark:to-[#05080f] rounded-3xl border border-blue-200/50 dark:border-blue-500/20 relative overflow-hidden">
                       <h3 className="text-base font-black text-blue-900 dark:text-blue-400 uppercase tracking-widest mb-5 flex items-center gap-3">
-                        <Award className="w-5 h-5 text-blue-500" /> Milestones &amp; Achievements
+                        <Award className="w-5 h-5 text-blue-500" /> {d.milestones}
                         <div className="h-px flex-1 bg-gradient-to-r from-blue-200/50 dark:from-blue-500/20 to-transparent" />
                       </h3>
                       <div className="space-y-4">
@@ -1218,7 +1285,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                                 <p className="font-bold text-lg leading-snug text-slate-900 dark:text-white">{ach.title}</p>
                                 {ach.pinned && (
                                   <span className="shrink-0 flex items-center gap-1.5 text-[10px] font-black text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-2.5 py-1 rounded-full tracking-wider uppercase border border-blue-200 dark:border-blue-800/50">
-                                    <Star className="w-3 h-3 fill-current" /> Featured
+                                    <Star className="w-3 h-3 fill-current" /> {d.featured}
                                   </span>
                                 )}
                               </div>
@@ -1235,25 +1302,25 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                     <div className="flex flex-col gap-3 px-5 py-5">
                       <div className="flex items-center gap-2">
                         <Scale className="w-4 h-4 text-indigo-500" />
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-0.5">Court Experience</span>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-0.5">{d.courtExp}</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {(Array.isArray(selectedLawyer.court) ? selectedLawyer.court : (selectedLawyer.court || 'Not specified').split(',')).map((court, i) => (
+                        {(Array.isArray(selectedLawyer.court) ? selectedLawyer.court : (selectedLawyer.court || d.notSpecified).split(',')).map((court, i) => (
                           <span key={i} className="px-3 py-1.5 text-sm font-medium bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200">{court.trim()}</span>
                         ))}
                       </div>
                     </div>
                     <div className="flex items-center justify-between px-5 py-5">
                       <div>
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Consultation Fee</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{d.consultationFee}</div>
                         <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                          {selectedLawyer.feeMin ? `₹${selectedLawyer.feeMin.toLocaleString()} – ₹${selectedLawyer.feeMax?.toLocaleString()}` : (selectedLawyer.fee || 'Contact')}
+                          {selectedLawyer.feeMin ? `₹${selectedLawyer.feeMin.toLocaleString()} – ₹${selectedLawyer.feeMax?.toLocaleString()}` : (selectedLawyer.fee || d.contactForFee)}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Mode</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{d.mode}</div>
                         <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">
-                          {selectedLawyer.consultation_preferences === 'both' ? 'Video & In-Person' : selectedLawyer.consultation_preferences === 'in_person' ? 'In-Person' : selectedLawyer.consultation_preferences === 'online' ? 'Video Call' : 'Not specified'}
+                          {selectedLawyer.consultation_preferences === 'both' ? d.videoInPerson : selectedLawyer.consultation_preferences === 'in_person' ? d.inPerson : selectedLawyer.consultation_preferences === 'online' ? d.videoCall : d.notSpecified}
                         </span>
                       </div>
                     </div>
@@ -1267,7 +1334,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   onClick={() => handleBookConsultation(selectedLawyer)}
                   className="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-base tracking-wide transition-all hover:scale-[1.02] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
                 >
-                  Book Consultation <ArrowRight className="w-5 h-5" />
+                  {d.bookConsultation} <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </motion.div>

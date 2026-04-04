@@ -25,10 +25,62 @@ const FloatingCard = ({ children, delay = 0, className = "" }) => (
   </motion.div>
 );
 
+const LOCAL_TEXT = {
+  en: {
+    aiFiltersSuccess: 'AI search filters automatically applied!',
+    maxFee: 'Max Fee (₹)',
+    anyPrice: 'Any Price',
+    under: 'Under',
+    hasAchievements: 'Has Achievements',
+    bothVideoInPerson: 'Video/In-person',
+    videoCall: 'Video Call',
+    inPerson: 'In-Person',
+    about: 'About',
+    experience: 'Experience',
+    years: 'Years',
+    location: 'Location',
+    education: 'Education',
+    noBio: 'No bio available.',
+    milestones: 'Milestones & Achievements',
+    featured: 'Featured',
+    courtExp: 'Court Experience',
+    primary: 'Primary',
+    yrs: 'yrs',
+    notSpecified: 'Not specified',
+    consultationFee: 'Consultation Fee',
+    mode: 'Mode',
+  },
+  hi: {
+    aiFiltersSuccess: 'AI खोज फ़िल्टर स्वचालित रूप से लागू हो गए!',
+    maxFee: 'अधिकतम शुल्क (₹)',
+    anyPrice: 'कोई भी कीमत',
+    under: 'के अंतर्गत',
+    hasAchievements: 'उपलब्धियां हैं',
+    bothVideoInPerson: 'वीडियो/इन-पर्सन',
+    videoCall: 'वीडियो कॉल',
+    inPerson: 'व्यक्तिगत रूप से',
+    about: 'के बारे में',
+    experience: 'अनुभव',
+    years: 'वर्ष',
+    location: 'स्थान',
+    education: 'शिक्षा',
+    noBio: 'कोई बायो उपलब्ध नहीं है।',
+    milestones: 'मील के पत्थर और उपलब्धियां',
+    featured: 'विशेष रुप से प्रदर्शित',
+    courtExp: 'अदालत का अनुभव',
+    primary: 'प्राथमिक',
+    yrs: 'वर्ष',
+    notSpecified: 'उल्लेखित नहीं है',
+    consultationFee: 'परामर्श शुल्क',
+    mode: 'मोड',
+  }
+};
+
 export default function FindLawyerManual() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const d = LOCAL_TEXT[lang] || LOCAL_TEXT.en;
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     state: '',
@@ -82,7 +134,7 @@ export default function FindLawyerManual() {
         applied = true;
       }
       if (applied) {
-        toast.success("AI search filters automatically applied!");
+        toast.success(d.aiFiltersSuccess);
       }
     }
   }, [location.state]);
@@ -247,8 +299,8 @@ export default function FindLawyerManual() {
     { key: 'city', value: filters.city },
     { key: 'court', value: filters.court },
     { key: 'consultationType', value: filters.consultationType },
-    { key: 'priceMax', value: filters.priceMax ? `Under ₹${filters.priceMax}` : '' },
-    ...(filters.withAchievement ? [{ key: 'withAchievement', value: 'Has Achievements' }] : [])
+    { key: 'priceMax', value: filters.priceMax ? `${d.under} ₹${filters.priceMax}` : '' },
+    ...(filters.withAchievement ? [{ key: 'withAchievement', value: d.hasAchievements }] : [])
   ].filter(f => f.value);
 
   return (
@@ -318,7 +370,7 @@ export default function FindLawyerManual() {
             <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
               {currentFilters.map(f => (
                 <span key={f.key} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-[#222] text-slate-700 dark:text-slate-300 border dark:border-[#333] rounded-lg text-sm font-medium">
-                  {f.key === 'consultationType' ? (f.value === 'both' ? 'Video/In-person' : (f.value === 'video' ? 'Video Call' : 'In-Person')) : f.value}
+                  {f.key === 'consultationType' ? (f.value === 'both' ? d.bothVideoInPerson : (f.value === 'video' ? d.videoCall : d.inPerson)) : f.value}
                   <button onClick={() => handleFilterChange(f.key, f.key === 'withAchievement' ? false : '')} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                     <X className="w-3 h-3" />
                   </button>
@@ -424,19 +476,19 @@ export default function FindLawyerManual() {
 
                   {/* Price filter */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Max Fee (₹)</label>
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.maxFee}</label>
                     <select
                       value={filters.priceMax}
                       onChange={(e) => handleFilterChange('priceMax', e.target.value)}
                       className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
                     >
-                      <option value="">Any Price</option>
-                      <option value="1000">Under ₹1,000</option>
-                      <option value="3000">Under ₹3,000</option>
-                      <option value="5000">Under ₹5,000</option>
-                      <option value="10000">Under ₹10,000</option>
-                      <option value="20000">Under ₹20,000</option>
-                      <option value="50000">Under ₹50,000</option>
+                      <option value="">{d.anyPrice}</option>
+                      <option value="1000">{d.under} ₹1,000</option>
+                      <option value="3000">{d.under} ₹3,000</option>
+                      <option value="5000">{d.under} ₹5,000</option>
+                      <option value="10000">{d.under} ₹10,000</option>
+                      <option value="20000">{d.under} ₹20,000</option>
+                      <option value="50000">{d.under} ₹50,000</option>
                     </select>
                   </div>
                 </div>
@@ -630,13 +682,13 @@ export default function FindLawyerManual() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold">
-                      <Briefcase className="w-4 h-4 text-blue-500" /> Experience
+                      <Briefcase className="w-4 h-4 text-blue-500" /> {d.experience}
                     </div>
-                    <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.experience} Years</div>
+                    <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.experience} {d.years}</div>
                   </div>
                   <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold">
-                      <MapPin className="w-4 h-4 text-blue-500" /> Location
+                      <MapPin className="w-4 h-4 text-blue-500" /> {d.location}
                     </div>
                     <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.city}</div>
                   </div>
@@ -644,7 +696,7 @@ export default function FindLawyerManual() {
 
                 <div className="mb-10 p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl transition-all duration-300">
                   <div className="flex items-center gap-2 text-slate-400 mb-3 text-xs uppercase tracking-wider font-bold">
-                    <GraduationCap className="w-4 h-4 text-blue-500" /> Education
+                    <GraduationCap className="w-4 h-4 text-blue-500" /> {d.education}
                   </div>
                   <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">{selectedLawyer.education}</div>
                 </div>
@@ -652,7 +704,7 @@ export default function FindLawyerManual() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                      About
+                      {d.about}
                       <div className="h-px flex-1 bg-slate-100 dark:bg-[#2A2A2A]" />
                     </h3>
                     {selectedLawyer.bio ? (() => {
@@ -672,7 +724,7 @@ export default function FindLawyerManual() {
                         </div>
                       );
                     })() : (
-                      <p className="text-slate-400 dark:text-slate-500 italic text-lg">No bio available.</p>
+                      <p className="text-slate-400 dark:text-slate-500 italic text-lg">{d.noBio}</p>
                     )}
                   </div>
 
@@ -685,7 +737,7 @@ export default function FindLawyerManual() {
 
                       <h3 className="text-base font-black text-yellow-800 dark:text-yellow-400 uppercase tracking-widest mb-5 flex items-center gap-3 relative z-10">
                         <Award className="w-5 h-5 text-yellow-500" />
-                        Milestones & Achievements
+                        {d.milestones}
                         <div className="h-px flex-1 bg-gradient-to-r from-yellow-200/50 dark:from-yellow-500/20 to-transparent" />
                       </h3>
 
@@ -728,7 +780,7 @@ export default function FindLawyerManual() {
                                 </p>
                                 {ach.pinned && (
                                   <span className="shrink-0 flex items-center gap-1.5 text-[10px] font-black text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/40 px-2.5 py-1 rounded-full tracking-wider uppercase border border-yellow-200 dark:border-yellow-800/50">
-                                    <Star className="w-3 h-3 fill-current" /> Featured
+                                    <Star className="w-3 h-3 fill-current" /> {d.featured}
                                   </span>
                                 )}
                               </div>
@@ -751,13 +803,13 @@ export default function FindLawyerManual() {
                     <div className="flex flex-col gap-3 px-5 py-5 border-b border-slate-100 dark:border-[#2A2A2A]">
                       <div className="flex items-center gap-2">
                         <Scale className="w-4 h-4 text-indigo-500" />
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-0.5">Court Experience</span>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest pt-0.5">{d.courtExp}</span>
                       </div>
 
                       {selectedLawyer.primary_court && (
                         <div className="flex items-center gap-2 mb-1">
                           <span className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-800">
-                            Primary
+                            {d.primary}
                           </span>
                           <span className="font-semibold text-slate-900 dark:text-white">{selectedLawyer.primary_court}</span>
                         </div>
@@ -771,7 +823,7 @@ export default function FindLawyerManual() {
                                 {c.court_name}
                               </span>
                               <span className="px-2.5 py-1.5 bg-slate-100 dark:bg-[#111] text-slate-500 border-l border-slate-200 dark:border-[#333]">
-                                {c.years} yrs
+                                {c.years} {d.yrs}
                               </span>
                             </div>
                           ))
@@ -782,14 +834,14 @@ export default function FindLawyerManual() {
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm text-slate-500 dark:text-slate-400 italic">{selectedLawyer.court || 'Not specified'}</span>
+                          <span className="text-sm text-slate-500 dark:text-slate-400 italic">{selectedLawyer.court || d.notSpecified}</span>
                         )}
                       </div>
                     </div>
 
                     {/* Consultation Fee */}
                     <div className="flex items-center gap-4 px-5 py-4">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0">Consultation Fee</span>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0">{d.consultationFee}</span>
                       <span className="text-base font-semibold text-slate-900 dark:text-white">
                         {(() => {
                           const p30 = selectedLawyer.charge_30min || selectedLawyer.consultation_fee_30min;
@@ -828,9 +880,8 @@ export default function FindLawyerManual() {
                       </span>
                     </div>
 
-                    {/* Consultation Type */}
                     <div className="flex items-start gap-4 px-5 py-4">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0 pt-0.5">Mode</span>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0 pt-0.5">{d.mode}</span>
                       <div className="flex flex-wrap gap-1.5">
                         {(() => {
                           const pref = (selectedLawyer.consultation_preferences || '').toLowerCase().trim();
@@ -838,11 +889,11 @@ export default function FindLawyerManual() {
                           const hasVideo = pref === 'video' || pref === 'both' || types.some(t => t.includes('video'));
                           const hasInPerson = pref === 'in_person' || pref === 'both' || types.some(t => t.includes('in_person') || t.includes('in person'));
                           const modes = [];
-                          if (hasVideo) modes.push('Video Call');
-                          if (hasInPerson) modes.push('In-Person');
+                          if (hasVideo) modes.push(d.videoCall);
+                          if (hasInPerson) modes.push(d.inPerson);
                           return modes.length > 0 ? modes.map((m, i) => (
                             <span key={i} className="text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-[#222] border border-slate-200 dark:border-[#333] px-2.5 py-1 rounded-md">{m}</span>
-                          )) : <span className="text-sm text-slate-400 dark:text-slate-500 italic">Not specified</span>;
+                          )) : <span className="text-sm text-slate-400 dark:text-slate-500 italic">{d.notSpecified}</span>;
                         })()}
                       </div>
                     </div>

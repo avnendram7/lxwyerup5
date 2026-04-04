@@ -8,6 +8,49 @@ import { toast } from 'sonner';
 import { Footer } from '../components/Footer';
 import { useLang } from '../context/LanguageContext';
 
+const TEXT = {
+  en: {
+    phoneLabel: 'Phone Number',
+    namePlace: 'Rahul Sharma',
+    emailPlace: 'rahul@example.com',
+    phonePlace: '+91 9876543210',
+    msgPlace: 'Tell us about your legal needs...',
+    getInTouch: 'Get in Touch',
+    reachOut: 'Reach out to us through any of these channels',
+    officeHours: 'Office Hours',
+    monFri: 'Monday - Friday: 9:00 AM - 6:00 PM',
+    sat: 'Saturday: 10:00 AM - 4:00 PM',
+    sun: 'Sunday: Closed',
+    urgentAI: 'For urgent matters, our AI assistant is available 24/7',
+    notSure: 'Not Sure Where to Start?',
+    bookFreeSub: 'Book a free consultation and let our experts guide you through your legal options',
+    bookFreeBtn: 'Book Free Consultation',
+    email: 'Email',
+    phone: 'Phone',
+    location: 'Location',
+  },
+  hi: {
+    phoneLabel: 'फ़ोन नंबर',
+    namePlace: 'राहुल शर्मा',
+    emailPlace: 'rahul@example.com',
+    phonePlace: '+91 9876543210',
+    msgPlace: 'अपनी कानूनी ज़रूरतों के बारे में हमें बताएं...',
+    getInTouch: 'संपर्क करें',
+    reachOut: 'इनमें से किसी भी माध्यम से हमसे जुड़ें',
+    officeHours: 'कार्यालय समय',
+    monFri: 'सोमवार - शुक्रवार: सुबह 9:00 - शाम 6:00',
+    sat: 'शनिवार: सुबह 10:00 - शाम 4:00',
+    sun: 'रविवार: बंद',
+    urgentAI: 'तात्कालिक मामलों के लिए, हमारा AI सहायक 24/7 उपलब्ध है',
+    notSure: 'समझ नहीं आ रहा कहाँ से शुरू करें?',
+    bookFreeSub: 'मुफ़्त परामर्श बुक करें और हमारे विशेषज्ञों को आपके विकल्पों के बारे में मार्गदर्शन करने दें',
+    bookFreeBtn: 'मुफ़्त परामर्श बुक करें',
+    email: 'ईमेल',
+    phone: 'फ़ोन',
+    location: 'स्थान',
+  }
+};
+
 const ContactPage = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -104,24 +147,25 @@ const ContactHero = ({ fadeInUp }) => {
 const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting, fadeInUp }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
 
   const contactInfo = [
     {
       icon: Mail,
-      title: 'Email',
+      title: d.email,
       value: 'avnendram.7@gmail.com',
       link: 'mailto:avnendram.7@gmail.com'
     },
     {
       icon: Phone,
-      title: 'Phone',
+      title: d.phone,
       value: '+91 8318216968',
       link: 'tel:+918318216968'
     },
     {
       icon: MapPin,
-      title: 'Location',
+      title: d.location,
       value: 'Sonipat, Haryana, India',
       link: null
     }
@@ -156,7 +200,7 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   onChange={handleChange}
                   required
                   className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
-                  placeholder="Rahul Sharma"
+                  placeholder={d.namePlace}
                 />
               </div>
 
@@ -172,13 +216,13 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   onChange={handleChange}
                   required
                   className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
-                  placeholder="rahul@example.com"
+                  placeholder={d.emailPlace}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  Phone Number
+                  {d.phoneLabel}
                 </label>
                 <motion.input
                   whileFocus={{ scale: 1.01 }}
@@ -188,7 +232,7 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   onChange={handleChange}
                   required
                   className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 placeholder:text-slate-400"
-                  placeholder="+91 9876543210"
+                  placeholder={d.phonePlace}
                 />
               </div>
 
@@ -204,7 +248,7 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
                   required
                   rows="5"
                   className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-blue-600 dark:focus:border-blue-500 text-slate-900 dark:text-white focus:outline-none transition-all duration-300 resize-none placeholder:text-slate-400"
-                  placeholder="Tell us about your legal needs..."
+                  placeholder={d.msgPlace}
                 />
               </div>
 
@@ -233,9 +277,9 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Get in Touch</h2>
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">{d.getInTouch}</h2>
             <p className="text-slate-600 dark:text-slate-400 mb-8">
-              Reach out to us through any of these channels
+              {d.reachOut}
             </p>
 
             <div className="space-y-6 mb-12">
@@ -275,15 +319,15 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
               transition={{ delay: 0.8 }}
               className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-3xl text-white shadow-xl"
             >
-              <h3 className="text-2xl font-bold mb-4">Office Hours</h3>
+              <h3 className="text-2xl font-bold mb-4">{d.officeHours}</h3>
               <div className="space-y-2 text-slate-300">
-                <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                <p>Saturday: 10:00 AM - 4:00 PM</p>
-                <p>Sunday: Closed</p>
+                <p>{d.monFri}</p>
+                <p>{d.sat}</p>
+                <p>{d.sun}</p>
               </div>
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-sm text-slate-400">
-                  For urgent matters, our AI assistant is available 24/7
+                  {d.urgentAI}
                 </p>
               </div>
             </motion.div>
@@ -300,6 +344,8 @@ const ContactFormSection = ({ formData, handleChange, handleSubmit, isSubmitting
 const FinalCTA = ({ fadeInUp }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const { lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
 
   return (
     <section ref={ref} className="py-24 px-4 sm:px-6 lg:px-8">
@@ -317,16 +363,16 @@ const FinalCTA = ({ fadeInUp }) => {
             <CheckCircle className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 relative z-10">
-            Not Sure Where to Start?
+            {d.notSure}
           </h2>
           <p className="text-xl text-slate-300 mb-8 relative z-10">
-            Book a free consultation and let our experts guide you through your legal options
+            {d.bookFreeSub}
           </p>
           <Button
             onClick={() => window.location.href = '/register'}
             className="bg-white text-slate-900 hover:bg-slate-100 text-lg px-10 py-6 rounded-full font-semibold shadow-lg hover:scale-105 transition-all duration-300 relative z-10"
           >
-            Book Free Consultation
+            {d.bookFreeBtn}
           </Button>
         </motion.div>
       </div>

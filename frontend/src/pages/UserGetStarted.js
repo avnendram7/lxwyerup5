@@ -3,9 +3,49 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Building2, ArrowRight, ArrowLeft, ShieldCheck, Lock, Star } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+import { useLang } from '../context/LanguageContext';
+
+const TEXT = {
+  en: {
+    heroSup: "India's First Legal Ecosystem",
+    heroTitle: "Find the best possible consultation",
+    lawyerSup: 'Individual Advocate',
+    lawyerTitle: 'Find a Lawyer',
+    lawyerSub: 'Search 1,000+ verified lawyers by specialization, city & budget.',
+    firmSup: 'Legal Establishment',
+    firmTitle: 'Find a Law Firm',
+    firmSub: 'Discover top-rated firms with full specialist teams.',
+    trust1: 'Bar Council Verified',
+    trust2: 'End-to-end Encrypted',
+    trust3: 'Free Consultation',
+    stat1: 'Verified Lawyers',
+    stat2: 'Cases Resolved',
+    stat3: 'States Covered',
+    backBtn: 'Back to Home'
+  },
+  hi: {
+    heroSup: "भारत का पहला कानूनी पारिस्थितिकी तंत्र",
+    heroTitle: "सर्वोत्तम संभव परामर्श खोजें",
+    lawyerSup: 'व्यक्तिगत अधिवक्ता',
+    lawyerTitle: 'वकील खोजें',
+    lawyerSub: 'विशेषज्ञता, शहर और बजट के अनुसार 1,000+ सत्यापित वकीलों को खोजें।',
+    firmSup: 'कानूनी संस्था',
+    firmTitle: 'लॉ फर्म खोजें',
+    firmSub: 'पूर्ण विशेषज्ञ टीमों के साथ शीर्ष रेटेड फर्मों की खोज करें।',
+    trust1: 'बार काउंसिल सत्यापित',
+    trust2: 'एंड-टू-एंड एन्क्रिप्टेड',
+    trust3: 'मुफ्त परामर्श',
+    stat1: 'सत्यापित वकील',
+    stat2: 'हल किए गए मामले',
+    stat3: 'राज्य कवर किए गए',
+    backBtn: 'होम पर वापस जाएं'
+  }
+};
 
 export default function UserGetStarted() {
   const navigate = useNavigate();
+  const { lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   // ── CountUp hook ──────────────────────────────────────
@@ -73,10 +113,10 @@ export default function UserGetStarted() {
             className="text-center px-4"
           >
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-3 md:mb-4">
-              <span className="text-[9px] md:text-[10px] tracking-[0.25em] uppercase text-blue-400 font-bold">India's First Legal Ecosystem</span>
+              <span className="text-[9px] md:text-[10px] tracking-[0.25em] uppercase text-blue-400 font-bold">{d.heroSup}</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-2xl">
-              Find the best possible consultation
+              {d.heroTitle}
             </h1>
           </motion.div>
         </div>
@@ -90,9 +130,9 @@ export default function UserGetStarted() {
             {
               id: 'lawyer',
               Icon: User,
-              sup: 'Individual Advocate',
-              title: 'Find a Lawyer',
-              sub: 'Search 1,000+ verified lawyers by specialization, city & budget.',
+              sup: d.lawyerSup,
+              title: d.lawyerTitle,
+              sub: d.lawyerSub,
               path: '/find-lawyer/manual',
               btnClass: 'bg-blue-600 hover:bg-blue-700',
               borderHover: 'hover:border-blue-500/50',
@@ -103,9 +143,9 @@ export default function UserGetStarted() {
             {
               id: 'firm',
               Icon: Building2,
-              sup: 'Legal Establishment',
-              title: 'Find a Law Firm',
-              sub: 'Discover top-rated firms with full specialist teams.',
+              sup: d.firmSup,
+              title: d.firmTitle,
+              sub: d.firmSub,
               path: '/find-lawfirm/manual',
               btnClass: 'bg-slate-700 hover:bg-slate-600',
               borderHover: 'hover:border-slate-500/50',
@@ -156,9 +196,9 @@ export default function UserGetStarted() {
           className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6"
         >
           {[
-            { Icon: ShieldCheck, text: 'Bar Council Verified' },
-            { Icon: Lock, text: 'End-to-end Encrypted' },
-            { Icon: Star, text: 'Free Consultation' },
+            { Icon: ShieldCheck, text: d.trust1 },
+            { Icon: Lock, text: d.trust2 },
+            { Icon: Star, text: d.trust3 },
           ].map(({ Icon, text }, i) => (
             <div key={i} className="flex items-center gap-1.5">
               <Icon className="w-3 h-3 text-blue-500/40" strokeWidth={1.5} />
@@ -174,9 +214,9 @@ export default function UserGetStarted() {
           transition={{ duration: 0.5, delay: 0.35 }}
           className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-8"
         >
-          <StatItem target={1000} suffix="+" label="Verified Lawyers" delay={500} />
-          <StatItem target={10000} suffix="+" label="Cases Resolved" delay={600} />
-          <StatItem target={3} suffix="+" label="States Covered" delay={700} />
+          <StatItem target={1000} suffix="+" label={d.stat1} delay={500} />
+          <StatItem target={10000} suffix="+" label={d.stat2} delay={600} />
+          <StatItem target={3} suffix="+" label={d.stat3} delay={700} />
         </motion.div>
 
         {/* Back link */}
@@ -185,7 +225,7 @@ export default function UserGetStarted() {
           className="flex items-center gap-1.5 text-xs text-white/20 hover:text-white/50 transition-colors group"
         >
           <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Home
+          {d.backBtn}
         </button>
       </main>
     </div>

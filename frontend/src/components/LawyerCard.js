@@ -2,6 +2,28 @@ import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowRight, Eye } from 'lucide-react';
 import { getInitials } from '../utils/lawyerPhoto';
+import { useLang } from '../context/LanguageContext';
+
+const TEXT = {
+  en: {
+    verified: 'Verified',
+    legalExpert: 'Legal Expert',
+    yr: 'yr',
+    exp: 'Exp.',
+    location: 'Location',
+    profile: 'Profile',
+    bookConsultation: 'Book Consultation',
+  },
+  hi: {
+    verified: 'सत्यापित',
+    legalExpert: 'कानूनी विशेषज्ञ',
+    yr: 'वर्ष',
+    exp: 'अनुभव',
+    location: 'स्थान',
+    profile: 'प्रोफ़ाइल',
+    bookConsultation: 'परामर्श बुक करें',
+  }
+};
 
 /* ── Specialization → professional banner color ── */
 const SPEC_COLORS = {
@@ -41,6 +63,8 @@ function getColors(spec = '') {
 }
 
 function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
+  const { lang } = useLang();
+  const d = TEXT[lang] || TEXT.en;
   const hasPhoto = !!(lawyer.photo && lawyer.photo.length > 5);
   const colors   = getColors(lawyer.specialization);
 
@@ -136,7 +160,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
             fontSize: 10, fontWeight: 700, color: '#34d399',
           }}>
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
-            Verified
+            {d.verified}
           </div>
         )}
       </div>
@@ -202,13 +226,12 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
           {lawyer.name}
         </h3>
 
-        {/* Specialization */}
         <p style={{
           fontSize: 11, fontWeight: 600, marginBottom: 10,
           color: colors.accent,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
-          {lawyer.specialization || 'Legal Expert'}
+          {lawyer.specialization || d.legalExpert}
         </p>
 
         {/* Tags */}
@@ -253,9 +276,9 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
           {/* Experience */}
           <div style={{ flex: 1, textAlign: 'center' }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: '#f0f4ff', letterSpacing: '-0.01em', lineHeight: 1 }}>
-              {lawyer.experience}<span style={{ fontSize: 9, fontWeight: 600, color: '#475569' }}>yr</span>
+              {lawyer.experience}<span style={{ fontSize: 9, fontWeight: 600, color: '#475569', marginLeft: 2 }}>{d.yr}</span>
             </div>
-            <div style={{ fontSize: 8, color: '#475569', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Exp.</div>
+            <div style={{ fontSize: 8, color: '#475569', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{d.exp}</div>
           </div>
 
           <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.07)' }} />
@@ -268,7 +291,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
                 {lawyer.city || lawyer.state || '—'}
               </span>
             </div>
-            <div style={{ fontSize: 9, color: '#475569', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Location</div>
+            <div style={{ fontSize: 9, color: '#475569', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{d.location}</div>
           </div>
 
           {(fee30 || fallback) && (
@@ -303,7 +326,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
             onMouseLeave={e => { e.currentTarget.style.background = `${colors.accent}15`; e.currentTarget.style.border = `1px solid ${colors.accent}40`; }}
           >
             <Eye style={{ width: 13, height: 13 }} />
-            Profile
+            {d.profile}
           </button>
 
           {/* Book button — always professional blue */}
@@ -322,7 +345,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
             onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg,#2563eb,#4f46e5)'; e.currentTarget.style.boxShadow = '0 6px 22px rgba(29,78,216,0.5)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg,#1d4ed8,#4338ca)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(29,78,216,0.35)'; }}
           >
-            Book Consultation
+            {d.bookConsultation}
             <ArrowRight style={{ width: 13, height: 13 }} />
           </button>
         </div>
