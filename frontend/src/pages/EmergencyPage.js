@@ -289,7 +289,7 @@ const EmergencyPage = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#030712', fontFamily: "'Outfit', sans-serif", position: 'relative', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: '#000000', fontFamily: "'Outfit', sans-serif", position: 'relative', overflowX: 'hidden' }}>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
         @keyframes esPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
@@ -302,8 +302,6 @@ const EmergencyPage = () => {
 
       {/* Ambient background */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
