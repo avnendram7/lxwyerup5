@@ -348,9 +348,9 @@ function LegalBG() {
     window.addEventListener('resize', resize);
 
     // Palette
-    const nodeColor = dark ? 'rgba(139,92,246,' : 'rgba(79,70,229,';
-    const lineColor = dark ? 'rgba(139,92,246,' : 'rgba(99,102,241,';
-    const glowColor = dark ? 'rgba(167,139,250,' : 'rgba(129,140,248,';
+    const nodeColor = dark ? 'rgba(59,130,246,' : 'rgba(37,99,235,';
+    const lineColor = dark ? 'rgba(59,130,246,' : 'rgba(37,99,235,';
+    const glowColor = dark ? 'rgba(96,165,250,' : 'rgba(147,197,253,';
 
     // Particles
     const N = 55;
@@ -425,9 +425,9 @@ function LegalBG() {
   }, [dark]);
 
   // Orb colors
-  const orb1 = dark ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.07)';
-  const orb2 = dark ? 'rgba(139,92,246,0.09)' : 'rgba(139,92,246,0.05)';
-  const orb3 = dark ? 'rgba(79,70,229,0.08)' : 'rgba(79,70,229,0.04)';
+  const orb1 = dark ? 'rgba(37,99,235,0.12)' : 'rgba(37,99,235,0.07)';
+  const orb2 = dark ? 'rgba(30,64,175,0.09)' : 'rgba(30,64,175,0.05)';
+  const orb3 = dark ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.04)';
 
   return (
     <div aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -482,6 +482,7 @@ export default function LawyerApplication() {
     charge30min: "",
     charge60min: "",
     bio: "",
+    catchphrase: "",
     officeAddresses: [""],
     barCouncilPhoto: "",
     collegeDegreePhoto: "",
@@ -494,6 +495,7 @@ export default function LawyerApplication() {
     sosLocations: [],
     sosMatters: [],
     sosTermsAccepted: false,
+    sosType: 'sos_talk', // 'sos_talk' | 'sos_full'
   });
 
   useEffect(() => {
@@ -645,9 +647,15 @@ export default function LawyerApplication() {
         !formData.education ||
         !formData.graduationDate ||
         formData.languages.length === 0 ||
-        !formData.bio
+        !formData.bio ||
+        !formData.catchphrase
       ) {
         toast.error("Please complete your additional information");
+        return false;
+      }
+      const catchphraseWordCount = formData.catchphrase.trim().split(/\s+/).length;
+      if (catchphraseWordCount > 20) {
+        toast.error(`One liner must be under 20 words. Current: ${catchphraseWordCount} words.`);
         return false;
       }
       const bioWordCount = formData.bio.trim().split(/\s+/).length;
@@ -734,6 +742,7 @@ export default function LawyerApplication() {
           education: formData.education,
           languages: formData.languages,
           bio: formData.bio,
+          catchphrase: formData.catchphrase,
           // Additional APEX fields
           state: formData.state,
           city: formData.city,
@@ -778,6 +787,7 @@ export default function LawyerApplication() {
         charge_30min: formData.charge30min,
         charge_60min: formData.charge60min,
         bio: formData.bio,
+        catchphrase: formData.catchphrase,
         office_address: formData.officeAddresses.filter((a) => a.trim()),
         bar_council_photo: formData.barCouncilPhoto,
         college_degree_photo: formData.collegeDegreePhoto,
@@ -787,6 +797,7 @@ export default function LawyerApplication() {
         aadhar_card_back: formData.aadharCardBack,
         pan_card: formData.panCard,
         application_type: formData.applicationType,
+        sos_type: formData.sosType,
         sos_locations: formData.sosLocations,
         sos_matters: formData.sosMatters,
         sos_terms_accepted: formData.sosTermsAccepted
@@ -905,9 +916,9 @@ export default function LawyerApplication() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all text-sm ${
                   s === step
-                    ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/30'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
                     : s < step
-                      ? 'bg-indigo-500 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-white/10 text-slate-400 border border-white/15'
                 }`}
               >
@@ -916,7 +927,7 @@ export default function LawyerApplication() {
               {s < (formData.applicationType.includes("sos") ? 6 : 5) && (
                 <div
                   className={`w-8 md:w-16 h-1 mx-1 md:mx-2 rounded ${
-                    s < step ? 'bg-indigo-500' : 'bg-white/10'
+                    s < step ? 'bg-blue-600' : 'bg-white/10'
                   }`}
                 />
               )}
@@ -978,7 +989,7 @@ export default function LawyerApplication() {
                       value={formData.name}
                       onChange={(e) => updateField("name", e.target.value)}
                       placeholder="Adv. Rajesh Kumar"
-                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
@@ -994,7 +1005,7 @@ export default function LawyerApplication() {
                       value={formData.email}
                       onChange={(e) => updateField("email", e.target.value)}
                       placeholder="advocate@example.com"
-                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
@@ -1020,7 +1031,7 @@ export default function LawyerApplication() {
                           updateField("password", e.target.value)
                         }
                         placeholder="••••••••"
-                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                       />
                       <button
                         type="button"
@@ -1048,7 +1059,7 @@ export default function LawyerApplication() {
                           updateField("confirmPassword", e.target.value)
                         }
                         placeholder="••••••••"
-                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                       />
                       <button
                         type="button"
@@ -1072,14 +1083,14 @@ export default function LawyerApplication() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/60 dark:bg-indigo-900/20 dark:border-indigo-800"
+                    className="p-4 rounded-xl border border-blue-200 bg-blue-50/60 dark:bg-blue-900/20 dark:border-blue-800"
                   >
                     <div className="flex items-start gap-3">
-                      <Building2 className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
+                      <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
                       <div>
-                        <p className="font-semibold text-indigo-900 dark:text-indigo-100 text-sm">Law Firm Associate Application</p>
-                        <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-1">Your application will be sent directly to your selected law firm. The firm manager will review, approve, and assign you work from their dashboard. You will be tagged as a <strong>Law Firm Lawyer</strong>.</p>
-                        <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-medium">✓ Normal &amp; SOS classification will be decided by your firm manager.</p>
+                        <p className="font-semibold text-blue-900 dark:text-blue-100 text-sm">Law Firm Associate Application</p>
+                        <p className="text-xs text-indigo-700 dark:text-blue-300 mt-1">Your application will be sent directly to your selected law firm. The firm manager will review, approve, and assign you work from their dashboard. You will be tagged as a <strong>Law Firm Lawyer</strong>.</p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">✓ Normal &amp; SOS classification will be decided by your firm manager.</p>
                       </div>
                     </div>
                   </motion.div>
@@ -1101,11 +1112,11 @@ export default function LawyerApplication() {
                         updateField("applicationType", newTypes);
                       }}
                       className={`px-6 py-3 rounded-xl border-2 transition-all flex items-center gap-2 ${formData.applicationType.includes("normal")
-                        ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100 font-bold"
-                        : "border-white/10 hover:border-indigo-200 bg-white/5 text-slate-300"
+                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 font-bold"
+                        : "border-white/10 hover:border-blue-200 bg-white/5 text-slate-300"
                         }`}
                     >
-                      <Briefcase className={`w-5 h-5 ${formData.applicationType.includes("normal") ? "text-indigo-600" : "text-slate-400"}`} />
+                      <Briefcase className={`w-5 h-5 ${formData.applicationType.includes("normal") ? "text-blue-600" : "text-slate-400"}`} />
                       Normal Lawyer
                     </button>
 
@@ -1171,15 +1182,15 @@ export default function LawyerApplication() {
                         });
                       }}
                       className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.lawyerType === "independent"
-                        ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20"
-                        : "border-white/10 hover:border-indigo-200 dark:hover:border-indigo-800 bg-white/5"
+                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/20"
+                        : "border-white/10 hover:border-blue-200 dark:hover:border-blue-800 bg-white/5"
                         }`}
                     >
                       <User
-                        className={`w-8 h-8 ${formData.lawyerType === "independent" ? "text-indigo-600" : "text-slate-400"}`}
+                        className={`w-8 h-8 ${formData.lawyerType === "independent" ? "text-blue-600" : "text-slate-400"}`}
                       />
                       <span
-                        className={`font-medium ${formData.lawyerType === "independent" ? "text-indigo-900" : "text-slate-600"}`}
+                        className={`font-medium ${formData.lawyerType === "independent" ? "text-blue-900" : "text-slate-600"}`}
                       >
                         Independent
                       </span>
@@ -1192,15 +1203,15 @@ export default function LawyerApplication() {
                       type="button"
                       onClick={() => updateField("lawyerType", "law_firm")}
                       className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.lawyerType === "law_firm"
-                        ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20"
-                        : "border-white/10 hover:border-indigo-200 dark:hover:border-indigo-800 bg-white/5"
+                        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/20"
+                        : "border-white/10 hover:border-blue-200 dark:hover:border-blue-800 bg-white/5"
                         }`}
                     >
                       <Building2
-                        className={`w-8 h-8 ${formData.lawyerType === "law_firm" ? "text-indigo-600" : "text-slate-400"}`}
+                        className={`w-8 h-8 ${formData.lawyerType === "law_firm" ? "text-blue-600" : "text-slate-400"}`}
                       />
                       <span
-                        className={`font-medium ${formData.lawyerType === "law_firm" ? "text-indigo-900" : "text-slate-600"}`}
+                        className={`font-medium ${formData.lawyerType === "law_firm" ? "text-blue-900" : "text-slate-600"}`}
                       >
                         Associate
                       </span>
@@ -1234,7 +1245,7 @@ export default function LawyerApplication() {
                             lawFirmName: selectedFirm?.firm_name || "",
                           });
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                       >
                         <option value="">Select a law firm</option>
                         {lawFirms.map((firm) => (
@@ -1288,7 +1299,7 @@ export default function LawyerApplication() {
                         updateField("barCouncilNumber", e.target.value)
                       }
                       placeholder="D/1234/2015"
-                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
@@ -1306,7 +1317,7 @@ export default function LawyerApplication() {
                         onChange={(e) =>
                           handleDocumentUpload("barCouncilPhoto", e)
                         }
-                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 text-white"
+                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 text-white"
                       />
                     </div>
                     {formData.barCouncilPhoto && (
@@ -1348,7 +1359,7 @@ export default function LawyerApplication() {
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleDocumentUpload("aadharCardFront", e)}
-                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 text-white"
+                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 text-white"
                       />
                     </div>
                     {formData.aadharCardFront && (
@@ -1396,11 +1407,11 @@ export default function LawyerApplication() {
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleDocumentUpload("panCard", e)}
-                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 text-white"
+                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-blue-100 dark:file:bg-emerald-900/30 dark:file:text-blue-400 text-white"
                       />
                     </div>
                     {formData.panCard && (
-                      <div className="h-14 w-20 rounded-xl overflow-hidden border-2 border-emerald-400/50 shadow-sm">
+                      <div className="h-14 w-20 rounded-xl overflow-hidden border-2 border-blue-400/50 shadow-sm">
                         <img src={formData.panCard} alt="PAN Card" className="h-full w-full object-cover" />
                       </div>
                     )}
@@ -1418,7 +1429,7 @@ export default function LawyerApplication() {
                     onChange={(e) =>
                       updateField("specialization", e.target.value)
                     }
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   >
                     <option value="">Select your specialization</option>
                     {specializations.map((spec) => (
@@ -1442,7 +1453,7 @@ export default function LawyerApplication() {
                         onChange={(e) =>
                           updateField("practiceStart", e.target.value)
                         }
-                        className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                        className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                         max={new Date().toISOString().slice(0, 7)}
                       />
                     </div>
@@ -1450,7 +1461,7 @@ export default function LawyerApplication() {
                   <div className="flex items-end pb-3">
                     <p className="text-sm text-slate-500">
                       Experience:{" "}
-                      <span className="font-bold text-indigo-600">
+                      <span className="font-bold text-blue-600">
                         {calculateExperience(formData.practiceStart)} Years
                       </span>
                     </p>
@@ -1484,7 +1495,7 @@ export default function LawyerApplication() {
                         courts: [""],
                       });
                     }}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   >
                     <option value="">Select State</option>
                     {states.map((state) => (
@@ -1502,7 +1513,7 @@ export default function LawyerApplication() {
                   <select
                     value={formData.city}
                     onChange={(e) => updateField("city", e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     disabled={!formData.state}
                   >
                     <option value="">Select City</option>
@@ -1537,7 +1548,7 @@ export default function LawyerApplication() {
                               setFormData(prev => ({ ...prev, detailed_court_experience: newExp }));
                             }
                           }}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                           disabled={!formData.state}
                         >
                           <option value="">Select Court</option>
@@ -1566,7 +1577,7 @@ export default function LawyerApplication() {
                             newExp[index].years = e.target.value;
                             setFormData(prev => ({ ...prev, detailed_court_experience: newExp }));
                           }}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                         />
                       </div>
                       
@@ -1600,7 +1611,7 @@ export default function LawyerApplication() {
                         detailed_court_experience: [...prev.detailed_court_experience, { court_name: "", years: "" }],
                       }))
                     }
-                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                   >
                     + Add Another Court
                   </button>
@@ -1614,7 +1625,7 @@ export default function LawyerApplication() {
                   <select
                     value={formData.primary_court}
                     onChange={(e) => updateField("primary_court", e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     disabled={formData.detailed_court_experience.filter(c => c.court_name).length === 0}
                   >
                     <option value="">Select Primary Court</option>
@@ -1647,7 +1658,7 @@ export default function LawyerApplication() {
                         }}
                         placeholder="e.g. Chamber 405, Delhi High Court..."
                         rows={2}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                       />
                       {index > 0 && (
                         <Button
@@ -1677,7 +1688,7 @@ export default function LawyerApplication() {
                         officeAddresses: [...prev.officeAddresses, ""],
                       }))
                     }
-                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                   >
                     + Add Another Address
                   </button>
@@ -1696,7 +1707,7 @@ export default function LawyerApplication() {
                         onChange={(e) =>
                           handleDocumentUpload("officeAddressPhoto", e)
                         }
-                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 text-white"
+                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 text-white"
                       />
                     </div>
                     {formData.officeAddressPhoto && (
@@ -1735,7 +1746,7 @@ export default function LawyerApplication() {
                       value={formData.education}
                       onChange={(e) => updateField("education", e.target.value)}
                       placeholder="LLB from Delhi University, LLM from NLS"
-                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
@@ -1753,7 +1764,7 @@ export default function LawyerApplication() {
                         onChange={(e) =>
                           handleDocumentUpload("collegeDegreePhoto", e)
                         }
-                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 text-white"
+                        className="pl-10 bg-white/5 border-white/10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 text-white"
                       />
                     </div>
                     {formData.collegeDegreePhoto && (
@@ -1780,7 +1791,7 @@ export default function LawyerApplication() {
                       onChange={(e) =>
                         updateField("graduationDate", e.target.value)
                       }
-                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                      className="pl-10 bg-white/5 border-white/10 text-white focus:border-blue-500 focus:ring-blue-500/20"
                       max={new Date().toISOString().slice(0, 7)}
                     />
                   </div>
@@ -1797,7 +1808,7 @@ export default function LawyerApplication() {
                         type="button"
                         onClick={() => toggleLanguage(lang)}
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${formData.languages.includes(lang)
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                          ? "bg-blue-600 text-white shadow-md shadow-blue-200"
                           : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
                           }`}
                       >
@@ -1830,7 +1841,7 @@ export default function LawyerApplication() {
                           value={formData.charge30min}
                           onChange={(e) => updateField("charge30min", e.target.value)}
                           placeholder="e.g. 500"
-                          className="pl-9 bg-white/5 border-slate-200 dark:border-slate-700 text-white focus:border-indigo-500"
+                          className="pl-9 bg-white/5 border-slate-200 dark:border-slate-700 text-white focus:border-blue-500"
                         />
                       </div>
                       <p className="text-[10px] text-slate-500 mt-1.5">Suggested: ₹300 – ₹800</p>
@@ -1844,11 +1855,28 @@ export default function LawyerApplication() {
                           value={formData.charge60min}
                           onChange={(e) => updateField("charge60min", e.target.value)}
                           placeholder="e.g. 900"
-                          className="pl-9 bg-white/5 border-slate-200 dark:border-slate-700 text-white focus:border-indigo-500"
+                          className="pl-9 bg-white/5 border-slate-200 dark:border-slate-700 text-white focus:border-blue-500"
                         />
                       </div>
                       <p className="text-[10px] text-slate-500 mt-1.5">Suggested: ₹500 – ₹1500</p>
                     </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                    Catchphrase / One Liner *
+                  </label>
+                  <Input
+                    value={formData.catchphrase || ""}
+                    onChange={(e) => updateField("catchphrase", e.target.value)}
+                    placeholder="Why should clients choose you? (Max 20 words)"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-400 mb-1"
+                  />
+                  <div className="flex justify-between items-center mb-6">
+                     <p className={`text-xs ${formData.catchphrase.trim().split(/\s+/).length > 20 ? "text-red-500" : "text-slate-500"}`}>
+                        Word count: {formData.catchphrase.trim() ? formData.catchphrase.trim().split(/\s+/).length : 0} / 20
+                     </p>
                   </div>
                 </div>
 
@@ -1861,7 +1889,7 @@ export default function LawyerApplication() {
                     onChange={(e) => updateField("bio", e.target.value)}
                     placeholder="Write a brief description about your practice, areas of expertise, and professional background..."
                     rows={6}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                   <div className="flex justify-between items-center mt-2">
                     <p
@@ -1893,97 +1921,195 @@ export default function LawyerApplication() {
                   <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Emergency Response Profile</span>
                 </div>
                 <h2 className="text-2xl font-bold text-white">SOS Lawyer Details</h2>
-                <p className="text-slate-400 text-sm mt-1">Set up your urgent legal assistance availability</p>
+                <p className="text-slate-400 text-sm mt-1">Define your SOS coverage and availability type</p>
               </div>
 
               <div className="space-y-5">
-                {/* Location Multi-select */}
+
+                {/* ── SOS Type Selection ── */}
                 <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl p-5">
-                  <div className="flex items-start justify-between mb-1">
-                    <label className="block text-sm font-semibold text-white">
-                      Service Areas (Localities) <span className="text-red-400">*</span>
-                    </label>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                      📍 Advised: under 10 km
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 mb-3">Add areas you can physically reach within 30 mins. Select from suggestions or type a custom area and press Enter.</p>
+                  <label className="block text-sm font-bold text-white mb-1">
+                    SOS Service Type <span className="text-red-400">*</span>
+                  </label>
+                  <p className="text-xs text-slate-400 mb-4">Choose how you want to participate in the SOS network. You can change this anytime from your dashboard.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                  {/* Selected Tags */}
-                  {formData.sosLocations.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {formData.sosLocations.map((loc) => (
-                        <span
-                          key={loc}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-medium"
-                        >
-                          📍 {loc}
-                          <button
-                            type="button"
-                            onClick={() => updateField('sosLocations', formData.sosLocations.filter(l => l !== loc))}
-                            className="text-red-400 hover:text-white transition-colors ml-0.5"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Text input to add custom area */}
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Type an area and press Enter (e.g. Rohini, Dwarka...)"
-                      className="flex-1 bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-all"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const val = e.target.value.trim();
-                          if (val && !formData.sosLocations.includes(val)) {
-                            updateField('sosLocations', [...formData.sosLocations, val]);
-                            e.target.value = '';
-                          }
-                        }
-                      }}
-                    />
+                    {/* Talk Only */}
                     <button
                       type="button"
-                      className="px-4 py-2 bg-red-600/80 hover:bg-red-600 text-white text-sm font-semibold rounded-xl border border-red-500/50 transition-all"
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousSibling;
-                        const val = input.value.trim();
-                        if (val && !formData.sosLocations.includes(val)) {
-                          updateField('sosLocations', [...formData.sosLocations, val]);
-                          input.value = '';
-                        }
-                      }}
+                      onClick={() => updateField('sosType', 'sos_talk')}
+                      className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                        formData.sosType === 'sos_talk'
+                          ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10'
+                          : 'border-slate-600 bg-slate-900/40 hover:border-slate-500'
+                      }`}
                     >
-                      Add
+                      {formData.sosType === 'sos_talk' && (
+                        <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      )}
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                          formData.sosType === 'sos_talk' ? 'bg-blue-500/20' : 'bg-slate-700'
+                        }`}>
+                          <Phone className={`w-5 h-5 ${formData.sosType === 'sos_talk' ? 'text-blue-400' : 'text-slate-400'}`} />
+                        </div>
+                        <div>
+                          <p className={`font-bold text-sm ${formData.sosType === 'sos_talk' ? 'text-white' : 'text-slate-300'}`}>🎙️ SOS Talk Only</p>
+                          <p className="text-[10px] text-slate-500">Call / Video Consultation</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        You handle emergency consultations <strong className="text-slate-200">remotely via call or video</strong>. You will <strong className="text-slate-200">NOT</strong> be required to travel to the client physically.
+                      </p>
+                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-900/30 border border-blue-800/40">
+                        <span className="text-[10px] text-blue-400 font-semibold">Client Fee: ₹300 / session</span>
+                      </div>
                     </button>
-                  </div>
 
-                  {/* Quick-select suggestions */}
-                  <div className="mt-3">
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2 font-semibold">Quick select common areas:</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['South Delhi', 'North Delhi', 'Connaught Place', 'Rohini', 'Dwarka', 'Gurugram', 'Noida', 'Faridabad', 'Lajpat Nagar', 'Saket', 'Janakpuri', 'Nehru Place', 'Mayur Vihar', 'Vasant Kunj', 'Pitampura'].filter(s => !formData.sosLocations.includes(s)).map((area) => (
-                        <button
-                          key={area}
-                          type="button"
-                          onClick={() => updateField('sosLocations', [...formData.sosLocations, area])}
-                          className="px-2.5 py-1 rounded-full text-[11px] bg-slate-700/60 hover:bg-slate-700 text-slate-300 border border-slate-600/50 hover:border-slate-500 transition-all"
-                        >
-                          + {area}
-                        </button>
-                      ))}
-                    </div>
+                    {/* Full SOS */}
+                    <button
+                      type="button"
+                      onClick={() => updateField('sosType', 'sos_full')}
+                      className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                        formData.sosType === 'sos_full'
+                          ? 'border-red-500 bg-red-500/10 shadow-lg shadow-red-500/10'
+                          : 'border-slate-600 bg-slate-900/40 hover:border-slate-500'
+                      }`}
+                    >
+                      {formData.sosType === 'sos_full' && (
+                        <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+                      )}
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                          formData.sosType === 'sos_full' ? 'bg-red-500/20' : 'bg-slate-700'
+                        }`}>
+                          <MapPin className={`w-5 h-5 ${formData.sosType === 'sos_full' ? 'text-red-400' : 'text-slate-400'}`} />
+                        </div>
+                        <div>
+                          <p className={`font-bold text-sm ${formData.sosType === 'sos_full' ? 'text-white' : 'text-slate-300'}`}>🚗 Full SOS Lawyer</p>
+                          <p className="text-[10px] text-slate-500">Call + Physical Visit Option</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        You may be required to <strong className="text-slate-200">physically travel to the client's location</strong> within 30 minutes when requested. You can decline if unavailable.
+                      </p>
+                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-900/30 border border-red-800/40">
+                        <span className="text-[10px] text-red-400 font-semibold">Client Fee: ₹1,100 base + ₹400/30 min extra</span>
+                      </div>
+                    </button>
                   </div>
                 </div>
 
+                {/* ── District-based Location Coverage ── */}
+                <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl p-5">
+                  <div className="flex items-start justify-between mb-1">
+                    <label className="block text-sm font-bold text-white">
+                      Service Districts <span className="text-red-400">*</span>
+                    </label>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                      📍 Within 30 min / 15–20 km
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Select all districts you can serve. For Full SOS, these are areas you can physically reach within 30 minutes from your practice area or home.
+                  </p>
+
+                  {/* Selected Count Badge */}
+                  {formData.sosLocations.length > 0 && (
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 text-xs font-semibold">
+                        ✓ {formData.sosLocations.length} district{formData.sosLocations.length > 1 ? 's' : ''} selected
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateField('sosLocations', [])}
+                        className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+                      >Clear all</button>
+                    </div>
+                  )}
+
+                  {/* Districts by State */}
+                  {[
+                    {
+                      state: 'Delhi',
+                      districts: ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'North East Delhi', 'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi', 'South West Delhi', 'West Delhi']
+                    },
+                    {
+                      state: 'Haryana',
+                      districts: ['Ambala', 'Faridabad', 'Gurugram', 'Hisar', 'Jhajjar', 'Jind', 'Karnal', 'Nuh', 'Palwal', 'Panchkula', 'Panipat', 'Rewari', 'Rohtak', 'Sirsa', 'Sonipat', 'Yamunanagar']
+                    },
+                    {
+                      state: 'Uttar Pradesh',
+                      districts: ['Agra', 'Aligarh', 'Ayodhya', 'Baghpat', 'Bulandshahr', 'Firozabad', 'Gautam Buddha Nagar (Noida)', 'Ghaziabad', 'Hapur', 'Kanpur Nagar', 'Lucknow', 'Mathura', 'Meerut', 'Muzaffarnagar', 'Prayagraj', 'Saharanpur', 'Varanasi']
+                    }
+                  ].map(({ state, districts }) => (
+                    <div key={state} className="mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{state}</span>
+                        <div className="flex-1 h-px bg-slate-700" />
+                        <button
+                          type="button"
+                          className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                          onClick={() => {
+                            const allSelected = districts.every(d => formData.sosLocations.includes(d));
+                            if (allSelected) {
+                              updateField('sosLocations', formData.sosLocations.filter(l => !districts.includes(l)));
+                            } else {
+                              const merged = [...new Set([...formData.sosLocations, ...districts])];
+                              updateField('sosLocations', merged);
+                            }
+                          }}
+                        >
+                          {districts.every(d => formData.sosLocations.includes(d)) ? 'Clear all' : 'Select all'}
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {districts.map((district) => {
+                          const selected = formData.sosLocations.includes(district);
+                          return (
+                            <button
+                              key={district}
+                              type="button"
+                              onClick={() => {
+                                if (selected) {
+                                  updateField('sosLocations', formData.sosLocations.filter(l => l !== district));
+                                } else {
+                                  updateField('sosLocations', [...formData.sosLocations, district]);
+                                }
+                              }}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                                selected
+                                  ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-900/40'
+                                  : 'bg-slate-900/60 border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300'
+                              }`}
+                            >
+                              {selected ? '✓ ' : ''}{district}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ── 30-min Reachability Warning ── */}
+                {formData.sosType === 'sos_full' && (
+                  <div className="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-4 flex items-start gap-3">
+                    <span className="text-amber-400 text-xl shrink-0 mt-0.5">⚠️</span>
+                    <div>
+                      <p className="text-amber-300 font-bold text-sm mb-1">Full SOS Physical Commitment</p>
+                      <p className="text-amber-400/80 text-xs leading-relaxed">
+                        By selecting Full SOS, you commit to reaching any selected district within <strong className="text-amber-300">30 minutes</strong> from your practice area or home.
+                        If a client requests your physical presence and you are unable to respond without a valid reason, you may face <strong className="text-amber-300">account suspension or penalties</strong>.
+                        You may decline a request if genuinely unavailable — the system will auto-assign the next available lawyer.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Urgent Matters */}
                 <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl p-5">
-                  <label className="block text-sm font-semibold text-white mb-3">
+                  <label className="block text-sm font-bold text-white mb-3">
                     Urgent Matters Handled <span className="text-red-400">*</span>
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -1999,7 +2125,7 @@ export default function LawyerApplication() {
                         }}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                           formData.sosMatters.includes(matter)
-                            ? "bg-red-600 text-white border-red-500 shadow-lg shadow-red-900/40"
+                            ? "bg-blue-600 text-white border-blue-500 shadow-sm shadow-blue-900/40"
                             : "bg-slate-700/60 text-slate-300 border-slate-600/50 hover:bg-slate-700 hover:border-slate-500"
                         }`}
                       >
@@ -2010,20 +2136,24 @@ export default function LawyerApplication() {
                 </div>
 
                 {/* Penalty Agreement */}
-                <div className="bg-red-950/40 border border-red-800/40 rounded-2xl p-5">
+                <div className="bg-slate-800/60 border border-slate-600/50 rounded-2xl p-5">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={formData.sosTermsAccepted}
                       onChange={(e) => updateField("sosTermsAccepted", e.target.checked)}
-                      className="mt-0.5 w-5 h-5 accent-red-500 rounded focus:ring-red-500 shrink-0"
+                      className="mt-0.5 w-5 h-5 accent-blue-500 rounded focus:ring-blue-500 shrink-0"
                     />
                     <div>
-                      <span className="block text-sm font-bold text-red-300 mb-1">
-                        ⚠️ SOS Missed Call Penalty Agreement <span className="text-red-400">*</span>
+                      <span className="block text-sm font-bold text-white mb-1">
+                        ⚠️ SOS Commitment Agreement <span className="text-red-400">*</span>
                       </span>
-                      <span className="block text-xs text-red-400/80 leading-relaxed">
-                        I understand that as an SOS Lawyer, I am expected to answer urgent consultations. Unanswered calls (more than one) will incur a <strong className="text-red-300">₹250 penalty</strong> on my payouts. I can submit valid proof (e.g., medical emergency, court hearing) to dispute the penalty.
+                      <span className="block text-xs text-slate-400 leading-relaxed">
+                        I understand my duties as an SOS Lawyer on LxwyerUp. Unanswered requests (beyond one) without valid reason will incur a <strong className="text-slate-200">₹250 penalty</strong> on payouts.
+                        {formData.sosType === 'sos_full' && (
+                          <span> For Full SOS, I commit to physically reaching clients within 30 minutes when requested and accept that failure to do so may result in account review.</span>
+                        )}
+                        {' '}I may dispute penalties by submitting valid proof (court hearing, medical emergency, etc.).
                       </span>
                     </div>
                   </label>
@@ -2036,8 +2166,8 @@ export default function LawyerApplication() {
           {((!formData.applicationType.includes("sos") && step === 5) || (formData.applicationType.includes("sos") && step === 6)) && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
-                  <ShieldCheck className="w-8 h-8 text-emerald-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
+                  <ShieldCheck className="w-8 h-8 text-blue-600" />
                 </div>
                 <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
                   Application Processing Fee
@@ -2063,15 +2193,15 @@ export default function LawyerApplication() {
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between items-center text-slate-400">
                       <span>Application Evaluation</span>
-                      <span>₹2,118.64</span>
+                      <span>{formData.applicationType.includes("sos") ? "₹2,542.37" : "₹1,694.92"}</span>
                     </div>
                     <div className="flex justify-between items-center text-slate-400">
                       <span>GST (18%)</span>
-                      <span>₹381.36</span>
+                      <span>{formData.applicationType.includes("sos") ? "₹457.63" : "₹305.08"}</span>
                     </div>
                     <div className="flex justify-between items-center font-bold text-lg text-white pt-3 border-t border-white/10">
                       <span>Total Secure Payment</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">₹2,500.00</span>
+                      <span className="text-blue-600 dark:text-blue-400">{formData.applicationType.includes("sos") ? "₹3,000.00" : "₹2,000.00"}</span>
                     </div>
                   </div>
 
@@ -2081,7 +2211,9 @@ export default function LawyerApplication() {
                       <div>
                         <h4 className="font-bold text-blue-900 dark:text-blue-100 text-[15px]">100% Refundable Guarantee</h4>
                         <p className="text-sm text-blue-800/80 dark:text-blue-300/80 mt-1 leading-relaxed">
-                          The ₹2500 application fee is fully refundable regardless of whether your application is selected or rejected by our Apex system. This helps us ensure only serious verified professionals apply.
+                          {formData.applicationType.includes("sos")
+                            ? "The ₹3000 application fee establishes commitment. If selected, you will be refunded ₹2000 and receive a 2-month Apex Verified + SOS Lawyer subscription (worth ₹4,000). If not selected, you will receive a full ₹3000 refund within 48 hours."
+                            : "The ₹2000 application fee establishes commitment. If selected, you will be refunded ₹1000 and receive a 2-month Apex Verified subscription (worth ₹2,500). If not selected, you will receive a full ₹2000 refund within 48 hours."}
                         </p>
                       </div>
                     </div>
@@ -2101,7 +2233,7 @@ export default function LawyerApplication() {
               <Button
                 variant="ghost"
                 onClick={() => setStep(step - 1)}
-                className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 -ml-4"
+                className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 -ml-4"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -2113,7 +2245,7 @@ export default function LawyerApplication() {
             {step < (formData.applicationType.includes("sos") ? 6 : 5) ? (
               <Button
                 onClick={handleNext}
-                className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40 rounded-xl px-8"
+                className="bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 dark:shadow-blue-900/40 rounded-xl px-8"
               >
                 Next Step
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -2125,7 +2257,7 @@ export default function LawyerApplication() {
                 className={`text-white shadow-lg rounded-xl px-8 w-full md:w-auto text-lg h-12 transition-all ${
                   formData.applicationType.includes("sos") && !formData.sosTermsAccepted
                     ? 'bg-slate-600 cursor-not-allowed opacity-60 shadow-none'
-                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/40'
+                    : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200 dark:shadow-blue-900/40'
                 }`}
               >
                 {loading ? (

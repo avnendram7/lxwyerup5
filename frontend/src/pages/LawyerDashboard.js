@@ -116,6 +116,8 @@ export default function LawyerDashboard() {
   const [selectedCallForDispute, setSelectedCallForDispute] = useState(null);
   const [disputeReason, setDisputeReason] = useState("");
   const [disputeFile, setDisputeFile] = useState(null);
+  const [sosType, setSosType] = useState(null); // 'sos_talk' | 'sos_full' — loaded from user profile
+  const [sosTypeLoading, setSosTypeLoading] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -953,9 +955,7 @@ export default function LawyerDashboard() {
         >
           {/* Logo */}
           <div className="px-4 py-3 flex items-center gap-2.5 mb-1">
-            <div className="w-7 h-7 bg-gradient-to-br from-[#3B82F6] to-[#0EA5E9] rounded-lg flex items-center justify-center shadow-md shrink-0">
-              <Scale className="w-4 h-4 text-white" />
-            </div>
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className={`font-bold text-xs tracking-tight ${darkMode ? 'text-white' : 'text-slate-800'}`}>Lxwyer Up</span>
           </div>
 
@@ -1186,6 +1186,19 @@ export default function LawyerDashboard() {
             {/* Dashboard Tab */}
             {activeTab === "dashboard" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Application Pending Banner */}
+                {(!user?.is_approved || user?.status === 'pending') && (
+                  <div className={`p-5 rounded-2xl border flex items-start gap-4 shadow-sm ${darkMode ? 'bg-amber-900/20 border-amber-800' : 'bg-amber-50 border-amber-200'}`}>
+                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className={`text-base font-bold ${darkMode ? 'text-amber-400' : 'text-amber-800'}`}>Application Pending Review</h3>
+                      <p className={`text-sm mt-1 leading-relaxed ${darkMode ? 'text-amber-200/70' : 'text-amber-700/80'}`}>
+                        Your application is currently being evaluated by our Apex system. The application fee (₹2000 for standard, ₹3000 for SOS) ensures commitment. If selected, you will be respectively refunded ₹1000 or ₹2000, and awarded a complimentary 2-month verified subscription (value up to ₹4000). If not selected, you will receive a full refund within 48 hours.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Greeting Header & Actions */}
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -2581,7 +2594,83 @@ export default function LawyerDashboard() {
                   </div>
                 </div>
 
-                {/* Missed Calls Table */}
+                {/* ── SOS Mode Toggle Panel ── */}
+                <div className={`rounded-2xl border mb-6 overflow-hidden ${darkMode ? 'bg-[#111827] border-white/5' : 'bg-blue-50 border-blue-100'}`}>
+                  <div className={`px-6 py-4 border-b ${darkMode ? 'border-white/5' : 'border-blue-100'}`}>
+                    <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>Your SOS Participation Mode</h2>
+                    <p className={`text-sm mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      You can change your SOS mode at any time. Changes take effect immediately.
+                    </p>
+                  </div>
+                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    {/* Talk Only Card */}
+                    <button
+                      onClick={async () => {
+                        setSosTypeLoading(true);
+                        try {
+                          const token = localStorage.getItem('token');
+                          await axios.patch(`${API}/sos/lawyer/toggle-type`, { sos_type: 'sos_talk' }, { headers: { Authorization: `Bearer ${token}` } });
+                          setSosType('sos_talk');
+                          toast.success('SOS mode updated: Talk Only');
+                        } catch (e) { toast.error('Failed to update SOS mode'); }
+                        finally { setSosTypeLoading(false); }
+                      }}
+                      disabled={sosTypeLoading || (user?.sos_type || sosType) === 'sos_talk'}
+                      className={`relative p-5 rounded-xl border-2 text-left transition-all ${
+                        (user?.sos_type || sosType) === 'sos_talk' || (!user?.sos_type && !sosType)
+                          ? darkMode ? 'border-blue-500 bg-blue-500/10' : 'border-blue-500 bg-blue-50'
+                          : darkMode ? 'border-slate-700 bg-slate-800/50 hover:border-slate-600' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      {((user?.sos_type || sosType) === 'sos_talk' || (!user?.sos_type && !sosType)) && (
+                        <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-blue-500 text-white text-[10px] font-bold">ACTIVE</span>
+                      )}
+                      <div className="text-2xl mb-2">🎙️</div>
+                      <p className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>SOS Talk Only</p>
+                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Handle emergency consultations <strong>remotely via call or video</strong>. You will NOT be required to physically travel to any client.
+                      </p>
+                      <div className={`mt-3 text-xs font-semibold ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Client fee: ₹300 / session</div>
+                    </button>
+
+                    {/* Full SOS Card */}
+                    <button
+                      onClick={async () => {
+                        setSosTypeLoading(true);
+                        try {
+                          const token = localStorage.getItem('token');
+                          await axios.patch(`${API}/sos/lawyer/toggle-type`, { sos_type: 'sos_full' }, { headers: { Authorization: `Bearer ${token}` } });
+                          setSosType('sos_full');
+                          toast.success('SOS mode updated: Full SOS Lawyer');
+                        } catch (e) { toast.error('Failed to update SOS mode'); }
+                        finally { setSosTypeLoading(false); }
+                      }}
+                      disabled={sosTypeLoading || (user?.sos_type || sosType) === 'sos_full'}
+                      className={`relative p-5 rounded-xl border-2 text-left transition-all ${
+                        (user?.sos_type || sosType) === 'sos_full'
+                          ? darkMode ? 'border-red-500 bg-red-500/10' : 'border-red-500 bg-red-50'
+                          : darkMode ? 'border-slate-700 bg-slate-800/50 hover:border-slate-600' : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      {(user?.sos_type || sosType) === 'sos_full' && (
+                        <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold">ACTIVE</span>
+                      )}
+                      <div className="text-2xl mb-2">🚗</div>
+                      <p className={`font-bold text-base mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>Full SOS Lawyer</p>
+                      <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        You may be required to <strong>physically travel to the client</strong> within 30 minutes when requested. You can decline if genuinely unavailable.
+                      </p>
+                      <div className={`mt-3 text-xs font-semibold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>Client fee: ₹1,100 base + ₹400/30 min extra</div>
+                    </button>
+                  </div>
+                  {sosTypeLoading && (
+                    <div className="px-6 pb-4 flex items-center gap-2 text-xs text-slate-400">
+                      <span className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      Updating SOS mode...
+                    </div>
+                  )}
+                </div>
                 <div className={`rounded-2xl border shadow-sm overflow-hidden ${darkMode ? "bg-[#1c1c1c] border-white/5" : "bg-white border-gray-200"}`}>
                   <div className={`p-6 border-b ${darkMode ? "border-white/5" : "border-gray-100"}`}>
                     <h2 className={`text-xl font-bold ${darkMode ? "text-white" : "text-[#0F2944]"}`}>

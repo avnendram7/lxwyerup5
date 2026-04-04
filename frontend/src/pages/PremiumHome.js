@@ -11,7 +11,7 @@ const SimpleNavbar = ({ navigate }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-black" />
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="text-xl font-bold text-black">Lxwyer Up</span>
           </button>
 
@@ -467,7 +467,7 @@ const Footer = ({ navigate }) => {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Scale className="w-6 h-6" />
+              <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
               <span className="text-xl font-bold">Lxwyer Up</span>
             </div>
             <p className="text-gray-300 text-sm">

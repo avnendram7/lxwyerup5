@@ -120,6 +120,16 @@ const femaleFirstNames = new Set([
   'Preeti', 'Shruti', 'Swati', 'Pallavi', 'Megha', 'Sneha', 'Komal', 'Tanvi', 'Sakshi'
 ]);
 
+const achievementPool = [
+  { title: "Won Landmark Supreme Court Case", date: "2023", icon: "Scale", pinned: true },
+  { title: "Top 40 Under 40 Legal Eagles by India Law Journal", date: "2022", icon: "Award", pinned: true },
+  { title: "Recognized as Best Corporate Attorney", date: "2023", icon: "Star", pinned: false },
+  { title: "Successfully defended high-profile PIL", date: "2021", icon: "Shield", pinned: false },
+  { title: "Featured in Forbes Legal Powerlist", date: "2024", icon: "Award", pinned: true },
+  { title: "Appointed to National Legal Advisory Board", date: "2020", icon: "Briefcase", pinned: false },
+  { title: "Keynote Speaker at Global Law Tech Summit", date: "2023", icon: "Globe", pinned: false }
+];
+
 const generateLawyers = () => {
   let maleIdx = 1;
   let femaleIdx = 1;
@@ -133,8 +143,9 @@ const generateLawyers = () => {
       const lastName = lastNames[index % lastNames.length];
       const fullName = `${firstName} ${lastName}`;
       const isFemale = femaleFirstNames.has(firstName);
-      const feeMin = 1000 + Math.floor(Math.random() * 3000);
-      const feeMax = feeMin + 1000 + Math.floor(Math.random() * 4000);
+      
+      const fee_60min = 1500 + Math.floor(Math.random() * 4000);
+      const fee_30min = Math.ceil(fee_60min / 2);
 
       // Assign gender-matched photo from curated professional-looking indices
       let photo;
@@ -146,6 +157,10 @@ const generateLawyers = () => {
         maleIdx++;
       }
 
+      // Shuffle and pick 3-4 random achievements
+      const shuffledAchievements = [...achievementPool].sort(() => 0.5 - Math.random());
+      const selectedAchievements = shuffledAchievements.slice(0, 3 + (index % 2));
+
       return {
         id: `dummy_lawyer_${index + 1}`,
         name: fullName,
@@ -154,7 +169,8 @@ const generateLawyers = () => {
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
         phone: '+91 9876543210',
         specialization: spec,
-        secondarySpecializations: [],
+        secondarySpecializations: [specializations[(index + 1) % specializations.length]],
+        practice_areas: [spec, specializations[(index + 2) % specializations.length], "General Litigation"],
         experience,
         rating: 4.5 + (Math.random() * 0.5),
         reviews: 20 + Math.floor(Math.random() * 100),
@@ -167,16 +183,21 @@ const generateLawyers = () => {
         barCouncilNumber: `DUMMY/${location.state.substring(0, 2).toUpperCase()}/${2024 - experience}`,
         education: educations[index % educations.length],
         languages: ['English', 'Hindi', languages[index % languages.length]],
-        feeMin,
-        feeMax,
-        charge_30min: String(feeMin),
-        charge_60min: String(feeMax),
-        bio: `${fullName} is a distinguished ${spec} lawyer based in ${location.city} with over ${experience} years of experience. Specializing in complex ${spec.toLowerCase()} matters, they have successfully handled numerous high-profile cases and provide dedicated legal counsel to clients across ${location.state}.`,
-        photo,                         // ← real randomuser.me portrait
+        
+        consultation_fee: fee_60min,
+        feeMin: fee_30min,
+        feeMax: fee_60min,
+        charge_30min: String(fee_30min),
+        charge_60min: String(fee_60min),
+        
+        bio: `${fullName} is a distinguished ${spec} attorney based in ${location.city} with over ${experience} years of aggressive courtroom experience. Recognized for strategic litigation and a deep understanding of complex ${spec.toLowerCase()} frameworks, they have successfully secured landmark verdicts for clients across ${location.state}. Their commitment to transparent fees and unyielding representation makes them one of the most sought-after legal minds in the region.`,
+        catchphrase: `Providing expert legal solutions and dedicated representation in ${spec} to secure your best outcome.`,
+        photo,
+        achievements: selectedAchievements,
         availability: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        consultationModes: ['In-Person', 'Video Call'],
-        consultation_preferences: Math.random() > 0.5 ? 'both' : 'video',
-        verified: Math.random() > 0.3,
+        consultationModes: ['In-Person', 'Video Call', 'Phone'],
+        consultation_preferences: 'both',
+        verified: true,
         featured: Math.random() > 0.8,
         joinedDate: '2024-01-01'
       };

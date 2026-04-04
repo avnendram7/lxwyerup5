@@ -36,12 +36,20 @@ const VisionaryForm = memo(function VisionaryForm() {
         }),
       });
       if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        const detail = JSON.stringify(errData?.detail || '');
-        if (detail.toLowerCase().includes('already registered')) {
+        let errData = {};
+        try { errData = await response.json(); } catch (e) {}
+        
+        const detailStr = JSON.stringify(errData?.detail || '');
+        const detailObj = errData?.detail;
+
+        if (response.status === 400 && detailStr.toLowerCase().includes('already registered')) {
           setStatus('already_registered');
-        } else if (response.status === 422 || detail.toLowerCase().includes('validation') || detail.toLowerCase().includes('email')) {
+        } else if (response.status === 422 || detailStr.toLowerCase().includes('validation') || detailStr.toLowerCase().includes('email')) {
           setStatus('invalid_email');
+        } else if (typeof detailObj === 'string' && detailObj) {
+          // Dynamic error from backend
+          setStatus('backend_error');
+          // Temporarily attach it to form state or a ref if needed, but for now just use a specific status
         } else {
           setStatus('error');
         }
@@ -126,6 +134,7 @@ const VisionaryForm = memo(function VisionaryForm() {
       {status === 'invalid_email' && <p style={{ fontSize: '0.8rem', color: '#ef4444', textAlign: 'center' }}>Please enter a valid email address.</p>}
       {status === 'invalid_phone' && <p style={{ fontSize: '0.8rem', color: '#ef4444', textAlign: 'center' }}>Phone number must be 10 digits.</p>}
       {status === 'already_registered' && <p style={{ fontSize: '0.8rem', color: '#f59e0b', textAlign: 'center' }}>✉️ This email is already registered! We'll reach out when we launch.</p>}
+      {status === 'backend_error' && <p style={{ fontSize: '0.8rem', color: '#f59e0b', textAlign: 'center' }}>Something went wrong. Please verify your details.</p>}
       <p style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', marginTop: 2 }}>
         Questions? <a href="mailto:avnendram.7@gmail.com" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>avnendram.7@gmail.com</a>
       </p>
@@ -364,16 +373,25 @@ export default function RevolutionisingSoon() {
         )}
 
         {/* Center foreground — minimal text stack */}
-        {/* Top brand bar — always visible, anchors the page */}
+        {/* Top brand bar — logo + brand exactly like home page */}
         <div className="w-full mx-auto px-4 md:px-6 xl:px-12" style={{
           position: 'absolute', top: 0, left: 0, right: 0, zIndex: 11,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           height: '3.5rem',
         }}>
-          <span className="text-base md:text-lg font-bold tracking-tight select-none" style={{
-            fontFamily: "'Outfit','Inter',sans-serif",
-            color: '#fff', opacity: 0.85,
-          }}>Lxwyer Up</span>
+          {/* Logo — same as Navbar.js on home page */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img
+              src="/logo.png"
+              alt="Lxwyer Up Logo"
+              style={{ width: 32, height: 32, objectFit: 'contain', mixBlendMode: 'screen' }}
+            />
+            <span style={{
+              fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em',
+              fontFamily: "'Outfit','Inter',sans-serif",
+              color: '#fff', userSelect: 'none',
+            }}>Lxwyer Up</span>
+          </div>
           <span style={{
             fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.22em',
             textTransform: 'uppercase',
@@ -462,6 +480,31 @@ export default function RevolutionisingSoon() {
               </svg>
               Explore Demo
             </button>
+          </div>
+        </div>
+
+        {/* Scroll Down Arrow to explore more */}
+        <div
+          onClick={() => signupRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          style={{
+            position: 'absolute',
+            bottom: '5%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            opacity: mounted ? 0.7 : 0,
+            transition: 'opacity 1.5s ease 1.5s',
+            zIndex: 20
+          }}
+          className="hover:opacity-100 group"
+        >
+          <div style={{ animation: 'floatOrb 2s ease-in-out infinite' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-white transition-colors">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
           </div>
         </div>
       </section>

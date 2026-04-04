@@ -7,7 +7,7 @@ const SimpleNavbar = ({ navigate }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-[#0F2944]" />
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="text-xl font-bold text-[#0F2944]">Lxwyer Up</span>
           </button>
           

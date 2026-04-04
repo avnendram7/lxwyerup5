@@ -56,7 +56,7 @@ export default function UserGetStarted() {
       {/* ── Hero Image Banner ── */}
       <div className="relative h-[28vh] md:h-[35vh] overflow-hidden">
         <img
-          src="/law-office-hero.png"
+          src="/law-office-hero.jpg"
           alt="Legal professionals"
           className="w-full h-full object-cover object-[center_30%]"
         />
@@ -76,7 +76,7 @@ export default function UserGetStarted() {
               <span className="text-[9px] md:text-[10px] tracking-[0.25em] uppercase text-blue-400 font-bold">India's First Legal Ecosystem</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-2xl">
-              Who are you looking for?
+              Find the best possible consultation
             </h1>
           </motion.div>
         </div>

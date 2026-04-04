@@ -24,6 +24,7 @@ class LawyerApplicationCreate(BaseModel):
     languages: List[str]
     fee_range: str
     bio: str
+    catchphrase: Optional[str] = None
     lawyer_type: str = 'independent'  # independent, law_firm
     law_firm_id: Optional[str] = None
     law_firm_name: Optional[str] = None
@@ -64,6 +65,7 @@ class LawyerApplication(BaseModel):
     languages: List[str]
     fee_range: str
     bio: str
+    catchphrase: Optional[str] = None
     status: str = 'pending'  # pending, approved, rejected
     lawyer_type: str = 'independent'
     law_firm_id: Optional[str] = None

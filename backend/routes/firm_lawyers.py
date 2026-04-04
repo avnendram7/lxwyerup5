@@ -24,6 +24,7 @@ class FirmLawyerApplicationCreate(BaseModel):
     education: Optional[str] = None
     languages: Optional[List[str]] = ["Hindi", "English"]
     bio: Optional[str] = None
+    catchphrase: Optional[str] = None
 
 
 @router.post("/login")
@@ -80,6 +81,7 @@ async def submit_firm_lawyer_application(application: FirmLawyerApplicationCreat
         'education': application.education,
         'languages': application.languages,
         'bio': application.bio,
+        'catchphrase': application.catchphrase,
         'status': 'pending',
         'created_at': datetime.now(timezone.utc).isoformat()
     }
@@ -144,6 +146,7 @@ async def update_firm_lawyer_application_status(app_id: str, status: str):
             'education': application.get('education'),
             'languages': application.get('languages', ['Hindi', 'English']),
             'bio': application.get('bio'),
+            'catchphrase': application.get('catchphrase'),
             'user_type': 'firm_lawyer',
             'is_active': True,
             'created_at': datetime.now(timezone.utc).isoformat(),

@@ -94,6 +94,7 @@ async def submit_lawyer_application(application: LawyerApplicationCreate):
         languages=application.languages,
         fee_range=application.fee_range,
         bio=application.bio,
+        catchphrase=application.catchphrase,
         lawyer_type=application.lawyer_type,
         office_address=application.office_address,
         law_firm_id=application.law_firm_id,

@@ -189,8 +189,14 @@ export const NavbarWave = () => {
                     <div className="flex shrink-0">
                         <button
                             onClick={() => { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                            className="shrink-0"
+                            className="shrink-0 flex items-center gap-2"
                         >
+                            <img
+                                src="/logo.png"
+                                alt="Lxwyer Up Logo"
+                                className="w-8 h-8 object-contain rounded"
+                                style={{ mixBlendMode: 'screen' }}
+                            />
                             <span className="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none">
                                 Lxwyer Up
                             </span>

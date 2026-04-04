@@ -67,9 +67,7 @@ export default function LawFirmLawyerLogin() {
           className="relative z-10 w-full max-w-md"
         >
           <Link to="/" className="flex items-center justify-center space-x-3 mb-8 group">
-            <div className="w-12 h-12 bg-[#0F2944] rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
-              <Scale className="w-7 h-7 text-white" />
-            </div>
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="text-2xl font-bold text-[#0F2944]">Lxwyer Up</span>
           </Link>
 

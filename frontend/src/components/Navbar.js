@@ -99,22 +99,16 @@ export const Navbar = ({ hideLinks = false, minimal = false }) => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 object-contain rounded" />
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 object-contain rounded" style={{ mixBlendMode: 'screen' }} />
             <span className="text-base md:text-lg font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none">
               Lxwyer Up
             </span>
           </Link>
 
-          {/* ── MINIMAL mode: just logo + sign in + theme ── */}
+          {/* ── MINIMAL mode: just logo ── */}
           {minimal ? (
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/login')}
-                className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
-              >
-                Sign in
-              </button>
-
+              {/* Sign in button removed — user is already on login page */}
             </div>
           ) : (
             <>

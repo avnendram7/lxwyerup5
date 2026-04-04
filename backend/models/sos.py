@@ -42,13 +42,31 @@ class SOSSession(BaseModel):
     user_state: str
     user_city: str
     issue_type: str
+    sos_type: Literal['sos_talk', 'sos_full'] = 'sos_talk'
+
     matched_lawyer_id: Optional[str] = None
     matched_lawyer_name: Optional[str] = None
     matched_lawyer_phone: Optional[str] = None
     matched_lawyer_specialization: Optional[str] = None
-    status: Literal['searching', 'matched', 'active', 'completed', 'flagged', 'no_lawyer'] = 'searching'
-    amount_paid: int = 299
+
+    status: Literal['searching', 'matched', 'active', 'completed', 'flagged', 'no_lawyer', 'cancelled_otp'] = 'searching'
+
+    # Billing
+    base_amount: int = 300          # 300 for talk, 1100 for full
+    billing_ticks: int = 0          # number of extra 30-min blocks (full SOS only)
+    total_billed: int = 300         # dynamically updated
+    amount_paid: int = 0
     payment_id: Optional[str] = None
+
+    # OTP presence verification
+    current_otp: Optional[str] = None
+    otp_expires_at: Optional[str] = None
+    otp_confirmed_user: bool = False
+    otp_confirmed_lawyer: bool = False
+
+    # Decline tracking
+    declined_lawyer_ids: List[str] = []
+
     transcript: List[SOSTranscriptMessage] = []
     admin_notes: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -61,13 +79,23 @@ class SOSSessionRequest(BaseModel):
     user_state: str
     user_city: str
     issue_type: str
+    sos_type: Literal['sos_talk', 'sos_full'] = 'sos_talk'
 
 class SOSSessionStatusUpdate(BaseModel):
-    status: Literal['searching', 'matched', 'active', 'completed', 'flagged', 'no_lawyer']
+    status: Literal['searching', 'matched', 'active', 'completed', 'flagged', 'no_lawyer', 'cancelled_otp']
     admin_notes: Optional[str] = None
+
+class SOSOtpVerify(BaseModel):
+    otp: str
+    party: Literal['user', 'lawyer']
+
+class SOSBillingTick(BaseModel):
+    session_id: str
+
+class SOSToggleType(BaseModel):
+    sos_type: Literal['sos_talk', 'sos_full']
 
 class SOSTranscriptAdd(BaseModel):
     sender: str
     sender_name: str
     text: str
-

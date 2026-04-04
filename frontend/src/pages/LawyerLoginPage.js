@@ -70,9 +70,7 @@ export default function LawyerLoginPage() {
           className="relative z-10 w-full max-w-md"
         >
           <Link to="/" className="flex items-center justify-center space-x-3 mb-8 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
-              <Scale className="w-7 h-7 text-white" />
-            </div>
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="text-2xl font-bold text-white">Lxwyer Up</span>
           </Link>
 

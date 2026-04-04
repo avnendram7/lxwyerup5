@@ -1911,7 +1911,8 @@ const Footer = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                     {/* Brand */}
                     <div>
-                        <div className="mb-5">
+                        <div className="mb-5 flex items-center gap-2">
+                            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 object-contain rounded" style={{ mixBlendMode: "screen" }} />
                             <span className="text-lg font-bold text-slate-900 dark:text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Lxwyer Up</span>
                         </div>
                         <p className="text-sm leading-relaxed" style={{ color: 'rgba(148,163,184,0.5)' }}>

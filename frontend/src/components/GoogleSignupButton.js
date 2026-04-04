@@ -98,11 +98,7 @@ export default function GoogleSignupButton({
             <button
                 type="button"
                 onClick={() => googleLogin()}
-                className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border font-semibold transition-all text-sm
-          ${isDark
-                        ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm'
-                    }`}
+                className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-800 bg-[#0A0F1C] hover:bg-[#111827] text-white font-semibold transition-all shadow-md focus:ring-2 focus:ring-blue-500/50 text-sm`}
             >
                 {/* Google SVG Icon */}
                 <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">

@@ -84,9 +84,7 @@ export default function NavigationHeader({
               onClick={handleHome}
               className={`flex items-center space-x-3 ${textClass} hover:opacity-80 transition-opacity`}
             >
-              <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Scale className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
               <span className="text-lg font-semibold hidden sm:block">Lxwyer Up</span>
             </button>
           </div>

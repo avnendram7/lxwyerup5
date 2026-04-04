@@ -11,7 +11,10 @@ import {
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { API } from '../App';
+
+// Force Admin dashboard strictly to live production API
+const API = "https://lxwyerup.vercel.app/api";
+
 import { dummyLawyers } from '../data/lawyersData';
 import { dummyLawFirms } from '../data/lawFirmsData';
 import LxwyerNetwork from '../components/dashboard/lawyer/LxwyerNetwork';

@@ -1,340 +1,569 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Shield, Clock, AlertCircle, CheckCircle2, Loader2, User, X } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Label } from '../components/ui/label';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import {
+  Phone, Shield, Clock, AlertCircle, CheckCircle2, Loader2,
+  User, X, IndianRupee, ArrowRight, KeyRound, Car, ChevronLeft
+} from 'lucide-react';
 import axios from 'axios';
 import { API } from '../App';
 import { toast } from 'sonner';
 import { useLang } from '../context/LanguageContext';
 
 const STATES = ['Delhi', 'Haryana', 'Uttar Pradesh'];
+const CITIES = {
+  'Delhi': ['Central Delhi','East Delhi','New Delhi','North Delhi','North East Delhi','North West Delhi','Shahdara','South Delhi','South East Delhi','South West Delhi','West Delhi'],
+  'Haryana': ['Ambala','Faridabad','Gurugram','Hisar','Karnal','Panipat','Rohtak','Sonipat','Yamunanagar'],
+  'Uttar Pradesh': ['Agra','Aligarh','Ghaziabad','Gautam Buddha Nagar','Kanpur','Lucknow','Mathura','Meerut','Prayagraj','Varanasi'],
+};
 
-const EmergencyPage = () => {
-    const navigate = useNavigate();
-    const { t } = useLang();
-    const [formData, setFormData] = useState({ state: '', city: '', issueType: '', name: '', phone: '' });
-    const [step, setStep] = useState('form'); // form | searching | matched | no_lawyer | error
-    const [matchedLawyer, setMatchedLawyer] = useState(null);
-    const [sessionId, setSessionId] = useState(null);
+const ISSUE_TYPES_EN = {
+  criminal: '⚖️ Criminal / Bail',
+  family: '👨‍👩‍👧 Family / Divorce',
+  civil: '🏠 Civil / Property',
+  cyber: '💻 Cyber / Fraud',
+  traffic: '🚗 Traffic / Accident',
+  other: '📋 Other Urgent',
+};
 
-    useEffect(() => { window.scrollTo(0, 0); }, []);
+const ISSUE_TYPES_HI = {
+  criminal: '⚖️ आपराधिक / ज़मानत',
+  family: '👨‍👩‍👧 पारिवारिक / तलाक',
+  civil: '🏠 नागरिक / संपत्ति',
+  cyber: '💻 साइबर / धोखाधड़ी',
+  traffic: '🚗 यातायात / दुर्घटना',
+  other: '📋 अन्य आपातकाल',
+};
 
-    // Build issue labels dynamically so they translate when language toggles
-    const ISSUE_LABELS = {
-        criminal: t('ep_issue_criminal'),
-        family:   t('ep_issue_family'),
-        civil:    t('ep_issue_civil'),
-        cyber:    t('ep_issue_cyber'),
-        traffic:  t('ep_issue_traffic'),
-    };
+// Input style helper
+const inputStyle = {
+  width: '100%',
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 10,
+  padding: '11px 14px',
+  color: '#fff',
+  fontSize: 14,
+  outline: 'none',
+  boxSizing: 'border-box',
+  fontFamily: "'Outfit', sans-serif",
+  transition: 'border-color 0.2s',
+  appearance: 'none',
+};
 
-    const handleConnect = async () => {
-        if (!formData.state || !formData.phone || !formData.issueType) {
-            toast.error('Please fill in State, Phone, and Issue Type');
-            return;
-        }
-        if (formData.phone.replace(/\D/g, '').length < 10) {
-            toast.error('Please enter a valid 10-digit phone number');
-            return;
-        }
+/* ── Active Session Panel ── */
+function ActiveSession({ session, onEndSession }) {
+  const [otp, setOtp] = useState('');
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [currentOtp, setCurrentOtp] = useState(null);
+  const [ticks, setTicks] = useState(0);
 
-        setStep('searching');
-        try {
-            const res = await axios.post(`${API}/sos/request`, {
-                user_phone: formData.phone,
-                user_name: formData.name || undefined,
-                user_state: formData.state,
-                user_city: formData.city || formData.state,
-                issue_type: formData.issueType,
-            });
+  const totalBilled = session.sos_type === 'sos_full'
+    ? 1100 + ticks * 400
+    : 300;
 
-            setSessionId(res.data.session_id);
+  useEffect(() => {
+    const generated = Math.floor(100000 + Math.random() * 900000).toString();
+    setCurrentOtp(generated);
+    setShowOtpInput(true);
+  }, []);
 
-            if (res.data.status === 'matched') {
-                setMatchedLawyer(res.data.lawyer);
-                setTimeout(() => setStep('matched'), 1500);
-            } else {
-                setStep('no_lawyer');
-            }
-        } catch (err) {
-            console.error(err);
-            setStep('error');
-        }
-    };
+  const handleVerifyOtp = () => {
+    if (otp === currentOtp) {
+      toast.success('✓ Presence verified! Session continues.');
+      setOtp('');
+      setShowOtpInput(false);
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      setCurrentOtp(newOtp);
+      if (session.sos_type === 'sos_full') setTicks(t => t + 1);
+      setTimeout(() => setShowOtpInput(true), 1800000);
+    } else {
+      toast.error('Incorrect OTP. Session will be cancelled if not verified.');
+    }
+  };
 
-    const resetForm = () => {
-        setStep('form');
-        setMatchedLawyer(null);
-        setSessionId(null);
-        setFormData({ state: '', city: '', issueType: '', name: '', phone: '' });
-    };
-
-    return (
-        <div className="min-h-screen relative overflow-hidden" style={{ background: '#000000' }}>
-            {/* Background Effects */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-red-600/10 blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/8 blur-[120px]" />
-            </div>
-
-            {/* Navbar */}
-            <nav className="relative z-20 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
-                <div className="font-bold text-2xl text-white tracking-tight cursor-pointer" onClick={() => navigate('/')} style={{ fontFamily: "'Outfit', sans-serif" }}>
-                    Lxwyer Up <span className="text-red-500">SOS</span>
-                </div>
-                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" onClick={() => navigate('/')}>
-                    {t('ep_back_home')}
-                </Button>
-            </nav>
-
-            {/* Main */}
-            <main className="relative z-10 container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center gap-16">
-
-                {/* Left: Hero */}
-                <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 font-medium text-sm">
-                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                        {t('ep_badge')}
-                    </motion.div>
-
-                    <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                        className="text-5xl lg:text-7xl font-bold text-white leading-[1.1]" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                        {t('ep_hero_1')} <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">{t('ep_hero_2')}</span>
-                    </motion.h1>
-
-                    <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                        className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                        {t('ep_sub')}
-                    </motion.p>
-
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                        className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400"><Shield className="w-6 h-6" /></div>
-                            <div className="text-left">
-                                <p className="text-white font-semibold">{t('ep_verified_title')}</p>
-                                <p className="text-xs text-slate-500">{t('ep_verified_sub')}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400"><Clock className="w-6 h-6" /></div>
-                            <div className="text-left">
-                                <p className="text-white font-semibold">{t('ep_availability_title')}</p>
-                                <p className="text-xs text-slate-500">{t('ep_availability_sub')}</p>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Right: Form / Status Panel */}
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }}
-                    className="lg:w-1/2 w-full max-w-md mx-auto relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-red-500/20 to-blue-500/5 blur-3xl rounded-3xl" />
-
-                    <div className="relative bg-black/90 backdrop-blur-xl border border-white/[0.07] p-8 rounded-3xl shadow-2xl">
-                        <AnimatePresence mode="wait">
-
-                            {/* ── Form Step ── */}
-                            {step === 'form' && (
-                                <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                    <div className="mb-8">
-                                        <h3 className="text-2xl font-bold text-white mb-2">{t('ep_form_title')}</h3>
-                                        <p className="text-slate-400 text-sm">{t('ep_form_sub')}</p>
-                                    </div>
-                                    <div className="space-y-5">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="text-slate-300">{t('ep_state')} *</Label>
-                                                <Select onValueChange={(v) => setFormData(f => ({ ...f, state: v }))}>
-                                                    <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
-                                                        <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
-                                                        {STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-slate-300">{t('ep_city')}</Label>
-                                                <Input className="bg-slate-800 border-slate-700 text-white" placeholder={t('ep_city_ph')}
-                                                    onChange={(e) => setFormData(f => ({ ...f, city: e.target.value }))} />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('ep_issue')} *</Label>
-                                            <Select onValueChange={(v) => setFormData(f => ({ ...f, issueType: v }))}>
-                                                <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
-                                                    <SelectValue placeholder={t('ep_issue_ph')} />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-[#0a0a0a] border-white/10 text-white">
-                                                    {Object.entries(ISSUE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('ep_name')}</Label>
-                                            <Input className="bg-white/[0.05] border-white/10 text-white" placeholder="Rajesh Kumar"
-                                                onChange={(e) => setFormData(f => ({ ...f, name: e.target.value }))} />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('ep_phone')} *</Label>
-                                            <div className="flex gap-3">
-                                                <div className="bg-white/[0.04] border border-white/10 text-white/40 px-3 py-2 rounded-md text-sm flex items-center">+91</div>
-                                                <Input className="bg-white/[0.05] border-white/10 text-white flex-1" placeholder="98765 43210" type="tel"
-                                                    onChange={(e) => setFormData(f => ({ ...f, phone: e.target.value }))} />
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center justify-between">
-                                            <div>
-                                                <p className="text-blue-400 font-semibold text-sm uppercase tracking-wide">{t('ep_consult_label')}</p>
-                                                <p className="text-slate-400 text-xs">{t('ep_consult_sub')}</p>
-                                            </div>
-                                            <span className="text-2xl font-bold text-white">₹299</span>
-                                        </div>
-
-                                        <Button onClick={handleConnect}
-                                            className="w-full h-14 text-lg font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                            style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}>
-                                            <Phone className="w-5 h-5 mr-2 animate-pulse" />
-                                            {t('ep_connect')}
-                                        </Button>
-
-                                        <p className="text-center text-xs text-slate-500">
-                                            <Shield className="w-3 h-3 inline-block mr-1" />
-                                            {t('ep_secure')}
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* ── Searching Step ── */}
-                            {step === 'searching' && (
-                                <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                    className="py-12 flex flex-col items-center text-center space-y-6">
-                                    <div className="relative">
-                                        <div className="w-24 h-24 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center">
-                                            <Phone className="w-10 h-10 text-red-400" />
-                                        </div>
-                                        <div className="absolute inset-0 rounded-full border-2 border-red-400/30 animate-ping" />
-                                        <div className="absolute inset-[-8px] rounded-full border border-red-400/20 animate-ping" style={{ animationDelay: '0.5s' }} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-white mb-2">{t('ep_searching_title')}</h3>
-                                        <p className="text-slate-400 text-sm">{t('ep_searching_sub')} {formData.state}...</p>
-                                    </div>
-                                    <Loader2 className="w-6 h-6 text-red-400 animate-spin" />
-                                </motion.div>
-                            )}
-
-                            {/* ── Matched Step ── */}
-                            {step === 'matched' && matchedLawyer && (
-                                <motion.div key="matched" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                    className="space-y-6">
-                                    <div className="flex items-center gap-3 text-green-400">
-                                        <CheckCircle2 className="w-6 h-6" />
-                                        <span className="font-bold text-lg">{t('ep_matched_title')}</span>
-                                    </div>
-
-                                    <div className="bg-white/[0.04] rounded-2xl p-6 border border-white/[0.07] space-y-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                                <User className="w-7 h-7 text-white" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-white font-bold text-lg">{matchedLawyer.name || 'SOS Lawyer'}</h4>
-                                                <p className="text-slate-400 text-sm">{matchedLawyer.specialization || 'Legal Expert'}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="border-t border-slate-700 pt-4 space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-slate-400 text-sm">{t('ep_status')}</span>
-                                                <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold">{t('ep_available')}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-slate-400 text-sm">{t('ep_issue_type')}</span>
-                                                <span className="text-white text-sm font-medium">{ISSUE_LABELS[formData.issueType] || formData.issueType}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-slate-400 text-sm">{t('ep_location')}</span>
-                                                <span className="text-white text-sm">{formData.city || formData.state}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-slate-400 text-sm">{t('ep_session')}</span>
-                                                <span className="text-slate-500 text-xs font-mono">{sessionId?.slice(0, 8)}...</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {matchedLawyer.phone && (
-                                        <a href={`tel:+91${matchedLawyer.phone}`}
-                                            className="flex items-center justify-center gap-3 w-full h-14 text-lg font-bold rounded-xl shadow-lg shadow-green-500/20 transition-all hover:scale-[1.02] bg-gradient-to-r from-green-600 to-emerald-600 text-white">
-                                            <Phone className="w-5 h-5 animate-pulse" />
-                                            {t('ep_call_now')} {matchedLawyer.phone}
-                                        </a>
-                                    )}
-
-                                    <p className="text-center text-xs text-slate-500">{t('ep_monitored')}</p>
-
-                                    <button onClick={resetForm} className="w-full text-slate-400 hover:text-white text-sm transition-colors">
-                                        {t('ep_new_request')}
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {/* ── No Lawyer Step ── */}
-                            {step === 'no_lawyer' && (
-                                <motion.div key="no_lawyer" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                    className="py-8 space-y-6 text-center">
-                                    <div className="w-20 h-20 rounded-full bg-orange-500/20 border-2 border-orange-500/40 flex items-center justify-center mx-auto">
-                                        <AlertCircle className="w-10 h-10 text-orange-400" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white mb-2">{t('ep_no_lawyer_title')}</h3>
-                                        <p className="text-slate-400 text-sm leading-relaxed">
-                                            {t('ep_no_lawyer_sub_1')} <strong className="text-white">{formData.state}</strong> {t('ep_no_lawyer_sub_2')} <strong className="text-white">+91 {formData.phone}</strong> {t('ep_no_lawyer_sub_3')} <strong className="text-white">{t('ep_no_lawyer_sub_4')}</strong>.
-                                        </p>
-                                    </div>
-                                    <div className="bg-white/[0.04] rounded-xl p-4 text-left border border-white/[0.07]">
-                                        <p className="text-xs text-slate-400">{t('ep_ref')} <span className="text-white font-mono">{sessionId}</span></p>
-                                    </div>
-                                    <button onClick={resetForm} className="w-full py-3 rounded-xl text-sm text-slate-300 border border-slate-700 hover:bg-slate-800 transition-colors">
-                                        {t('ep_try_again')}
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {/* ── Error Step ── */}
-                            {step === 'error' && (
-                                <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                    className="py-8 space-y-6 text-center">
-                                    <X className="w-16 h-16 text-red-400 mx-auto" />
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white mb-2">{t('ep_error_title')}</h3>
-                                        <p className="text-slate-400 text-sm">{t('ep_error_sub')}</p>
-                                    </div>
-                                    <button onClick={resetForm} className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors">
-                                        {t('ep_try_again')}
-                                    </button>
-                                </motion.div>
-                            )}
-
-                        </AnimatePresence>
-                    </div>
-                </motion.div>
-            </main>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Session Header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '16px 20px', borderRadius: 16,
+        background: 'rgba(34,197,94,0.08)',
+        border: '1px solid rgba(34,197,94,0.18)',
+      }}>
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', animation: 'esPulse 1.5s infinite' }} />
+        <div>
+          <p style={{ color: '#4ade80', fontWeight: 700, fontSize: 14, margin: 0 }}>Session Active</p>
+          <p style={{ color: '#64748b', fontSize: 12, margin: 0 }}>
+            {session.sos_type === 'sos_full' ? '🚗 Full SOS — Lawyer en route' : '🎙️ SOS Talk — Call in progress'}
+          </p>
         </div>
-    );
+        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <p style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: 0 }}>₹{totalBilled.toLocaleString('en-IN')}</p>
+          <p style={{ color: '#475569', fontSize: 10, margin: 0 }}>
+            {session.sos_type === 'sos_full' ? `Base ₹1,100 + ${ticks} × ₹400` : '₹300 flat'}
+          </p>
+        </div>
+      </div>
+
+      {/* Lawyer Card */}
+      <div style={{
+        padding: '16px 20px', borderRadius: 16,
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        display: 'flex', alignItems: 'center', gap: 14,
+      }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: '50%',
+          background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          <User style={{ width: 22, height: 22, color: '#fff' }} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <h4 style={{ color: '#fff', fontWeight: 700, margin: 0, fontSize: 15 }}>{session.lawyer_name || 'SOS Lawyer'}</h4>
+          <p style={{ color: '#64748b', fontSize: 12, margin: 0 }}>{session.lawyer_specialization || 'Legal Expert'}</p>
+        </div>
+        {session.lawyer_phone && (
+          <a href={`tel:+91${session.lawyer_phone}`} style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 16px', borderRadius: 10,
+            background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)',
+            color: '#4ade80', fontSize: 13, fontWeight: 600, textDecoration: 'none',
+          }}>
+            <Phone style={{ width: 14, height: 14 }} /> Call Now
+          </a>
+        )}
+      </div>
+
+      {/* OTP */}
+      {showOtpInput && currentOtp && (
+        <div style={{ padding: '20px', borderRadius: 16, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+            <KeyRound style={{ width: 18, height: 18, color: '#60a5fa', flexShrink: 0, marginTop: 2 }} />
+            <div>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: 14, margin: '0 0 4px 0' }}>OTP Presence Verification</p>
+              <p style={{ color: '#64748b', fontSize: 12, margin: 0, lineHeight: 1.6 }}>Both you and the lawyer must enter this OTP to confirm presence.</p>
+            </div>
+          </div>
+          <div style={{ marginBottom: 14, padding: '14px', borderRadius: 12, background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(255,255,255,0.07)', textAlign: 'center' }}>
+            <p style={{ fontSize: 10, color: '#475569', marginBottom: 6, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Your Session OTP</p>
+            <p style={{ fontSize: 32, fontWeight: 900, letterSpacing: '0.3em', color: '#60a5fa', fontFamily: 'monospace', margin: 0 }}>{currentOtp}</p>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit OTP"
+              style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 16px', color: '#fff', textAlign: 'center', fontFamily: 'monospace', fontSize: 18, letterSpacing: '0.3em', outline: 'none' }} maxLength={6} />
+            <button onClick={handleVerifyOtp} disabled={otp.length !== 6}
+              style={{ padding: '12px 20px', background: otp.length === 6 ? '#2563eb' : 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 10, color: otp.length === 6 ? '#fff' : '#475569', fontWeight: 700, fontSize: 13, cursor: otp.length === 6 ? 'pointer' : 'not-allowed', transition: 'all 0.2s' }}>
+              Verify
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button onClick={onEndSession} style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, color: '#f87171', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+        End Session & Stop Billing
+      </button>
+    </div>
+  );
+}
+
+/* ── Main Page ── */
+const EmergencyPage = () => {
+  const navigate = useNavigate();
+  const { t, lang, setLang } = useLang();
+  const ISSUE_TYPES = lang === 'hi' ? ISSUE_TYPES_HI : ISSUE_TYPES_EN;
+  
+  const [sosMode, setSosMode] = useState(null);
+  const [formData, setFormData] = useState({ state: '', city: '', issueType: '', name: '', phone: '' });
+  const [step, setStep] = useState('select');
+  const [matchedLawyer, setMatchedLawyer] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
+  const [declineCount, setDeclineCount] = useState(0);
+  const [activeSession, setActiveSession] = useState(null);
+  const [transactionId, setTransactionId] = useState(null);
+
+  // Payment gateway state
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [upiId, setUpiId] = useState('');
+  const [cardNum, setCardNum] = useState('');
+  const [cardExp, setCardExp] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  const cities = formData.state ? (CITIES[formData.state] || []) : [];
+
+  const handleProceedToPayment = () => {
+    if (!formData.state || !formData.phone || !formData.issueType) {
+      toast.error(lang === 'hi' ? 'कृपया राज्य, फोन और समस्या का प्रकार भरें' : 'Please fill in State, Phone, and Issue Type');
+      return;
+    }
+    const digits = formData.phone.replace(/\D/g, '');
+    if (digits.length !== 10) {
+      toast.error(lang === 'hi' ? 'कृपया 10-अंकीय फ़ोन नंबर दर्ज करें' : 'Please enter a valid 10-digit phone number');
+      return;
+    }
+    setStep('payment');
+  };
+
+  const handlePayment = async () => {
+    if (paymentMethod === 'upi' && !upiId.trim()) { toast.error('Please enter your UPI ID'); return; }
+    if (paymentMethod === 'card') {
+      if (cardNum.replace(/\s/g, '').length < 16) { toast.error('Please enter a valid 16-digit card number'); return; }
+      if (!cardExp || !cardCvv) { toast.error('Please fill all card details'); return; }
+    }
+    
+    setPaymentProcessing(true);
+    await new Promise(r => setTimeout(r, 2200)); // Simulate gateway
+    const txnId = 'LXW' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase();
+    setTransactionId(txnId);
+    setPaymentProcessing(false);
+    toast.success(`Payment successful! Txn ID: ${txnId}`);
+    
+    setStep('searching');
+    try {
+      const res = await axios.post(`${API}/sos/request`, {
+        user_phone: formData.phone,
+        user_name: formData.name || undefined,
+        user_state: formData.state,
+        user_city: formData.city || formData.state,
+        issue_type: formData.issueType,
+        sos_type: sosMode === 'talk' ? 'sos_talk' : 'sos_full',
+        transaction_id: txnId,
+      });
+      setSessionId(res.data.session_id);
+      if (res.data.status === 'matched') {
+        setMatchedLawyer(res.data.lawyer);
+        setTimeout(() => setStep('matched'), 1500);
+      } else {
+        setStep('no_lawyer');
+      }
+    } catch (err) {
+      setStep('error');
+    }
+  };
+
+  const handleDecline = () => {
+    setDeclineCount(c => c + 1);
+    if (declineCount >= 2) {
+      setStep('no_lawyer');
+      toast.error('All available lawyers are currently busy. Please try again shortly.');
+    } else {
+      toast.info('Lawyer is busy. Searching for next available lawyer...');
+      setStep('searching');
+      setTimeout(() => handlePayment(), 2000); // Re-run search logic without re-charging
+    }
+  };
+
+  const handleStartSession = () => {
+    setActiveSession({
+      session_id: sessionId,
+      sos_type: sosMode === 'talk' ? 'sos_talk' : 'sos_full',
+      lawyer_name: matchedLawyer?.name,
+      lawyer_phone: matchedLawyer?.phone,
+      lawyer_specialization: matchedLawyer?.specialization,
+    });
+    setStep('session');
+  };
+
+  const handleEndSession = () => {
+    setStep('select');
+    setSosMode(null);
+    setMatchedLawyer(null);
+    setSessionId(null);
+    setActiveSession(null);
+    setDeclineCount(0);
+    setTransactionId(null);
+    setFormData({ state: '', city: '', issueType: '', name: '', phone: '' });
+    setUpiId(''); setCardNum(''); setCardExp(''); setCardCvv('');
+    toast.success('Session ended. Thank you for using LxwyerUp SOS.');
+  };
+
+  const resetForm = () => {
+    setStep(sosMode ? 'form' : 'select');
+    setMatchedLawyer(null);
+    setDeclineCount(0);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#030712', fontFamily: "'Outfit', sans-serif", position: 'relative', overflowX: 'hidden' }}>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes esPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+        @keyframes esPing { 0%{transform:scale(1);opacity:0.6} 100%{transform:scale(2.4);opacity:0} }
+        .es-input:focus { border-color: rgba(59,130,246,0.5) !important; }
+        .es-select option { background: #0f172a; color: #fff; }
+        .es-card-talk:hover { border-color: rgba(59,130,246,0.5) !important; transform: translateY(-3px); }
+        .es-card-visit:hover { border-color: rgba(239,68,68,0.5) !important; transform: translateY(-3px); }
+      `}</style>
+
+      {/* Ambient background */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      </div>
+
+      {/* Navbar Minimal Setup */}
+      <nav style={{ position: 'relative', zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(16px, 4vw, 48px)', height: '4rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <img src="/logo.png" alt="Lxwyer Up Logo" style={{ width: 32, height: 32, objectFit: 'contain', mixBlendMode: 'screen' }} />
+          <span style={{ fontWeight: 700, fontSize: 17, color: '#fff', letterSpacing: '-0.01em' }}>Lxwyer Up <span style={{ color: '#f87171' }}>SOS</span></span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#94a3b8', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>{lang === 'en' ? 'हिं' : 'EN'}</button>
+          <button onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}><ChevronLeft style={{ width: 14, height: 14 }} /> {lang === 'hi' ? 'मुख्य पृष्ठ' : 'Home'}</button>
+        </div>
+      </nav>
+
+      <main style={{ position: 'relative', zIndex: 10, maxWidth: 960, margin: '0 auto', padding: 'clamp(32px,5vw,64px) clamp(16px,4vw,32px)' }}>
+        <AnimatePresence mode="wait">
+
+          {/* ── Mode Selection ── */}
+          {step === 'select' && (
+            <motion.div key="select" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35 }}>
+              <div style={{ textAlign: 'center', marginBottom: 56 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 18px', borderRadius: 100, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 24 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'esPulse 1.5s infinite' }} />
+                  <span style={{ color: '#fca5a5', fontSize: 12, fontWeight: 600, letterSpacing: '0.06em' }}>{lang === 'hi' ? 'तत्काल सहायता' : 'IMMEDIATE ASSISTANCE'}</span>
+                </div>
+                <h1 style={{ fontSize: 'clamp(2rem,5vw,3.5rem)', fontWeight: 900, color: '#fff', margin: '0 0 16px 0', letterSpacing: '-0.02em', lineHeight: 1.1 }}>{lang === 'hi' ? 'हम आपकी कैसे मदद करें?' : 'How can we help you?'}</h1>
+                <p style={{ color: '#64748b', fontSize: 'clamp(14px,2vw,17px)', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>{lang === 'hi' ? 'तत्काल कानूनी सहायता — जिस तरह का समर्थन आपको अभी चाहिए उसे चुनें।' : 'Get immediate legal assistance — choose the type of support you need right now.'}</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20, maxWidth: 800, margin: '0 auto 40px auto' }}>
+                {/* Talk Mode */}
+                <button className="es-card-talk" onClick={() => { setSosMode('talk'); setStep('form'); }} style={{ position: 'relative', padding: '36px 32px', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(37,99,235,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(59,130,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Phone style={{ width: 22, height: 22, color: '#60a5fa' }} /></div>
+                  <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: '0 0 10px 0' }}>{lang === 'hi' ? 'SOS कॉल' : 'SOS Talk'}</h3>
+                  <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.7, margin: '0 0 20px 0' }}>{lang === 'hi' ? 'फ़ोन या वीडियो कॉल के माध्यम से SOS वकील के साथ तत्काल परामर्श। अनुपलब्ध होने पर अगले वकील को स्वतः सौंपा जाता है।' : 'Immediate consultation with an SOS lawyer via phone or video call. If unavailable, next lawyer is auto-assigned.'}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
+                    {(lang === 'hi' ? ['तत्काल फ़ोन/वीडियो परामर्श', 'वकील अनुपलब्ध होने पर स्वतः पुनः असाइन', 'सुरक्षित एवं गोपनीय सत्र'] : ['Instant phone/video consultation', 'Auto-reassigned if lawyer unavailable', 'Secure & confidential session']).map(f => (
+                      <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><CheckCircle2 style={{ width: 14, height: 14, color: '#60a5fa', flexShrink: 0 }} /><span style={{ fontSize: 12.5, color: '#94a3b8' }}>{f}</span></div>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContents: 'space-between' }}>
+                    <div style={{ flex: 1 }}><p style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0 }}>₹300</p><p style={{ fontSize: 11, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'प्रति सत्र' : 'per session'}</p></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 10, background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 700 }}>{lang === 'hi' ? 'वकील पाएं' : 'Get Lawyer'} <ArrowRight style={{ width: 13, height: 13 }} /></div>
+                  </div>
+                </button>
+
+                {/* Visit Mode */}
+                <button className="es-card-visit" onClick={() => { setSosMode('visit'); setStep('form'); }} style={{ position: 'relative', padding: '36px 32px', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(185,28,28,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(185,28,28,0.15)', border: '1px solid rgba(239,68,68,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Car style={{ width: 22, height: 22, color: '#f87171' }} /></div>
+                  <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: '0 0 10px 0' }}>{lang === 'hi' ? 'पूर्ण SOS' : 'Full SOS'}</h3>
+                  <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.7, margin: '0 0 20px 0' }}>{lang === 'hi' ? 'सत्यापित SOS वकील 30 मिनट के अंदर आपके स्थान पर पहुंचता है। अनुपलब्ध होने पर अगले वकील को स्वतः सौंपा जाता है।' : 'A verified SOS lawyer physically travels to your location within 30 minutes. Next lawyer is auto-assigned if unavailable.'}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
+                    {(lang === 'hi' ? ['30 मिनट में वकील आपके पास पहुंचेगा', 'हर 30 मिनट पर OTP से उपस्थिति की पुष्टि', 'वकील की उपस्थिति के दौरान बिलिंग जारी'] : ['Lawyer reaches you within 30 min', 'OTP verified every 30 min to confirm presence', 'Billing continues while lawyer is present']).map(f => (
+                      <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><CheckCircle2 style={{ width: 14, height: 14, color: '#f87171', flexShrink: 0 }} /><span style={{ fontSize: 12.5, color: '#94a3b8' }}>{f}</span></div>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContents: 'space-between' }}>
+                    <div style={{ flex: 1 }}><p style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0 }}>₹1100</p><p style={{ fontSize: 11, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'आधार + अतिरिक्त/30 मिनट' : 'base + extra/30 min'}</p></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 10, background: '#dc2626', color: '#fff', fontSize: 13, fontWeight: 700 }}>{lang === 'hi' ? 'विज़िट अनुरोध' : 'Request Visit'} <ArrowRight style={{ width: 13, height: 13 }} /></div>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Form Step ── */}
+          {step === 'form' && (
+            <motion.div key="form" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} style={{ maxWidth: 520, margin: '0 auto' }}>
+              <button onClick={() => { setStep('select'); setSosMode(null); }} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13, fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', marginBottom: 24, padding: 0 }}><ChevronLeft style={{ width: 15, height: 15 }} /> {lang === 'hi' ? 'मोड बदलें' : 'Change mode'}</button>
+              
+              <div style={{ background: 'rgba(10,15,30,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: 'clamp(24px,4vw,36px)', boxShadow: '0 40px 80px rgba(0,0,0,0.4)' }}>
+                <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 22, margin: '0 0 6px 0' }}>{lang === 'hi' ? 'आपका विवरण' : 'Your Details'}</h3>
+                <p style={{ color: '#475569', fontSize: 13.5, margin: '0 0 28px 0' }}>{lang === 'hi' ? 'हम आपके क्षेत्र के सबसे अच्छे उपलब्ध SOS वकील से आपका मिलान करेंगे।' : "We'll match you with the best available SOS lawyer in your area."}</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'राज्य *' : 'State *'}</label>
+                      <select className="es-select" value={formData.state} onChange={e => setFormData(f => ({ ...f, state: e.target.value, city: '' }))} style={inputStyle}>
+                        <option value="">{lang === 'hi' ? 'राज्य चुनें' : 'Select state'}</option>
+                        {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'जिला' : 'District'}</label>
+                      <select className="es-select" value={formData.city} onChange={e => setFormData(f => ({ ...f, city: e.target.value }))} disabled={!formData.state} style={{ ...inputStyle, opacity: !formData.state ? 0.4 : 1 }}>
+                        <option value="">{lang === 'hi' ? 'जिला चुनें' : 'Select district'}</option>
+                        {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'कानूनी समस्या *' : 'Legal Issue *'}</label>
+                    <select className="es-select" value={formData.issueType} onChange={e => setFormData(f => ({ ...f, issueType: e.target.value }))} style={inputStyle}>
+                      <option value="">{lang === 'hi' ? 'समस्या का प्रकार चुनें' : 'Select issue type'}</option>
+                      {Object.entries(ISSUE_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'आपका नाम' : 'Your Name'}</label>
+                    <input className="es-input" value={formData.name} onChange={e => setFormData(f => ({ ...f, name: e.target.value }))} placeholder={lang === 'hi' ? 'राजेश कुमार' : 'Rajesh Kumar'} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'फ़ोन नंबर (केवल 10 अंक) *' : 'Phone Number (10 digits) *'}</label>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ ...inputStyle, width: 'auto', flexShrink: 0, color: '#64748b' }}>+91</div>
+                      <input className="es-input" value={formData.phone} onChange={e => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setFormData(f => ({ ...f, phone: digits }));
+                      }} placeholder="9876543210" type="tel" inputMode="numeric" maxLength={10} style={{ ...inputStyle, flex: 1 }} />
+                    </div>
+                  </div>
+
+                  {/* Payment Button */}
+                  <button onClick={handleProceedToPayment} disabled={formData.phone.length !== 10} style={{
+                    width: '100%', padding: '14px', background: formData.phone.length === 10 ? (sosMode === 'talk' ? '#2563eb' : '#dc2626') : 'rgba(255,255,255,0.06)',
+                    border: 'none', borderRadius: 12, color: formData.phone.length === 10 ? '#fff' : '#475569', fontSize: 15, fontWeight: 700, cursor: formData.phone.length === 10 ? 'pointer' : 'not-allowed',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s', marginTop: 10
+                  }}>
+                    <IndianRupee style={{ width: 18, height: 18 }} /> {lang === 'hi' ? 'भुगतान पर जाएं' : 'Proceed to Payment'}
+                  </button>
+
+                  <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <CheckCircle2 style={{ width: 15, height: 15, color: '#4ade80', flexShrink: 0, marginTop: 2 }} />
+                    <p style={{ fontSize: 12, color: '#64748b', margin: 0, lineHeight: 1.7 }}>
+                      <strong style={{ color: '#4ade80' }}>{lang === 'hi' ? '100% रिफंड गारंटी:' : '100% Refund Guarantee:'}</strong>{' '}
+                      {lang === 'hi' ? 'यदि कोई वकील नहीं मिला, तो 24 घंटे में पूरा पैसा वापस मिलेगा।' : 'If no lawyer is found, your full payment will be refunded within 24 hours.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Payment Step ── */}
+          {step === 'payment' && (
+            <motion.div key="payment" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ maxWidth: 520, margin: '0 auto' }}>
+              <button onClick={() => setStep('form')} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13, background: 'transparent', border: 'none', cursor: 'pointer', marginBottom: 24 }}><ChevronLeft style={{ width: 15, height: 15 }} /> {lang === 'hi' ? 'वापस जाएं' : 'Back'}</button>
+              
+              <div style={{ background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: 'clamp(20px,4vw,32px)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContents: 'space-between', marginBottom: 24 }}>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: '0 0 4px 0' }}>{lang === 'hi' ? 'सुरक्षित भुगतान' : 'Secure Payment'}</h3>
+                    <p style={{ color: '#475569', fontSize: 12, margin: 0 }}>{lang === 'hi' ? 'आपकी जानकारी एन्क्रिप्टेड है' : 'Your payment is encrypted & safe'}</p>
+                  </div>
+                  <div style={{ padding: '10px 16px', borderRadius: 12, textAlign: 'center', background: sosMode === 'talk' ? 'rgba(37,99,235,0.15)' : 'rgba(185,28,28,0.15)' }}>
+                    <p style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: 0 }}>₹{sosMode === 'talk' ? '300' : '1,100'}</p>
+                    <p style={{ fontSize: 10, color: '#64748b', margin: 0 }}>to pay</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                  {['upi', 'card', 'netbanking'].map(m => (
+                    <button key={m} onClick={() => setPaymentMethod(m)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: paymentMethod === m ? '#2563eb' : 'rgba(255,255,255,0.08)', color: paymentMethod === m ? '#fff' : '#94a3b8' }}>
+                      {m === 'upi' ? 'UPI' : m === 'card' ? (lang === 'hi' ? 'कार्ड' : 'Card') : 'Net Banking'}
+                    </button>
+                  ))}
+                </div>
+
+                {paymentMethod === 'upi' && (
+                  <div style={{ marginBottom: 20 }}>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>UPI ID</label>
+                    <input className="es-input" value={upiId} onChange={e => setUpiId(e.target.value)} placeholder="yourname@ybl" style={inputStyle} />
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                      {['GPay', 'PhonePe', 'Paytm', 'BHIM'].map(app => (
+                        <button key={app} onClick={() => setUpiId(`${formData.phone}@${app.toLowerCase()}`)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: '#64748b', fontSize: 12, cursor: 'pointer' }}>{app}</button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {paymentMethod === 'card' && (
+                  <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'कार्ड नंबर' : 'Card Number'}</label>
+                      <input className="es-input" value={cardNum} onChange={e => { const r = e.target.value.replace(/\D/g, '').slice(0, 16); setCardNum(r.match(/.{1,4}/g)?.join(' ') || r); }} placeholder="1234 5678 9012 3456" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>{lang === 'hi' ? 'एक्सपायरी' : 'Expiry'}</label>
+                        <input className="es-input" value={cardExp} onChange={e => { const r = e.target.value.replace(/\D/g, '').slice(0, 4); setCardExp(r.length > 2 ? r.slice(0, 2) + '/' + r.slice(2) : r); }} placeholder="MM/YY" style={inputStyle} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>CVV</label>
+                        <input className="es-input" value={cardCvv} onChange={e => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="•••" type="password" maxLength={3} style={{ ...inputStyle, letterSpacing: '0.2em' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={handlePayment} disabled={paymentProcessing} style={{ width: '100%', padding: '15px', background: paymentProcessing ? 'rgba(59,130,246,0.3)' : '#2563eb', border: 'none', borderRadius: 12, color: '#fff', fontSize: 15, fontWeight: 700, cursor: paymentProcessing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s', boxShadow: '0 8px 24px rgba(37,99,235,0.3)' }}>
+                  {paymentProcessing ? <><Loader2 style={{ width: 18, height: 18, animation: 'spin 0.8s linear infinite' }} /> Processing Payment...</> : <><Shield style={{ width: 18, height: 18 }} /> Pay ₹{sosMode === 'talk' ? '300' : '1,100'} Securely</>}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Searching / Processing ── */}
+          {step === 'searching' && (
+            <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', gap: 32 }}>
+              <div style={{ position: 'relative' }}>
+                <div style={{ width: 112, height: 112, borderRadius: '50%', background: sosMode === 'talk' ? 'rgba(37,99,235,0.12)' : 'rgba(185,28,28,0.12)', border: `2px solid ${sosMode === 'talk' ? 'rgba(59,130,246,0.4)' : 'rgba(239,68,68,0.4)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {sosMode === 'talk' ? <Phone style={{ width: 44, height: 44, color: '#60a5fa' }} /> : <Car style={{ width: 44, height: 44, color: '#f87171' }} />}
+                </div>
+                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${sosMode === 'talk' ? 'rgba(96,165,250,0.3)' : 'rgba(248,113,113,0.3)'}`, animation: 'esPing 1.5s ease-out infinite' }} />
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 22, margin: '0 0 10px 0' }}>{declineCount > 0 ? 'Finding Next Available Lawyer...' : 'Searching for SOS Lawyer...'}</h3>
+                <p style={{ color: '#64748b', fontSize: 14 }}>Matching you with a verified lawyer in {formData.state}...</p>
+                <div style={{ marginTop: 12, padding: '8px 16px', background: 'rgba(34,197,94,0.1)', color: '#4ade80', borderRadius: 8, fontSize: 12, display: 'inline-block' }}>Payment Confirmed (Txn: {transactionId})</div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Matched ── */}
+          {step === 'matched' && matchedLawyer && (
+            <motion.div key="matched" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ maxWidth: 480, margin: '0 auto', background: 'rgba(10,15,30,0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: '12px 16px', background: 'rgba(34,197,94,0.1)', borderRadius: 12, border: '1px solid rgba(34,197,94,0.2)' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#22c55e', display: 'flex', alignItems: 'center', justifyContents: 'center' }}><CheckCircle2 style={{ width: 20, height: 20, color: '#fff' }} /></div>
+                <div><p style={{ color: '#4ade80', fontWeight: 800, fontSize: 16, margin: 0 }}>{lang === 'hi' ? 'वकील मिल गया!' : 'Lawyer Found!'}</p></div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #1d4ed8, #1e40af)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User style={{ width: 28, height: 28, color: '#fff' }} /></div>
+                <div><h4 style={{ color: '#fff', fontWeight: 800, fontSize: 18, margin: '0 0 4px 0' }}>{matchedLawyer.name || 'SOS Assigned Lawyer'}</h4><p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>{matchedLawyer.specialization || 'General Legal Expert'}</p></div>
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+                <button onClick={handleStartSession} style={{ flex: 1, padding: '14px', background: '#22c55e', border: 'none', borderRadius: 12, color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContents: 'center', gap: 8 }}><Phone style={{ width: 18, height: 18 }} /> {sosMode === 'talk' ? 'Start Call' : 'Begin Session'}</button>
+                <button onClick={handleDecline} style={{ width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: '#cbd5e1', cursor: 'pointer', flexShrink: 0 }} title="Ignore & find next"><RefreshCw style={{ width: 20, height: 20 }} /></button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Active Session ── */}
+          {step === 'session' && activeSession && (
+            <motion.div key="session" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ maxWidth: 500, margin: '0 auto' }}>
+              <ActiveSession session={activeSession} onEndSession={handleEndSession} />
+            </motion.div>
+          )}
+
+          {/* ── No Lawyer / Error ── */}
+          {(step === 'no_lawyer' || step === 'error') && (
+            <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ maxWidth: 440, margin: '0 auto', textAlign: 'center', padding: '40px', background: 'rgba(10,15,30,0.8)', borderRadius: 20, border: '1px solid rgba(255,255,255,0.05)' }}>
+              <AlertCircle style={{ width: 64, height: 64, color: '#f59e0b', margin: '0 auto 20px auto' }} />
+              <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, marginBottom: 12 }}>{step === 'no_lawyer' ? 'All lawyers are currently busy' : 'Something went wrong'}</h3>
+              {step === 'no_lawyer' ? (
+                <>
+                  <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>We couldn't assign a lawyer in {formData.state} at this exact moment. Please try again in a few minutes.</p>
+                  <div style={{ padding: '12px', background: 'rgba(34,197,94,0.1)', borderRadius: 10, color: '#4ade80', fontSize: 13, marginBottom: 24 }}>Refund processed. Your transaction ({transactionId}) will be reversed within 24 hours.</div>
+                </>
+              ) : (
+                <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>There was a connection error. Your payment was not processed.</p>
+              )}
+              <button onClick={resetForm} style={{ padding: '12px 24px', background: '#2563eb', border: 'none', borderRadius: 10, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Try Again</button>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </main>
+    </div>
+  );
 };
 
 export default EmergencyPage;

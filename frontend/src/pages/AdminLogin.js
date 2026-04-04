@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Scale, Mail, Lock, ArrowRight, Shield, ArrowLeft, Home, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { API } from '../App';
+
+// Force Admin login strictly to live production API
+const API = "https://lxwyerup.vercel.app/api";
+
 import { motion } from 'framer-motion';
 import { CorporateInput, CorporateButton } from '../components/CorporateComponents';
 

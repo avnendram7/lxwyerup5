@@ -157,6 +157,30 @@ async def create_booking(booking_data: BookingCreate, current_user: dict = Depen
 
     await db.bookings.insert_one(doc)
 
+    # Send visionary dummy email
+    try:
+        from services.email_service import send_email
+        client_email = current_user.get('email')
+        if client_email:
+            email_body = f"""
+Dear Visionary,
+
+Welcome to the dawn of a new era in legal representation. At LxwyerUp, we don't just connect you with legal counsel; we bridge the gap to a future where justice is seamless, transparent, and powerful.
+
+This is a placeholder email acknowledging your recent booking with {booking_dict.get('lawyer_name', 'your selected counsel')} on {booking_data.date} at {booking_data.time}. Soon, we will have a real, fully-integrated system.
+
+Welcome aboard.
+
+The LxwyerUp Team
+"""
+            await send_email(
+                to_email=client_email,
+                subject="Welcome to LxwyerUp - Your Journey Begins",
+                body=email_body
+            )
+    except Exception as e:
+        print(f"Failed to send visionary dummy email: {e}")
+
     # ── Notify Lawyer — resolve canonical id (booking stores ObjectId string) ──
     lawyer_notif_id = booking_data.lawyer_id
     try:

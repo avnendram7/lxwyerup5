@@ -108,7 +108,7 @@ export default function RegisterSelectPage() {
 
                     {/* Hero image */}
                     <img
-                        src="/register_hero.png"
+                        src="/register_hero.jpg"
                         alt="Futuristic legal AI — holographic scales of justice"
                         className="w-full h-full object-cover object-center"
                         style={{ filter: 'brightness(0.75) saturate(1.2)' }}

@@ -223,10 +223,10 @@ export default function LawyerProfile() {
               {(lawyer.feeMin !== 'N/A' || lawyer.feeMax !== 'N/A') && (
                 <div className="text-right">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Consultation Fee</p>
-                  <p className="text-2xl font-black text-slate-800">
-                    {lawyer.feeMin !== 'N/A' ? `₹${lawyer.feeMin}` : ''}
-                    {lawyer.feeMin !== 'N/A' && lawyer.feeMax !== 'N/A' ? ' – ' : ''}
-                    {lawyer.feeMax !== 'N/A' ? `₹${lawyer.feeMax}` : ''}
+                  <p className="text-2xl font-black text-slate-800 flex items-center justify-end">
+                    <span className="text-xs font-bold text-slate-400 mr-1.5 uppercase">30m</span>₹{lawyer.feeMin !== 'N/A' ? lawyer.feeMin : '--'}
+                    <span className="text-slate-300 font-light mx-2">/</span>
+                    <span className="text-xs font-bold text-slate-400 mr-1.5 uppercase">1h</span>₹{lawyer.feeMax !== 'N/A' ? lawyer.feeMax : '--'}
                   </p>
                 </div>
               )}
@@ -247,7 +247,7 @@ export default function LawyerProfile() {
               { label: 'Experience', value: lawyer.experience ? `${lawyer.experience} Years` : '—' },
               { label: 'Location', value: lawyer.location || '—' },
               { label: 'Education', value: lawyer.education || '—' },
-              { label: 'Fee Range', value: lawyer.feeMin !== 'N/A' ? `₹${lawyer.feeMin} – ₹${lawyer.feeMax}` : 'Contact for fee' },
+              { label: 'Fee', value: lawyer.feeMin !== 'N/A' ? `30m: ₹${lawyer.feeMin} | 1h: ₹${lawyer.feeMax}` : 'Contact for fee' },
             ].map((s, i) => (
               <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm px-4 py-3">
                 <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">{s.label}</p>

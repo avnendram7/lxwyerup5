@@ -67,7 +67,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
     .slice(0, 2)
     .map(c => (typeof c === 'object' ? c.court_name : c))
     .filter(Boolean);
-  const tags = courts.length ? courts : lawyer.specialization ? [lawyer.specialization] : [];
+  const tags = courts.length ? courts : [];
 
   return (
     <motion.div
@@ -84,6 +84,7 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
         flexDirection: 'column',
         boxShadow: '0 8px 32px rgba(0,0,0,0.55)',
         willChange: 'transform',
+        minHeight: 380,
       }}
     >
       {/* ════ BANNER ════ */}
@@ -130,11 +131,11 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
             position: 'absolute', top: 12, right: 12,
             display: 'flex', alignItems: 'center', gap: 5,
             padding: '3px 9px', borderRadius: 999,
-            background: 'rgba(59,130,246,0.15)',
-            border: '1px solid rgba(59,130,246,0.35)',
-            fontSize: 10, fontWeight: 700, color: '#60a5fa',
+            background: 'rgba(16, 185, 129, 0.15)',
+            border: '1px solid rgba(16, 185, 129, 0.35)',
+            fontSize: 10, fontWeight: 700, color: '#34d399',
           }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 5px #3b82f6' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
             Verified
           </div>
         )}
@@ -226,6 +227,18 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
           </div>
         )}
 
+        {/* Catchphrase */}
+        {lawyer.catchphrase && (
+          <p style={{
+            fontSize: 12, fontStyle: 'italic', color: '#94a3b8',
+            marginBottom: 10, lineHeight: 1.4,
+            display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}>
+            "{lawyer.catchphrase}"
+          </p>
+        )}
+
         {/* Spacer */}
         <div style={{ flex: 1 }} />
 
@@ -258,13 +271,12 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
             <div style={{ fontSize: 9, color: '#475569', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Location</div>
           </div>
 
-          {(fee30 || fee60 || fallback) && (
+          {(fee30 || fallback) && (
             <>
               <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.07)' }} />
               <div style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: colors.accent, letterSpacing: '-0.01em', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: colors.accent, letterSpacing: '-0.01em', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
                   {fee30 ? <div>₹{fee30}/30m</div> : <div>{fallback}</div>}
-                  {fee60 && <div>₹{fee60}/1h</div>}
                 </div>
               </div>
             </>
@@ -280,15 +292,15 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
               flex: '0 0 auto',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
               padding: '11px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(200,210,230,0.8)',
+              background: `${colors.accent}15`,
+              border: `1px solid ${colors.accent}40`,
+              color: colors.accent,
               fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
               transition: 'all 0.18s',
               whiteSpace: 'nowrap',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(200,210,230,0.8)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = `${colors.accent}25`; e.currentTarget.style.border = `1px solid ${colors.accent}60`; }}
+            onMouseLeave={e => { e.currentTarget.style.background = `${colors.accent}15`; e.currentTarget.style.border = `1px solid ${colors.accent}40`; }}
           >
             <Eye style={{ width: 13, height: 13 }} />
             Profile

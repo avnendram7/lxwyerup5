@@ -68,6 +68,7 @@ try:
     from routes.smart_match import router as smart_match_router
     from middleware import IPGuardMiddleware
     from middleware.security import SecurityMiddleware
+    from middleware.rate_limit import RateLimitMiddleware
 
     from services.database import close_db
     from models.lawyer_application import LawyerApplicationCreate
@@ -164,6 +165,7 @@ try:
 
     real_app.add_middleware(IPGuardMiddleware)
     real_app.add_middleware(SecurityMiddleware)
+    real_app.add_middleware(RateLimitMiddleware)
 
     logging.basicConfig(
         level=logging.INFO,

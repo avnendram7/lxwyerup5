@@ -9,7 +9,7 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Scale className="w-8 h-8 text-blue-500" />
+              <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
               <span className="text-xl font-bold">Lxwyer Up</span>
             </div>
             <p className="text-slate-400 text-sm">

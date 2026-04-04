@@ -397,7 +397,7 @@ const Footer = () => {
     <footer className="bg-[#0F2944] text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
         <div className="flex items-center justify-center space-x-2 mb-4">
-          <Scale className="w-6 h-6" />
+          <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
           <span className="text-xl font-bold">Lxwyer Up</span>
         </div>
         <p className="text-blue-200 text-sm mb-6">

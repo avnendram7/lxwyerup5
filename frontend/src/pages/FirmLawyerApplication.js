@@ -14,7 +14,7 @@ const SimpleNavbar = ({ navigate }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <Scale className="w-6 h-6 text-[#0F2944]" />
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="text-xl font-bold text-[#0F2944]">Lxwyer Up</span>
           </button>
           
@@ -50,7 +50,8 @@ export default function FirmLawyerApplication() {
     bar_council_number: '',
     education: '',
     languages: '',
-    bio: ''
+    bio: '',
+    catchphrase: ''
   });
 
   const specializations = [
@@ -107,7 +108,8 @@ export default function FirmLawyerApplication() {
         bar_council_number: formData.bar_council_number,
         education: formData.education,
         languages: formData.languages.split(',').map(l => l.trim()).filter(Boolean),
-        bio: formData.bio
+        bio: formData.bio,
+        catchphrase: formData.catchphrase
       };
 
       await axios.post(`${API}/firm-lawyer-applications`, applicationData);
@@ -437,6 +439,14 @@ export default function FirmLawyerApplication() {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-[#0F2944] mb-2">Catchphrase / One Liner * (Max 20 words)</label>
+                  <Input
+                    name="catchphrase"
+                    value={formData.catchphrase || ''}
+                    onChange={handleChange}
+                    placeholder="Why should clients choose you?"
+                    className="bg-white border-gray-200 text-black rounded-xl py-3 placeholder:text-gray-400 mb-4"
+                  />
                   <label className="block text-sm font-medium text-[#0F2944] mb-2">About You</label>
                   <textarea
                     name="bio"
@@ -461,8 +471,12 @@ export default function FirmLawyerApplication() {
                   <Button
                     type="button"
                     onClick={() => {
-                      if (!formData.specialization || !formData.experience_years) {
-                        toast.error('Please fill required professional details');
+                      if (!formData.specialization || !formData.experience_years || !formData.catchphrase) {
+                        toast.error('Please fill required professional details including catchphrase');
+                        return;
+                      }
+                      if (formData.catchphrase && formData.catchphrase.trim().split(/\s+/).length > 20) {
+                        toast.error('Catchphrase must be under 20 words');
                         return;
                       }
                       setStep(4);
@@ -491,15 +505,15 @@ export default function FirmLawyerApplication() {
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
                         <span>Application Evaluation</span>
-                        <span>₹2,118.64</span>
+                        <span>₹1,694.92</span>
                       </div>
                       <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
                         <span>GST (18%)</span>
-                        <span>₹381.36</span>
+                        <span>₹305.08</span>
                       </div>
                       <div className="flex justify-between items-center font-bold text-lg text-slate-900 dark:text-white pt-3 border-t border-slate-200 dark:border-slate-800">
                         <span>Total Secure Payment</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">₹2,500.00</span>
+                        <span className="text-emerald-600 dark:text-emerald-400">₹2,000.00</span>
                       </div>
                     </div>
 
@@ -509,7 +523,7 @@ export default function FirmLawyerApplication() {
                         <div>
                           <h4 className="font-bold text-blue-900 dark:text-blue-100 text-[15px]">100% Refundable Guarantee</h4>
                           <p className="text-sm text-blue-800/80 dark:text-blue-300/80 mt-1 leading-relaxed">
-                            The ₹2500 application fee is fully refundable regardless of whether your application is selected or rejected by our Apex system. This helps us ensure only serious verified professionals apply.
+                            The ₹2000 application fee establishes commitment. If selected, you will be refunded ₹1000 and receive a 2-month Apex Verified subscription (worth ₹2,500). If not selected, you will receive a full ₹2000 refund within 48 hours.
                           </p>
                         </div>
                       </div>

@@ -568,7 +568,7 @@ export default function CinematicHero() {
       <footer className="relative z-10 border-t border-slate-800 bg-slate-950/80 py-8 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-slate-300">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
-            <Scale className="w-5 h-5 text-blue-400" />
+            <img src="/logo.png" alt="Lxwyer Up Logo" className="w-6 h-6 md:w-8 md:h-8 object-contain rounded-md" style={{ mixBlendMode: "screen" }} />
             <span className="font-semibold text-white">Lxwyer Up</span>
           </div>
           <p>© 2026 Lxwyer Up. All rights reserved.</p>
