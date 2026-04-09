@@ -420,7 +420,7 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
           <div className={`p-4 border-b ${borderCol} shrink-0`}>
             <div className="flex items-center justify-between">
               <h1 className={`font-bold text-base ${textPrimary} leading-tight`}>Lxwyer <span className="text-blue-400">AI</span></h1>
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-widest">v1.0</span>
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-widest">v0.1</span>
             </div>
             <p className={`text-[10px] ${textMuted} mt-0.5`}>Legal Intelligence</p>
           </div>
