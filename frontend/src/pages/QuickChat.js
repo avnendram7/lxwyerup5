@@ -344,7 +344,7 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
 
     // --- Default: legal information from AI ---
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
       const response = await fetch(`${API_URL}/api/chat/legal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
