@@ -621,9 +621,11 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                         >
                             India's First Legal Ecosystem
                         </h3>
-                        <p className="text-[10px] text-slate-500/70 dark:text-slate-400/70 transition-colors uppercase tracking-wider" style={{ position: 'relative', zIndex: 5 }}>
-                            {t('Scroll to explore')}
-                        </p>
+                        <div style={{ position: 'relative', zIndex: 5, marginTop: '8px', opacity: 0.35, display: 'flex', justifyContent: 'center' }}>
+                            <svg width="16" height="22" viewBox="0 0 16 22" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'esPing 2s ease-in-out infinite' }}>
+                                <path d="M8 2L8 18M8 18L3 13M8 18L13 13" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </div>
                     </motion.div>
                 </motion.div>
 
