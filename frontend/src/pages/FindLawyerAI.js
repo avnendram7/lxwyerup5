@@ -688,6 +688,37 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
       return;
     }
 
+    // STEP 0A: Name lookup (who is Prateek Sharma?)
+    if (knowledgeBase) {
+      const nameCheck = lookupByName(knowledgeBase, userMessage);
+      if (nameCheck.found && nameCheck.results.length > 0) {
+        setRecommendedLawyers(nameCheck.results.map(r => ({
+          ...r,
+          id: r.id || r._id,
+          name: r.name || r.full_name || r.firm_name || '',
+          experience: r.experience_years || r.experience || 0,
+          specialization: Array.isArray(r.specialization) ? r.specialization[0] : (r.specialization || 'Lawyer'),
+          feeMin: typeof r.consultation_fee === 'string' ? parseInt(r.consultation_fee.replace(/\D/g, '')) || 0 : (r.consultation_fee || r.feeMin || 0),
+          fee: r.consultation_fee || r.fee,
+          photo: getLawyerPhoto(r.photo, r.name),
+          verified: r.is_approved || r.verified || false,
+          rating: r.rating || 4.8,
+          matchBadges: ['Name Match'],
+          score: 100,
+        })));
+        setShowAllLawyers(false);
+        setMessages(prev => [...prev, { role: 'assistant', content: `Here is the profile and details for **${nameCheck.extractedName.replace(/\b\w/g, c => c.toUpperCase())}** you asked about! 👇` }]);
+        setIsLoading(false);
+        return;
+      } else if (nameCheck.extractedName) {
+        // Name extracted but not found in DB
+        setMessages(prev => [...prev, { role: 'assistant', content: `I'm sorry, but I couldn't find any lawyer or law firm named "**${nameCheck.extractedName.replace(/\b\w/g, c => c.toUpperCase())}**" in our current verified database.\n\nHowever, I can still help you find the right advocate. What kind of legal issue do you need help with?` }]);
+        setQuickChips(['Criminal lawyer', 'Property dispute', 'Divorce lawyer']);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     // STEP 0B: Platform-awareness query ("how many lawyers do you have", "which cities")
     if (knowledgeBase) {
       const platformReply = getPlatformAwarenessResponse(knowledgeBase, userMessage);

@@ -85,11 +85,12 @@ export function lookupByName(kb, message) {
     return { found: false, results: [], extractedName: '' };
   }
 
-  // Strict name patterns — only explicit "who is X", "lawyer named X", etc.
+  // Strict name patterns — explicit "who is X", "qualification of X", etc.
   const patterns = [
-    /(?:who is|about|show me|lawyer named|advocate named|find a lawyer called)(?: a| an| lawyer| advocate| vakeel)? ([a-z][a-z\s]{1,30}?)(?:\?|$| in | at | for | from )/i,
+    /(?:who is|about|show me|lawyer named|advocate named|find a lawyer called|details of|detail of|qualification of|qualifications of)(?: a| an| lawyer| advocate| vakeel)? ([a-z][a-z\s]{1,30}?)(?:\?|$| in | at | for | from )/i,
     /(?:named|called|known as) ([a-z][a-z\s]{1,25}?)(?:\?|$| in | at )/i,
     /lawyer ([a-z][a-z\s]{2,20}?)\b/i,
+    /(?:detail|details|profile|education|experience|fee|fees) (?:of|for) ([a-z][a-z\s]{1,30}?)(?:\?|$)/i,
   ];
 
   for (const pattern of patterns) {
