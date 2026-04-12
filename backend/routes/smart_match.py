@@ -21,6 +21,8 @@ import math
 import random
 import hashlib
 import logging
+import asyncio
+from datetime import datetime
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
@@ -72,6 +74,12 @@ class MatchResponse(BaseModel):
     results: list
     total_found: int
     query_summary: dict    # What the engine extracted from the query
+
+class FeedbackData(BaseModel):
+    query: Optional[str] = ""
+    lawyer_id: str
+    action: str  # "view" or "book"
+    session_id: Optional[str] = ""
 
 # ── NLP EXTRACTION ────────────────────────────────────────────────────────────
 
@@ -354,7 +362,7 @@ def seeded_jitter(entity_id: str, session_id: str, max_jitter: int = 3) -> int:
 
 # ── LAWYER SCORING ────────────────────────────────────────────────────────────
 
-def score_lawyer(lawyer: dict, intent: dict, session_id: str) -> tuple[int, list]:
+def score_lawyer(lawyer: dict, intent: dict, session_id: str, feedback_count: int = 0) -> tuple[int, list]:
     score = 0
     reasons = []
 
@@ -437,22 +445,7 @@ def score_lawyer(lawyer: dict, intent: dict, session_id: str) -> tuple[int, list
             score += 3
             reasons.append("Consult Mode Match")
 
-    # 7. Court-type scoring (bonus pts)
-    if "high court" in q or "hc" in q:
-        lawyer_courts = lawyer.get("court") or []
-        if isinstance(lawyer_courts, str):
-            lawyer_courts = [lawyer_courts]
-        if any("high court" in c.lower() for c in lawyer_courts):
-            score += 8
-            reasons.append("High Court Advocate")
 
-    if "supreme court" in q or "sc" in q:
-        lawyer_courts = lawyer.get("court") or []
-        if isinstance(lawyer_courts, str):
-            lawyer_courts = [lawyer_courts]
-        if any("supreme" in c.lower() for c in lawyer_courts):
-            score += 10
-            reasons.append("Supreme Court Advocate")
 
     # 8. Secondary specialization partial credit (15 pts)
     secondary = lawyer.get("secondary_specializations") or lawyer.get("secondary_specialization") or []
@@ -469,7 +462,13 @@ def score_lawyer(lawyer: dict, intent: dict, session_id: str) -> tuple[int, list
         if "Verified" not in reasons:
             reasons.append("Verified")
 
-    # 10. Seeded jitter ±3 pts (no bias, just rotation)
+    # 10. Feedback Loop Bonus (The AI 'Learning' Element)
+    if feedback_count > 0:
+        score += min(feedback_count, 10)
+        if feedback_count >= 5:
+            reasons.append("Popular Match (Highly Recommended)")
+
+    # 11. Seeded jitter ±3 pts (no bias, just rotation)
     score += seeded_jitter(str(lawyer.get("_id", "")), session_id, 3)
 
     return max(0, min(score, 100)), reasons
@@ -608,12 +607,24 @@ async def smart_match_lawyers(req: MatchQuery):
     }
     lawyers = await db.users.find(query_filter, {"password": 0}).to_list(2000)
 
+    # Fetch feedback stats in bulk to inform the scoring engine (AI Learning)
+    feedback_cursor = db.match_feedback.aggregate([
+        {"$match": {"action": {"$in": ["view", "book"]}}},
+        {"$group": {"_id": "$lawyer_id", "count": {"$sum": 1}}}
+    ])
+    feedback_counts = {}
+    async for f in feedback_cursor:
+        feedback_counts[f["_id"]] = f["count"]
+
     # Score and filter
     scored = []
     for lawyer in lawyers:
         if not passes_hard_filters(lawyer, intent):
             continue
-        s, reasons = score_lawyer(lawyer, intent, req.session_id or "")
+            
+        lawyer_db_id = str(lawyer.get("_id", ""))
+        fb_count = feedback_counts.get(lawyer_db_id, 0)
+        s, reasons = score_lawyer(lawyer, intent, req.session_id or "", fb_count)
 
         # Only include if there's at least some relevance signal
         # (score > 0 when no intent extracted = show everyone; score > threshold when intent exists)
@@ -655,6 +666,13 @@ async def smart_match_lawyers(req: MatchQuery):
         scored.sort(key=lambda x: (-x.get("experience", 0), -x.get("score", 0)))
     else:
         scored.sort(key=lambda x: -x.get("score", 0))
+
+    if len(scored) == 0 and req.query.strip():
+        asyncio.create_task(db.missed_queries.insert_one({
+            "query": req.query,
+            "intent_extracted": intent,
+            "timestamp": datetime.utcnow()
+        }))
 
     return MatchResponse(
         results=scored[:20],        # Top 20 results
@@ -718,3 +736,14 @@ async def smart_match_firms(req: MatchQuery):
         total_found=len(scored),
         query_summary=intent
     )
+
+@router.post("/feedback")
+async def record_feedback(data: FeedbackData):
+    await db.match_feedback.insert_one({
+        "query": data.query,
+        "lawyer_id": data.lawyer_id,
+        "action": data.action,
+        "session_id": data.session_id,
+        "timestamp": datetime.utcnow()
+    })
+    return {"status": "success"}

@@ -905,8 +905,26 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
     setIsLoading(false);
   };
 
+  const logFeedback = (lawyer_id, action) => {
+    // Only send feedback for actual backend DB matches (checks for mongo object id length)
+    if (!lawyer_id || typeof lawyer_id !== 'string' || lawyer_id.length < 10) return;
+    const lastUserMessage = messages.slice().reverse().find(m => m.role === 'user')?.content || '';
+    axios.post(`${API}/smart-match/feedback`, {
+      lawyer_id,
+      action,
+      session_id: sessionId,
+      query: lastUserMessage,
+    }).catch(e => console.log('Feedback log error', e));
+  };
+
   const handleBookConsultation = (lawyer) => {
+    logFeedback(lawyer.id || lawyer._id, 'book');
     navigate('/book-consultation-signup', { state: { lawyer } });
+  };
+
+  const handleViewProfile = (lawyer) => {
+    logFeedback(lawyer.id || lawyer._id, 'view');
+    setSelectedLawyer(lawyer);
   };
 
   const content = (
@@ -1129,7 +1147,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                         <FirmCard 
                            firm={lawyer} 
                            index={index} 
-                           onProfileClick={(firm) => setSelectedLawyer({ ...firm, isFirm: true })} 
+                           onProfileClick={(firm) => handleViewProfile({ ...firm, isFirm: true })} 
                            onBookClick={(firm) => handleBookConsultation(firm)} 
                         />
                       </div>
@@ -1143,7 +1161,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.06 }}
                       className="rounded-3xl overflow-hidden border border-slate-800 bg-slate-900 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
-                      onClick={() => setSelectedLawyer(lawyer)}
+                      onClick={() => handleViewProfile(lawyer)}
                     >
                       {/* Gradient header — black at top to dark blue, matching manual */}
                       <div className={`relative h-28 bg-gradient-to-b ${grad}`}>
@@ -1191,7 +1209,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedLawyer(lawyer); }}
+                          <button onClick={(e) => { e.stopPropagation(); handleViewProfile(lawyer); }}
                             className="flex-1 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all border border-slate-700">
                             {d.viewProfile}
                           </button>
