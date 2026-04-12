@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, ArrowRight, Eye } from 'lucide-react';
+import { MapPin, ArrowRight, Eye, Sparkles, Scale, ShieldCheck } from 'lucide-react';
 import { getInitials } from '../utils/lawyerPhoto';
 import { useLang } from '../context/LanguageContext';
 
@@ -92,6 +92,263 @@ function LawyerCard({ lawyer, index = 0, onProfileClick, onBookClick }) {
     .map(c => (typeof c === 'object' ? c.court_name : c))
     .filter(Boolean);
   const tags = courts.length ? courts : [];
+
+  if (lawyer.isSignature) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: index * 0.04 }}
+        whileHover={{ y: -6, transition: { duration: 0.2 } }}
+        style={{
+          background: '#040404',
+          border: '1px solid rgba(212, 175, 55, 0.2)',
+          borderRadius: 24,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.05)',
+          willChange: 'transform',
+          minHeight: 420,
+          position: 'relative',
+        }}
+      >
+        {/* Animated Gold Shimmer Background */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, transparent 0%, rgba(212,175,55,0.03) 50%, transparent 100%)',
+          pointerEvents: 'none', zIndex: 0
+        }} />
+
+        {/* ════ PREMIUM BANNER ════ */}
+        <div style={{
+          height: 120,
+          background: `linear-gradient(135deg, #0a0a0a 0%, #151515 100%)`,
+          position: 'relative',
+          overflow: 'hidden',
+          flexShrink: 0,
+          borderBottom: '1px solid rgba(212, 175, 55, 0.15)'
+        }}>
+          {/* Subtle Cursive Watermark */}
+          <span style={{
+            position: 'absolute',
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%) rotate(-5deg)',
+            fontSize: 52,
+            color: 'rgba(212, 175, 55, 0.04)',
+            userSelect: 'none', pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+            fontFamily: '"Playfair Display", serif',
+            fontStyle: 'italic',
+            fontWeight: 700
+          }}>
+            Signature
+          </span>
+
+          <div style={{
+            position: 'absolute', top: -40, right: -40,
+            width: 160, height: 160, borderRadius: '50%',
+            background: `radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%)`,
+            pointerEvents: 'none',
+          }} />
+
+          {/* Verified Shield Badge */}
+          <div style={{
+            position: 'absolute', top: 12, right: 12,
+            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '4px 10px', borderRadius: 999,
+            background: 'rgba(212, 175, 55, 0.1)',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            fontSize: 10, fontWeight: 800, color: '#d4af37',
+            letterSpacing: '0.05em', textTransform: 'uppercase'
+          }}>
+            <ShieldCheck size={12} strokeWidth={2.5} />
+            SIGNATURE
+          </div>
+        </div>
+
+        {/* ════ PREMIUM AVATAR ROW ════ */}
+        <div style={{
+          padding: '0 20px',
+          marginTop: -45,
+          marginBottom: 10,
+          zIndex: 2,
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+        }}>
+          {/* Avatar Base */}
+          <div style={{
+            width: 80, height: 80, borderRadius: '25%',
+            border: `2px solid rgba(212, 175, 55, 0.6)`,
+            outline: '4px solid #040404',
+            overflow: 'hidden', flexShrink: 0,
+            background: `#111`,
+            boxShadow: `0 8px 30px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.2) inset`,
+            transform: 'rotate(-3deg)',
+            transition: 'transform 0.3s ease',
+          }}>
+            <div style={{ transform: 'rotate(3deg)', width: '100%', height: '100%' }}>
+              {hasPhoto ? (
+                <img
+                  src={lawyer.photo}
+                  alt={lawyer.name}
+                  style={{
+                    width: '100%', height: '100%',
+                    objectFit: 'cover', objectPosition: 'center 5%',
+                    display: 'block',
+                  }}
+                  onError={e => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              {/* Initials fallback */}
+              <div style={{
+                width: '100%', height: '100%',
+                display: hasPhoto ? 'none' : 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                background: 'linear-gradient(135deg, #1f1f1f, #0a0a0a)'
+              }}>
+                <span style={{
+                  fontSize: 30, fontWeight: 900,
+                  color: '#d4af37',
+                  letterSpacing: '-0.03em',
+                }}>
+                  {getInitials(lawyer.name)}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+            marginBottom: 5 
+          }}>
+            <p style={{
+              fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+              textTransform: 'uppercase', letterSpacing: '0.1em'
+            }}>Experience</p>
+            <p style={{
+              fontSize: 16, fontWeight: 900, color: '#d4af37',
+            }}>{lawyer.experience} <span style={{ fontSize: 11, fontWeight: 600 }}>{d.yr}</span></p>
+          </div>
+        </div>
+
+        {/* ════ CARD BODY ════ */}
+        <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', flex: 1, position: 'relative', zIndex: 1 }}>
+
+          {/* Name */}
+          <h3 style={{
+            fontSize: 20, fontWeight: 800, color: '#ffffff',
+            letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 4,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            fontFamily: '"Playfair Display", serif'
+          }}>
+            {lawyer.name}
+          </h3>
+
+          <p style={{
+            fontSize: 12, fontWeight: 600, marginBottom: 12,
+            color: 'rgba(212, 175, 55, 0.9)',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            display: 'flex', alignItems: 'center', gap: 6
+          }}>
+            <Scale size={13} style={{ opacity: 0.8 }} />
+            {lawyer.specialization || d.legalExpert}
+          </p>
+
+          {/* Location & Tags */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 12 }}>
+            <MapPin size={12} color="rgba(255,255,255,0.4)" />
+            <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginRight: 6 }}>
+              {lawyer.city}
+            </span>
+            <div style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.2)' }} />
+            <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 6 }}>
+              {lawyer.languages?.[0] || 'English'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 'auto', minHeight: 40 }}>
+            {tags.map((t, i) => (
+              <span key={i} style={{
+                padding: '3px 10px', borderRadius: 6,
+                background: `rgba(212,175,55,0.08)`,
+                border: `1px solid rgba(212,175,55,0.2)`,
+                fontSize: 10, fontWeight: 600,
+                color: '#d4af37',
+                letterSpacing: '0.02em', whiteSpace: 'nowrap',
+              }}>{t}</span>
+            ))}
+          </div>
+
+          {/* Spacer */}
+          <div style={{ height: 16 }} />
+
+          {/* Pricing area */}
+          <div style={{
+            padding: '10px 12px', borderRadius: 12,
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: 16
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Consultation (30m)</span>
+              <span style={{ fontSize: 15, color: '#f0f4ff', fontWeight: 800 }}>
+                {fee30 ? `₹${fee30.toLocaleString()}` : 'Custom'}
+              </span>
+            </div>
+            {fee60 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Full Hour</span>
+                <span style={{ fontSize: 13, color: '#a0aec0', fontWeight: 700 }}>
+                  ₹{fee60.toLocaleString()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => onProfileClick && onProfileClick(lawyer)}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: 'rgba(212, 175, 55, 0.1)',
+                color: '#d4af37', fontSize: 12, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                cursor: 'pointer', transition: 'all 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'rgba(212, 175, 55, 0.15)'}
+              onMouseOut={e => e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)'}
+            >
+              <Eye size={14} /> {d.profile}
+            </button>
+            <button
+              onClick={() => onBookClick && onBookClick(lawyer)}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: 'linear-gradient(135deg, #d4af37 0%, #b5952f 100%)',
+                color: '#000000', fontSize: 12, fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                border: 'none', cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(212,175,55,0.3)'
+              }}
+              onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+              onMouseOut={e => e.currentTarget.style.filter = 'brightness(1)'}
+            >
+              {d.bookConsultation}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

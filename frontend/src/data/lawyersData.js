@@ -207,6 +207,7 @@ const generateLawyers = () => {
         consultationModes: ['In-Person', 'Video Call', 'Phone'],
         consultation_preferences: 'both',
         verified: true,
+        isSignature: Math.random() > 0.85, // 15% chance to be a signature lawyer
         featured: Math.random() > 0.8,
         joinedDate: '2024-01-01'
       };

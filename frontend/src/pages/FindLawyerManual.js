@@ -82,6 +82,7 @@ export default function FindLawyerManual() {
   const { t, lang } = useLang();
   const d = LOCAL_TEXT[lang] || LOCAL_TEXT.en;
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('standard'); // 'standard' | 'signature'
   const [filters, setFilters] = useState({
     state: '',
     city: '',
@@ -213,6 +214,11 @@ export default function FindLawyerManual() {
 
   // Search and filter logic — memoized, only re-runs when debounced query or filters change
   const filteredLawyers = useMemo(() => shuffledLawyers.filter(lawyer => {
+    // 1. Filter by Tier
+    if (activeTab === 'signature' && !lawyer.isSignature) return false;
+    if (activeTab === 'standard' && lawyer.isSignature) return false;
+
+    // 2. Filter by Search
     const matchesSearch =
       (lawyer.name?.toLowerCase() || '').includes(debouncedQuery.toLowerCase()) ||
       (lawyer.specialization?.toLowerCase() || '').includes(debouncedQuery.toLowerCase()) ||
@@ -335,6 +341,39 @@ export default function FindLawyerManual() {
             <Scale className="w-3.5 h-3.5 text-blue-600 dark:text-slate-400" />
             <span className="text-xs font-medium text-blue-600 dark:text-slate-400">{t('fl_verified')}</span>
           </motion.div>
+        </div>
+
+        {/* Premium Tab Toggle */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-slate-100 dark:bg-[#111] p-1.5 rounded-full border border-slate-200 dark:border-[#222]">
+            <button
+              onClick={() => { setActiveTab('standard'); setCurrentPage(1); }}
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'standard' 
+                ? 'bg-white dark:bg-[#222] text-slate-900 dark:text-white shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            >
+              Lawyers
+            </button>
+            <button
+              onClick={() => { setActiveTab('signature'); setCurrentPage(1); }}
+              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative overflow-hidden group ${activeTab === 'signature' 
+                ? 'bg-[#050505] text-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.15)] border border-[#d4af37]/30' 
+                : 'text-slate-500 hover:text-[#d4af37]'}`}
+              style={{ fontFamily: activeTab === 'signature' ? '"Playfair Display", serif' : 'inherit' }}
+            >
+              {activeTab === 'signature' && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+              )}
+              <style>{`
+                @keyframes shimmer {
+                  100% { transform: translateX(100%); }
+                }
+              `}</style>
+              <span className="relative z-10 flex items-center gap-1.5">
+                {activeTab === 'signature' && <Sparkles className="w-3.5 h-3.5" />} Signature
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Search & Filters */}
