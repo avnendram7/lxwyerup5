@@ -199,10 +199,10 @@ export default function LawyerProfile({ lawyerId, onCloseModal }) {
                   {lawyer.achievements.map((ach, i) => (
                     <div key={i} className="bg-white/80 dark:bg-[#1A1A1A] backdrop-blur-md rounded-2xl p-5 border border-emerald-100 dark:border-[#333] flex items-center gap-5">
                       {ach.photo ? (
-                        <img src={ach.photo} alt="achievement" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-emerald-200 dark:border-emerald-700" />
+                        <img src={ach.photo} alt="achievement" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-emerald-200 dark:border-emerald-700" />
                       ) : (
-                         <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-slate-800 border-emerald-200">
-                          <Award className="w-6 h-6 text-emerald-500" />
+                         <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-slate-800 border-emerald-200">
+                          <Award className="w-8 h-8 text-emerald-500" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">

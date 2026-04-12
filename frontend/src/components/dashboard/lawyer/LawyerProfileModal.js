@@ -387,10 +387,10 @@ export default function LawyerProfileModal({ user: initialUser, onClose, onLogou
                                             }`}
                                         >
                                             {ach.photo ? (
-                                                <img src={ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`} alt="achievement" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-emerald-500/20" />
+                                                <img src={ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`} alt="achievement" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-emerald-500/20" />
                                             ) : (
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${dm ? 'bg-emerald-900/20' : 'bg-emerald-100'}`}>
-                                                    <Award className="w-5 h-5 text-emerald-400" />
+                                                <div className={`w-16 h-16 rounded-xl flex items-center justify-center shrink-0 ${dm ? 'bg-emerald-900/20' : 'bg-emerald-100'}`}>
+                                                    <Award className="w-8 h-8 text-emerald-400" />
                                                 </div>
                                             )}
                                             <div className="flex-1 min-w-0 flex flex-col justify-center">

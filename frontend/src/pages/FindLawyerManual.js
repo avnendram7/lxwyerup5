@@ -765,12 +765,12 @@ export default function FindLawyerManual() {
                               <img
                                 src={ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`}
                                 alt="achievement"
-                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 border border-emerald-200 dark:border-emerald-500/30 shadow-sm cursor-pointer hover:scale-[1.02] transition-transform relative z-10"
+                                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover shrink-0 border border-emerald-200 dark:border-emerald-500/30 shadow-sm cursor-pointer hover:scale-[1.02] transition-transform relative z-10"
                                 onClick={() => setExpandedImage(ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`)}
                               />
                             ) : (
-                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-900/20 border border-emerald-200 dark:border-emerald-700/50 shadow-inner relative z-10">
-                                <Award className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500 dark:text-emerald-400 drop-shadow-sm" />
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-900/20 border border-emerald-200 dark:border-emerald-700/50 shadow-inner relative z-10">
+                                <Award className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-500 dark:text-emerald-400 drop-shadow-sm" />
                               </div>
                             )}
                             <div className="flex-1 min-w-0 flex flex-col justify-center relative z-10">
