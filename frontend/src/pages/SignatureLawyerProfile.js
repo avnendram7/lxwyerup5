@@ -220,32 +220,18 @@ export default function SignatureLawyerProfile() {
           </div>
         </motion.div>
 
-        {/* Action Button Row (Spanning beneath the header block) */}
+        {/* Action Button Row - Restricted to Only Internal Booking to secure leads */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col sm:flex-row gap-4 mt-6"
+          className="flex mt-6"
         >
-          <button 
-            onClick={() => window.location.href = `tel:+910000000000`}
-            className="flex-1 flex items-center justify-center gap-3 bg-[#111] border border-[#d4af37]/30 hover:bg-[#1a1a1a] rounded-2xl py-5 text-white/80 font-bold uppercase tracking-widest text-sm transition-all"
-          >
-            <Phone className="w-5 h-5 text-[#d4af37]" />
-            Direct Office Line
-          </button>
-          <button 
-            onClick={() => window.open('https://lxwyerup.com', '_blank')}
-            className="flex-1 flex items-center justify-center gap-3 bg-[#111] border border-[#d4af37]/30 hover:bg-[#1a1a1a] rounded-2xl py-5 text-white/80 font-bold uppercase tracking-widest text-sm transition-all"
-          >
-            <Globe className="w-5 h-5 text-[#d4af37]" />
-            Chambers Website
-          </button>
           <button
             onClick={() => navigate('/signature-booking', { state: { lawyer } })}
-            className="flex-[1.5] flex items-center justify-center gap-3 bg-gradient-to-r from-[#d4af37] to-[#aa8c2c] hover:from-[#e5c158] hover:to-[#b5952f] shadow-[0_0_20px_rgba(212,175,55,0.3)] rounded-2xl py-5 text-black font-extrabold uppercase tracking-widest text-sm transition-all"
+            className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-[#d4af37] to-[#aa8c2c] hover:from-[#e5c158] hover:to-[#b5952f] shadow-[0_0_20px_rgba(212,175,55,0.3)] rounded-2xl py-6 text-black font-black uppercase tracking-[0.3em] text-lg transition-all"
           >
-            <Clock className="w-5 h-5 opacity-80" />
+            <Clock className="w-6 h-6 opacity-80" />
             Book Priority Consultation
           </button>
         </motion.div>
@@ -368,6 +354,33 @@ export default function SignatureLawyerProfile() {
                 <div className="flex justify-between items-center">
                   <span className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Channel Access</span>
                   <span className="text-white font-bold">{lawyer.consultationModes.join(' • ')}</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Premium Visual Gallery */}
+            <motion.div 
+               initial={{ opacity: 0, x: 20 }}
+               animate={{ opacity: 1, x: 0 }}
+               transition={{ delay: 0.4 }}
+               className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-8 overflow-hidden relative"
+            >
+              <h3 className="text-lg font-bold text-white mb-6 uppercase tracking-widest flex items-center gap-3 relative z-10">
+                <Shield className="w-5 h-5 text-[#d4af37]" /> The Chambers
+              </h3>
+              <div className="grid grid-cols-2 gap-3 relative z-10">
+                {/* Simulated images using premium stock photo placeholders */}
+                <div className="h-28 rounded-xl bg-[#111] overflow-hidden border border-white/5 relative">
+                  <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" alt="Library" />
+                </div>
+                <div className="h-28 rounded-xl bg-[#111] overflow-hidden border border-white/5 relative">
+                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" alt="Conference Room" />
+                </div>
+                <div className="h-28 rounded-xl bg-[#111] overflow-hidden border border-white/5 relative">
+                  <img src="https://images.unsplash.com/photo-1505664124967-17b2b73bc3fa?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" alt="Office Lobby" />
+                </div>
+                <div className="h-28 rounded-xl bg-[#111] flex items-center justify-center border border-[#d4af37]/30 text-[#d4af37] text-xs font-black uppercase tracking-widest bg-gradient-to-br from-[#111] to-[#0a0a0a] hover:from-[#d4af37]/10 transition-all cursor-pointer">
+                  + V i e w<br/>A l l
                 </div>
               </div>
             </motion.div>

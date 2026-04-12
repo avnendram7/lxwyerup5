@@ -883,6 +883,22 @@ export default function LawyerDashboard() {
     }
   };
 
+  const handleSignatureApplication = async (plan) => {
+    try {
+      setLoading(true);
+      await axios.post(
+        `${API}/lawyers/apply-signature`,
+        { plan },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Signature Exclusivity Contract submitted. Application under review.");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Application process failed. Please contact admin.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSelectChat = async (chat) => {
     setSelectedChat(chat);
     setMsgPermission(null);
@@ -944,6 +960,7 @@ export default function LawyerDashboard() {
   const baseNavItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { id: "appointments", icon: CalendarCheck, label: "Appointments" },
+    { id: "signature_apply", icon: Star, label: "Signature Tier" },
     { id: "cases", icon: FileText, label: "Cases" },
     { id: "calendar", icon: CalendarIcon, label: "Calendar" },
     { id: "messages", icon: MessageSquare, label: "Messages" },
@@ -2440,6 +2457,60 @@ export default function LawyerDashboard() {
               </div>
             )}
 
+
+            {/* Signature Application Tab */}
+            {activeTab === "signature_apply" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-8 pb-32 min-h-[85vh] bg-black rounded-[2.5rem]">
+                <div className="max-w-4xl mx-auto mt-12">
+                  <div className="text-center mb-12">
+                    <Star className="w-16 h-16 text-[#d4af37] mx-auto mb-6 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]" />
+                    <h1 className="text-4xl font-black text-white uppercase tracking-widest mb-4">Ascend to Signature</h1>
+                    <p className="text-[#d4af37] tracking-widest uppercase text-sm font-bold bg-[#d4af37]/10 py-2 px-6 rounded-full inline-flex border border-[#d4af37]/30">Exclusive Legal Network</p>
+                  </div>
+                  
+                  <div className="bg-[#111] border border-[#d4af37]/30 rounded-[2rem] p-8 sm:p-12 shadow-[0_0_50px_rgba(212,175,55,0.05)] relative overflow-hidden mb-12">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full blur-3xl pointer-events-none" />
+                    <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-widest border-b border-white/10 pb-4">Strict Exclusivity Mandate</h2>
+                    <p className="text-white/70 text-lg leading-relaxed font-medium relative z-10">
+                      The Signature tier is the highest echelon of LxwyerUp. By applying, you agree to absolute exclusivity: 
+                      <span className="text-[#d4af37] font-black"> You cannot register, list, or broker consultations on any other legal digital platform. </span>
+                      Breach of this mandate results in instant delisting and forfeit of premium access metrics.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    {/* Vantage Plan */}
+                    <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border border-white/10 rounded-3xl p-8 hover:border-[#d4af37]/50 transition-colors flex flex-col relative group">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent group-hover:via-[#d4af37] transition-all"></div>
+                      <h3 className="text-xl font-black text-white uppercase tracking-widest mb-2">Vantage Plan</h3>
+                      <p className="text-white/50 font-bold uppercase text-xs mb-6 tracking-widest">Yearly Retainer</p>
+                      <div className="text-4xl font-black text-[#d4af37] mb-8">₹40,000<span className="text-sm text-white/30">/yr</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-[#d4af37]" /> Priority Global Routing</li>
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-[#d4af37]" /> Dedicated Account Concierge</li>
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-[#d4af37]" /> Zero Platform Commision</li>
+                      </ul>
+                      <button onClick={() => handleSignatureApplication('yearly')} disabled={loading} className="w-full py-4 bg-white/5 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-[#d4af37] hover:text-black transition-all border border-white/10 hover:border-[#d4af37] disabled:opacity-50">Apply for Vantage</button>
+                    </div>
+
+                    {/* Focus Plan */}
+                    <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border border-white/10 rounded-3xl p-8 hover:border-white/30 transition-colors flex flex-col relative group">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:via-white/50 transition-all"></div>
+                      <h3 className="text-xl font-black text-white uppercase tracking-widest mb-2">Focus Plan</h3>
+                      <p className="text-white/50 font-bold uppercase text-xs mb-6 tracking-widest">6-Month Terminal</p>
+                      <div className="text-4xl font-black text-white mb-8">₹25,000<span className="text-sm text-white/30">/6mo</span></div>
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-white/50" /> Premium Routing</li>
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-white/50" /> Standard Support SLA</li>
+                        <li className="flex gap-3 items-center text-white/80 font-medium"><CheckCircle className="w-5 h-5 text-white/50" /> Baseline Exclusivity Benefits</li>
+                      </ul>
+                      <button onClick={() => handleSignatureApplication('6month')} disabled={loading} className="w-full py-4 bg-white/5 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-white hover:text-black transition-all border border-white/10 hover:border-white disabled:opacity-50">Apply for Focus</button>
+                    </div>
+                  </div>
+
+                </div>
+              </motion.div>
+            )}
 
             {/* Earnings Tab */}
             {activeTab === "earnings" && (

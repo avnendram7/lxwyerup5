@@ -247,3 +247,40 @@ async def submit_deactivation_request(data: DeactivationRequest, user: dict = De
     
     return {'message': 'Deactivation request submitted successfully'}
 
+class SignatureApplicationRequest(BaseModel):
+    plan: str
+
+@router.post("/apply-signature")
+async def apply_for_signature(data: SignatureApplicationRequest, user: dict = Depends(get_current_user)):
+    """Submit an application/upgrade request for Signature tier"""
+    if user.get('user_type') != 'lawyer':
+        raise HTTPException(status_code=403, detail="Only lawyers can apply for Signature status")
+    
+    plan_name = "Vantage Plan (Yearly - ₹40,000)" if data.plan == 'yearly' else "Focus Plan (6-Month - ₹25,000)"
+    
+    # Record the application in the DB
+    application_record = {
+        'lawyer_id': user['id'],
+        'lawyer_email': user.get('email', 'unknown_email'),
+        'lawyer_name': user.get('full_name', user.get('name', 'Unknown Lawyer')),
+        'plan_selected': data.plan,
+        'exclusivity_accepted': True,
+        'status': 'pending_payment_verification',
+        'applied_at': datetime.now().isoformat()
+    }
+    
+    await db.signature_applications.insert_one(application_record)
+    
+    # Mocking the email notification to admin as requested
+    print("=====================================================")
+    print(f"📧 EMAIL DISPATCH INITIATED")
+    print(f"To: avnendram.7@gmail.com")
+    print(f"Subject: NEW SIGNATURE TIER APPLICATION: {application_record['lawyer_name']}")
+    print(f"Body:")
+    print(f"A new attorney has locked in the exclusivity contract and applied for Signature status.")
+    print(f"Lawyer: {application_record['lawyer_name']} ({application_record['lawyer_email']})")
+    print(f"Selected Plan: {plan_name}")
+    print(f"Exclusivity Clause: ACCEPTED")
+    print("=====================================================")
+    
+    return {'message': 'Signature application submitted and administrator notified.'}
