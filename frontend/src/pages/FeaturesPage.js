@@ -8,6 +8,7 @@ import {
   Award, Search, BadgeCheck, ClipboardCheck, Microscope, TrendingUp
 } from 'lucide-react';
 import { useLang } from '../context/LanguageContext';
+import { Card, CardHeader, CardContent } from '../components/ui/card';
 
 const TEXT = {
   en: {
@@ -91,11 +92,11 @@ const FEATURES = [
   },
   {
     icon: Fingerprint,
-    title: 'Lxwyer Up Signature',
-    description: 'Lxwyer Up Signature for users provides access to highly verified, premium lawyers with proven expertise and strong track records. It ensures trusted, high-quality legal consultation for complex or high-stakes matters, offering users greater confidence, reliability, and professional support when precision and experience matter most.',
+    title: 'APEX Verification',
+    description: 'Our proprietary, multi-stage verification framework. Every lawyer is subjected to rigorous credential checks, peer reviews, conduct audits, and AI-driven performance scoring before appearing in your results. It ensures trusted, high-quality legal consultation for complex or high-stakes matters with more details of their verified expertise.',
     tag: 'Both',
-    color: 'blue',
-    badge: 'Coming Soon',
+    color: 'green',
+    badge: 'Verified',
   },
   {
     icon: MessageSquare,
@@ -157,7 +158,7 @@ const FEATURES = [
 
 const FEATURES_HI = [
   { icon: Siren, title: 'SOS कानूनी सहायता', description: 'तत्काल कानूनी स्थितियों के दौरान सत्यापित वकीलों तक तत्काल पहुंच प्रदान करता है। एक क्लिक के साथ, जल्दी से जुड़ें, समय पर मार्गदर्शन प्राप्त करें, और अपने अगले कदम को समझें।', tag: 'Clients', color: 'red', badge: 'अभी लाइव', },
-  { icon: Fingerprint, title: 'Lxwyer Up सिग्नेचर', description: 'लॉयर अप सिग्नेचर उपयोगकर्ताओं को प्रमाणित विशेषज्ञता और मजबूत ट्रैक रिकॉर्ड वाले अत्यधिक सत्यापित, प्रीमियम वकीलों तक पहुंच प्रदान करता है।', tag: 'Both', color: 'blue', badge: 'जल्द आ रहा है', },
+  { icon: Fingerprint, title: 'APEX वेरिफिकेशन', description: 'हमारा मालिकाना बहु-चरणीय सत्यापन ढांचा। हर वकील की क्रेडेंशियल जांच, सहकर्मी समीक्षा और एआई-संचालित प्रदर्शन स्कोरिंग से गुज़रना पड़ता है। यह जटिल मामलों के लिए विश्वसनीय परामर्श सुनिश्चित करता है।', tag: 'Both', color: 'green', badge: 'सत्यापित', },
   { icon: MessageSquare, title: 'AI कानूनी चैटबॉट', description: 'साधारण भाषा में अपने कानूनी सवालों के तुरंत, संरचित उत्तर पाएं। जेमिनी द्वारा संचालित — 24/7 उपलब्ध।', tag: 'Both', color: 'blue', },
   { icon: Calendar, title: 'परामर्श बुकिंग', description: 'सेकंडों में सत्यापित वकीलों के साथ वीडियो या व्यक्तिगत परामर्श बुक करें। सभी नियुक्तियों को एक कैलेंडर में प्रबंधित करें।', tag: 'Clients', color: 'blue', },
   { icon: FileText, title: 'केस ट्रैकिंग', description: 'रीयल-टाइम में अपने केस की स्थिति, चरणों और महत्वपूर्ण समय सीमाओं की निगरानी करें। कभी भी कोई अपडेट या सुनवाई न चूकें।', tag: 'Clients', color: 'blue', },
@@ -252,68 +253,55 @@ const DOT_COLORS = {
   rose: 'bg-rose-400', indigo: 'bg-indigo-400', teal: 'bg-teal-400',
 };
 
+const CardDecorator = ({ children, colorTheme }) => {
+    let iconClass = "text-blue-500";
+    if (colorTheme === 'red') iconClass = "text-red-500";
+    if (colorTheme === 'green') iconClass = "text-emerald-500";
+
+    return (
+        <div aria-hidden className="relative mx-auto size-36 transform scale-[1.1] mb-2 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]">
+            <div className="absolute inset-0 [--border:rgba(0,0,0,0.1)] dark:[--border:rgba(255,255,255,0.15)] bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:24px_24px] opacity-20"/>
+            <div className={`bg-transparent absolute inset-0 m-auto flex size-12 items-center justify-center border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 rounded-xl ${iconClass}`}>{children}</div>
+        </div>
+    );
+};
+
 function FeatureCard({ feature, index }) {
   const { lang } = useLang();
-  const c = COLOR[feature.color] || COLOR.blue;
-  const glow = GLOW_VAR[feature.color] || GLOW_VAR.blue;
-
+  
   return (
-    <div
-      className={`group relative overflow-hidden rounded-3xl border ${c.border} dark:border-white/5 bg-white dark:bg-[#161616] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${c.shadow} ring-1 ring-transparent ${c.ring}`}
-      style={{
-        '--glow': glow,
-        animationName: 'cardEnter',
-        animationDuration: '0.55s',
-        animationTimingFunction: 'cubic-bezier(.22,.68,0,1.2)',
-        animationFillMode: 'both',
-        animationDelay: `${index * 0.07}s`,
-      }}
-    >
-      {/* ── Visual header panel ── */}
-      <div className={`relative h-44 flex items-center justify-center overflow-hidden ${c.lightHeader} dark:bg-[#111]`}>
-        {/* Large blurred glow behind icon */}
-        <div
-          className={`absolute w-32 h-32 ${c.glow} rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}
-        />
+      <Card 
+        className="group relative overflow-hidden bg-white dark:bg-black border-slate-200 dark:border-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl shadow-black/5"
+        style={{
+            animationName: 'cardEnter',
+            animationDuration: '0.55s',
+            animationTimingFunction: 'cubic-bezier(.22,.68,0,1.2)',
+            animationFillMode: 'both',
+            animationDelay: `${index * 0.07}s`,
+        }}
+      >
+          <CardHeader className="pb-3 text-center relative z-10">
+              {feature.badge && (
+                  <div className="absolute -top-1 -right-2 transform scale-75">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${feature.color === 'red' ? 'text-red-600 border-red-500/30 bg-red-500/10' : feature.color === 'green' ? 'text-emerald-600 border-emerald-500/30 bg-emerald-500/10' : 'text-blue-600 border-blue-500/30 bg-blue-500/10'} animate-pulse`}>
+                          {feature.badge}
+                      </span>
+                  </div>
+              )}
+              <CardDecorator colorTheme={feature.color}>
+                  <feature.icon className="size-6" aria-hidden />
+              </CardDecorator>
 
+              <h3 className="mt-4 text-xl font-bold text-slate-900 dark:text-white transition-colors">{feature.title}</h3>
+          </CardHeader>
 
-        {/* Badge pills */}
-        <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
-          {feature.badge && (
-            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${c.tag} animate-pulse`}>
-              {feature.badge}
-            </span>
-          )}
-          <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${c.tag}`}>
-            {lang === 'hi' ? TEXT.hi.forPre : TEXT.en.forPre}{feature.tag === 'Clients' ? (lang === 'hi' ? 'मुवक्किल' : 'Clients') : feature.tag === 'Lawyers' ? (lang === 'hi' ? 'वकील' : 'Lawyers') : (lang === 'hi' ? 'दोनों' : 'Both')}
-          </span>
-        </div>
-
-        {/* Main icon — pulsing glow ring on hover */}
-        <div
-          className={`relative z-10 w-20 h-20 rounded-2xl ${c.iconBg} border flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
-          style={{ '--glow': glow }}
-        >
-          <feature.icon className={`w-10 h-10 ${c.icon} transition-all duration-300`} />
-          {/* Ping ring */}
-          <span
-            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              boxShadow: `0 0 0 3px ${glow}`,
-              animationName: 'iconPulse',
-              animationDuration: '1.8s',
-              animationIterationCount: 'infinite',
-              '--glow': glow,
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="p-6">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 transition-colors">{feature.title}</h3>
-        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{feature.description}</p>
-      </div>
-    </div>
+          <CardContent className="text-center relative z-10">
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{feature.description}</p>
+          </CardContent>
+          
+          {/* Subtle background glow on hover */}
+          <div className={`absolute top-0 inset-x-0 h-40 mix-blend-screen pointer-events-none opacity-0 group-hover:opacity-[0.15] transition-opacity duration-700 bg-gradient-to-b ${feature.color === 'red' ? 'from-red-600' : feature.color === 'green' ? 'from-emerald-600' : 'from-blue-600'} to-transparent`} />
+      </Card>
   );
 }
 
@@ -359,86 +347,11 @@ export default function FeaturesPage() {
 
       {/* ── PLATFORM CAPABILITIES ─────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-6 pt-16 pb-24">
+        {/* Platform capabilities title */}
         <div className="text-center mb-14">
           <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.18em]">{d.cap_sub}</span>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-3 transition-colors">{d.cap_title}</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-xl mx-auto">{d.cap_desc}</p>
-        </div>
-
-        {/* ── APEX System Hero Card ── */}
-        <div
-          className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-[#00100a] via-[#001a10] to-[#000d08] mb-8 shadow-2xl shadow-emerald-500/8"
-          style={{ animationName: 'cardEnter', animationDuration: '0.6s', animationTimingFunction: 'cubic-bezier(.22,.68,0,1.2)', animationFillMode: 'both' }}
-        >
-          {/* Background radial glows */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/8 rounded-full blur-3xl" />
-            <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-green-600/6 rounded-full blur-3xl" />
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 70% 50%, rgba(16,185,129,0.04) 0%, transparent 60%)' }} />
-          </div>
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-0">
-
-            {/* ── Left: Visionary copy ── */}
-            <div className="p-10 lg:p-12 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold tracking-widest uppercase mb-6 w-fit">
-                <Award className="w-3.5 h-3.5" />
-                Lxwyer Up — APEX System
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-5">
-                {d.apex_title_1}{' '}
-                <span className="bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 bg-clip-text text-transparent">
-                  {d.apex_title_2}
-                </span>
-              </h2>
-
-              <p className="text-slate-300 text-[15px] leading-relaxed mb-5">
-                {d.apex_desc_1}
-              </p>
-
-              <p className="text-slate-400 text-sm leading-relaxed mb-8 italic border-l-2 border-emerald-500/40 pl-4">
-                {d.apex_quote}
-                <span className="block mt-1 text-emerald-600/80 not-italic font-semibold text-xs">— Lxwyer Up</span>
-              </p>
-
-              <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-emerald-500/8 border border-emerald-500/20 w-fit max-w-sm">
-                <BadgeCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="text-emerald-100 text-sm font-medium leading-relaxed">
-                  {d.apex_promise}
-                </span>
-              </div>
-            </div>
-
-            {/* ── Right: 6-stage pipeline ── */}
-            <div className="p-10 lg:p-12 border-t lg:border-t-0 lg:border-l border-emerald-500/10 flex flex-col justify-center gap-5">
-              <p className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-1">
-                {d.pipeline}
-              </p>
-
-              {[
-                { icon: Search,         step: '01', title: lang === 'hi' ? 'दस्तावेज़ सत्यापन' : 'Document Verification',     desc: lang === 'hi' ? 'बार काउंसिल नामांकन, कानून की डिग्री और राष्ट्रीय रजिस्ट्रियों के खिलाफ पहचान की जांच।' : 'Bar Council enrollment, law degree, and identity cross-checked against national registries.' },
-                { icon: ClipboardCheck, step: '02', title: lang === 'hi' ? 'विशेषज्ञता मूल्यांकन' : 'Specialisation Assessment', desc: lang === 'hi' ? 'केस-इतिहास विश्लेषण पुष्टि करता है कि घोषित विशेषज्ञता वास्तविक कोर्टरूम ट्रैक रिकॉर्ड द्वारा समर्थित है।' : 'Case-history analysis confirms that declared expertise is backed by real courtroom track records.' },
-                { icon: Microscope,     step: '03', title: lang === 'hi' ? 'आचरण और नैतिकता की समीक्षा' : 'Conduct & Ethics Review',   desc: lang === 'hi' ? 'अनुशासनात्मक रिकॉर्ड, सहकर्मी संदर्भ और ग्राहक प्रतिक्रिया की समीक्षा हमारे स्वतंत्र कानूनी पैनल द्वारा की जाती है।' : 'Disciplinary records, peer references, and client feedback reviewed by our independent legal panel.' },
-                { icon: TrendingUp,     step: '04', title: lang === 'hi' ? 'प्रदर्शन स्कोरिंग' : 'Performance Scoring',       desc: lang === 'hi' ? 'केस परिणामों, प्रतिक्रिया के समय और समय के साथ ग्राहकों की संतुष्टि के रुझानों पर एआई-संचालित स्कोरिंग।' : 'AI-driven scoring across case outcomes, response times, and client satisfaction trends over time.' },
-                { icon: Shield,         step: '05', title: lang === 'hi' ? 'मानदंड मिलान इंजन' : 'Criteria Matching Engine',  desc: lang === 'hi' ? 'स्मार्ट अनुक्रमणिका आपकी सटीक क्वेरी को मैप करती है - बजट, स्थान, भाषा, परामर्श मोड - सबसे उपयुक्त खोजने के लिए।' : 'Smart indexing maps your exact query — budget, location, language, consultation mode — to the best fit.' },
-                { icon: BadgeCheck,     step: '06', title: lang === 'hi' ? 'APEX सील प्रदान किया गया' : 'APEX Seal Awarded',         desc: lang === 'hi' ? 'केवल हर चरण को पार करने वाले वकीलों को ही उनकी प्रोफ़ाइल पर APEX सील गर्व के साथ प्रदर्शित करने को मिलता है।' : 'Only lawyers who pass every stage earn the APEX seal displayed proudly on their profile.' },
-              ].map(({ icon: Icon, step, title, desc }) => (
-                <div key={step} className="flex items-start gap-4 group">
-                  <div className="shrink-0 w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/18 transition-colors duration-200">
-                    <Icon className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-[9px] font-black text-emerald-600/80 tracking-widest">{step}</span>
-                      <span className="text-sm font-bold text-white">{title}</span>
-                    </div>
-                    <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

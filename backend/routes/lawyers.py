@@ -5,6 +5,7 @@ from models.user import User
 from models.lawyer_application import LawyerApplication, LawyerApplicationCreate
 from services.database import db
 from services.auth import hash_password
+from routes.auth import _email_taken_globally
 
 router = APIRouter(prefix="/lawyers", tags=["Lawyers"])
 
@@ -65,14 +66,10 @@ async def get_lawyers(specialization: str = None, city: str = None, limit: int =
 @router.post("/applications")
 async def submit_lawyer_application(application: LawyerApplicationCreate):
     """Submit a lawyer application"""
-    # Check if email already exists
-    existing = await db.lawyer_applications.find_one({'email': application.email})
-    if existing:
-        raise HTTPException(status_code=400, detail='An application with this email already exists')
-    
-    existing_user = await db.users.find_one({'email': application.email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail='A user with this email already exists')
+    # Global email uniqueness check across all collections
+    taken_msg = await _email_taken_globally(application.email)
+    if taken_msg:
+        raise HTTPException(status_code=400, detail=taken_msg)
     
     # Create application
     app_data = LawyerApplication(

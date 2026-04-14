@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 from datetime import datetime
 import os
 from jose import jwt
+from routes.auth import _email_taken_globally
 
 router = APIRouter(prefix="/firm-clients", tags=["Firm Clients"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -17,6 +18,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def submit_firm_client_application(application: FirmClientApplication):
     """Submit application to join a law firm as a client"""
     try:
+        taken_msg = await _email_taken_globally(application.email)
+        if taken_msg:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=taken_msg
+            )
+            
         collection = db.firm_client_applications
         
         # Check if already applied
@@ -181,12 +189,12 @@ async def register_paid_firm_client(client_data: dict):
     try:
         clients_collection = db.firm_clients
         
-        # Check if client already exists
-        existing = await clients_collection.find_one({"email": client_data.get("email")})
-        if existing:
+        # Global email uniqueness check
+        taken_msg = await _email_taken_globally(client_data.get("email", ""))
+        if taken_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered. Please login instead."
+                detail=taken_msg
             )
         
         # Hash password

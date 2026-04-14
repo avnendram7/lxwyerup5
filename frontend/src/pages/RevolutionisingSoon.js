@@ -37,8 +37,8 @@ const VisionaryForm = memo(function VisionaryForm() {
       });
       if (!response.ok) {
         let errData = {};
-        try { errData = await response.json(); } catch (e) {}
-        
+        try { errData = await response.json(); } catch (e) { }
+
         const detailStr = JSON.stringify(errData?.detail || '');
         const detailObj = errData?.detail;
 

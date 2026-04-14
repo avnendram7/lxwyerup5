@@ -3,6 +3,7 @@ from typing import List
 from datetime import datetime
 from services.database import db
 from services.auth import hash_password
+from routes.auth import _email_taken_globally
 
 from pydantic import BaseModel, EmailStr
 from typing import Optional
@@ -50,14 +51,10 @@ async def get_lawfirms():
 @router.post("/applications")
 async def submit_lawfirm_application(application: LawFirmApplicationCreate):
     """Submit a law firm application"""
-    # Check if email already exists
-    existing = await db.lawfirm_applications.find_one({'contact_email': application.contact_email})
-    if existing:
-        raise HTTPException(status_code=400, detail='An application with this email already exists')
-    
-    existing_user = await db.users.find_one({'email': application.contact_email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail='A user with this email already exists')
+    # Global email uniqueness check across all collections
+    taken_msg = await _email_taken_globally(application.contact_email)
+    if taken_msg:
+        raise HTTPException(status_code=400, detail=taken_msg)
     
     # Create application
     app_data = {

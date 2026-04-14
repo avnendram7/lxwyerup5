@@ -5,6 +5,7 @@ from services.database import db
 from services.auth import hash_password, verify_password, create_token
 from models.firm_lawyer import FirmLawyerCreate, FirmLawyerLogin, TaskCreate
 from pydantic import BaseModel, EmailStr
+from routes.auth import _email_taken_globally
 import uuid
 
 router = APIRouter(prefix="/firm-lawyers", tags=["Firm Lawyers"])
@@ -55,15 +56,10 @@ async def firm_lawyer_login(login_data: FirmLawyerLogin):
 @router.post("/applications")
 async def submit_firm_lawyer_application(application: FirmLawyerApplicationCreate):
     """Submit a firm lawyer application"""
-    # Check if email already exists in users
-    existing_user = await db.users.find_one({'email': application.email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail='A user with this email already exists')
-    
-    # Check if application already exists
-    existing_app = await db.firm_lawyer_applications.find_one({'email': application.email})
-    if existing_app:
-        raise HTTPException(status_code=400, detail='An application with this email already exists')
+    # Global email uniqueness check
+    taken_msg = await _email_taken_globally(application.email)
+    if taken_msg:
+        raise HTTPException(status_code=400, detail=taken_msg)
     
     # Create application
     app_id = str(uuid.uuid4())
@@ -163,10 +159,10 @@ async def update_firm_lawyer_application_status(app_id: str, status: str):
 @router.post("")
 async def create_firm_lawyer(lawyer_data: FirmLawyerCreate, firm_id: str, firm_name: str):
     """Create a new firm lawyer (called by manager)"""
-    # Check if email already exists
-    existing = await db.users.find_one({'email': lawyer_data.email})
-    if existing:
-        raise HTTPException(status_code=400, detail='A user with this email already exists')
+    # Global email uniqueness check
+    taken_msg = await _email_taken_globally(lawyer_data.email)
+    if taken_msg:
+        raise HTTPException(status_code=400, detail=taken_msg)
     
     lawyer_id = str(uuid.uuid4())
     lawyer_doc = {
