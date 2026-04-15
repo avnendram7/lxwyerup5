@@ -384,13 +384,9 @@ export default function RevolutionisingSoon() {
             <img
               src="/logo.png"
               alt="Lxwyer Up Logo"
-              className="w-8 h-8 xl:w-9 xl:h-9 object-contain rounded-md" style={{ mixBlendMode: 'screen' }}
+              className="w-8 h-8 xl:w-9 xl:h-9 object-contain rounded" style={{ mixBlendMode: 'screen' }}
             />
-            <span style={{
-              fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em',
-              fontFamily: "'Outfit','Inter',sans-serif",
-              color: '#fff', userSelect: 'none',
-            }}>Lxwyer Up</span>
+            <span className="text-base md:text-lg xl:text-[20px] font-bold tracking-tight text-white font-['Outfit'] select-none">Lxwyer Up</span>
           </div>
           <span style={{
             fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.22em',
