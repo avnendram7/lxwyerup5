@@ -417,6 +417,12 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
         offset: ['start start', 'end start'],
     });
 
+    const scaleVal = useTransform(scrollYProgress, [0, 0.5], [1.6, 0.16]);
+    const opacityVal = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+    const yVal = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+    const blurVal = useTransform(scrollYProgress, [0, 0.4], [0, 8]); // Reduced max blur from 20 to 8
+    const filterVal = useTransform(blurVal, (v) => `blur(${v}px)`);
+
     // ── Hide floating labels after 20 s ───────────────────────────────
     const [labelsVisible, setLabelsVisible] = useState(true);
     useEffect(() => {
@@ -424,7 +430,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
         return () => clearTimeout(t);
     }, []);
 
-    // Mobile check
+    // Mobile check to disable scroll transition on phones
     const [isMobile, setIsMobile] = useState(
         typeof window !== 'undefined' ? window.innerWidth <= 768 : false
     );
@@ -434,18 +440,12 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // With ThreeScenePushBridge, the height must cleanly be 100vh so it fits in the orchestrated cinematic viewport seamlessly
-    const sectionHeight = '100vh';
-
+    // On mobile (≤768px) use 100vh so it doesn't waste 2 full screens
     return (
-        <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500 overflow-hidden" style={{ height: sectionHeight }}>
-            <div
-                className="top-0 flex items-center justify-center w-full"
-                style={{ height: '100vh', zIndex: 20, pointerEvents: 'none', overflow: 'visible' }}
-            >
-                <motion.div
-                    className="relative flex flex-col items-center gap-6 w-full"
-                >
+        <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500 overflow-hidden min-h-screen flex items-center justify-center pt-20 pb-40">
+            <div style={{ zIndex: 20, pointerEvents: 'none', overflow: 'visible', width: '100%' }}>
+                {/* Hero tubelight effect removed as requested */}
+                <motion.div className="relative flex flex-col items-center gap-6 w-full">
                     <motion.div
                         initial={justTransitioned ? { opacity: 0, scale: 0.8, filter: 'blur(10px)' } : false}
                         animate={justTransitioned ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : false}
@@ -2030,9 +2030,12 @@ const StackedSection = ({ children, zIndex, bg = "" }) => (
 );
 
 /* ─────────────────────────────────────────────
-   REUSABLE 3-SCENE CINEMATIC PUSH BRIDGE
+   REUSABLE 2-SCENE CINEMATIC PUSH BRIDGE
+   Scene A stays full until 40%, then shrinks+dims.
+   Scene B slides up from below 40→85%.
+   Two independent 200vh containers = no overlap.
    ───────────────────────────────────────────── */
-const ThreeScenePushBridge = ({ sceneA, sceneB, sceneC }) => {
+const TwoScenePushBridge = ({ sceneA, sceneB }) => {
     const ref = useRef(null);
     const [isMobile, setIsMobile] = useState(
         typeof window !== 'undefined' ? window.innerWidth <= 768 : false
@@ -2049,28 +2052,16 @@ const ThreeScenePushBridge = ({ sceneA, sceneB, sceneC }) => {
         offset: ['start start', 'end start'],
     });
 
-    // Scene A -> Scene B transition (0.0 to 0.35)
-    const aScale = useTransform(scrollYProgress, [0.0, 0.35], [1, 0.92]);
-    const aBright = useTransform(scrollYProgress, [0.0, 0.35], [1, 0.40]);
-    const aRadius = useTransform(scrollYProgress, [0.0, 0.35], [0, 20]);
+    // Scene A: full until 40%, then shrinks + dims + gets rounded corners
+    const aScale = useTransform(scrollYProgress, [0.40, 0.85], [1, 0.92]);
+    const aBright = useTransform(scrollYProgress, [0.40, 0.85], [1, 0.40]);
+    const aRadius = useTransform(scrollYProgress, [0.40, 0.85], [0, 20]);
     const aFilter = useTransform(aBright, v => `brightness(${v})`);
     const aBorderRadius = useTransform(aRadius, v => `${v}px`);
-    // Crucial opacity fade so Scene A vanishes once fully covered, preventing background overlapping artifacts
-    const aOpacity = useTransform(scrollYProgress, [0.34, 0.35], [1, 0]);
 
-    const bY1 = useTransform(scrollYProgress, [0.0, 0.35], ['100%', '0%']);
-    const bShadow1 = useTransform(scrollYProgress, [0.0, 0.35],
-        ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']);
-
-    // Scene B -> Scene C transition (0.60 to 0.95)
-    const bScale = useTransform(scrollYProgress, [0.60, 0.95], [1, 0.92]);
-    const bBright = useTransform(scrollYProgress, [0.60, 0.95], [1, 0.40]);
-    const bRadius = useTransform(scrollYProgress, [0.60, 0.95], [0, 20]);
-    const bFilter = useTransform(bBright, v => `brightness(${v})`);
-    const bBorderRadius = useTransform(bRadius, v => `${v}px`);
-
-    const cY = useTransform(scrollYProgress, [0.60, 0.95], ['100%', '0%']);
-    const cShadow = useTransform(scrollYProgress, [0.60, 0.95],
+    // Scene B: slides in from below starting at 40%
+    const bY = useTransform(scrollYProgress, [0.40, 0.85], ['100%', '0%']);
+    const bShadow = useTransform(scrollYProgress, [0.40, 0.85],
         ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']);
 
     if (isMobile) {
@@ -2078,42 +2069,30 @@ const ThreeScenePushBridge = ({ sceneA, sceneB, sceneC }) => {
             <div className="flex flex-col w-full bg-black relative z-10">
                 <div className="relative w-full h-auto">{sceneA}</div>
                 <div className="relative w-full h-auto">{sceneB}</div>
-                <div className="relative w-full h-auto">{sceneC}</div>
             </div>
         );
     }
 
     return (
-        // 300vh: first 100vh = Scene A, next 100vh = transition to B, next 100vh = transition to C
-        <div ref={ref} style={{ position: 'relative', height: '300vh', background: 'black' }}>
-            {/* Scene A */}
+        // 200vh: first 100vh is the dwell on Scene A, next 100vh is the transition
+        <div ref={ref} style={{ position: 'relative', height: '200vh', background: 'black' }}>
+            {/* Scene A — sticky, shrinks + dims as Scene B arrives */}
             <motion.div style={{
                 position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
-                scale: aScale, filter: aFilter, borderRadius: aBorderRadius, opacity: aOpacity,
-                zIndex: 10, willChange: 'transform, filter, opacity', transformOrigin: 'center center',
+                scale: aScale, filter: aFilter, borderRadius: aBorderRadius,
+                zIndex: 10, willChange: 'transform, filter', transformOrigin: 'center center',
             }}>
                 {sceneA}
             </motion.div>
 
-            {/* Scene B */}
+            {/* Scene B — slides up from below with deep shadow */}
             <motion.div style={{
                 position: 'sticky', top: 0, height: '100vh',
-                y: bY1, boxShadow: bShadow1,
-                scale: bScale, filter: bFilter, borderRadius: bBorderRadius,
-                zIndex: 11, overflow: 'hidden', willChange: 'transform, filter',
-                marginTop: '-100vh', transformOrigin: 'center center',
-            }}>
-                {sceneB}
-            </motion.div>
-
-            {/* Scene C */}
-            <motion.div style={{
-                position: 'sticky', top: 0, height: '100vh',
-                y: cY, boxShadow: cShadow,
-                zIndex: 12, overflow: 'hidden', willChange: 'transform',
+                y: bY, boxShadow: bShadow,
+                zIndex: 11, overflow: 'hidden', willChange: 'transform',
                 marginTop: '-100vh',
             }}>
-                {sceneC}
+                {sceneB}
             </motion.div>
         </div>
     );
@@ -2327,11 +2306,13 @@ const LandingPageWave = () => {
             <FloatingEmergencyButton />
             <div className="relative" style={{ zIndex: 2 }}>
                 <NavbarWave />
-                <ThreeScenePushBridge
-                    sceneA={<ScalesOfJusticeIntro justTransitioned={justTransitioned} />}
-                    sceneB={grainHeroContent}
-                    sceneC={beamsContent}
-                />
+                <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
+
+                {/* Normal sequential flow replacing the cinematic scroll bridges */}
+                <div className="flex flex-col w-full relative z-10">
+                    <div className="relative w-full h-auto">{grainHeroContent}</div>
+                    <div className="relative w-full h-auto">{beamsContent}</div>
+                </div>
 
                 {/* Normal Scrolling Content */}
                 {/* Once the user finishes the cinematic scroll, the rest of the page flows naturally */}
