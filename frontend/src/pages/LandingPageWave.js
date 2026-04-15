@@ -430,8 +430,18 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
         return () => clearTimeout(t);
     }, []);
 
+    // Mobile check to disable scroll transition on phones
+    const [isMobile, setIsMobile] = useState(
+        typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+    );
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // On mobile (≤768px) use 100vh so it doesn't waste 2 full screens
-    const sectionHeight = typeof window !== 'undefined' && window.innerWidth <= 768 ? '100vh' : '160vh';
+    const sectionHeight = isMobile ? '100vh' : '160vh';
 
     return (
         <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500 overflow-hidden" style={{ height: sectionHeight }}>
@@ -442,10 +452,10 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                 {/* Hero tubelight effect removed as requested */}
                 <motion.div
                     style={{
-                        scale: scaleVal,
-                        opacity: opacityVal,
-                        y: yVal,
-                        filter: filterVal,
+                        scale: isMobile ? 1 : scaleVal,
+                        opacity: isMobile ? 1 : opacityVal,
+                        y: isMobile ? 0 : yVal,
+                        filter: isMobile ? 'none' : filterVal,
                     }}
                     className="relative flex flex-col items-center gap-6 w-full"
                 >
