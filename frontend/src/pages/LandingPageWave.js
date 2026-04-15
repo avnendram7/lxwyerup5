@@ -2029,6 +2029,65 @@ const StackedSection = ({ children, zIndex, bg = "" }) => (
     </div>
 );
 
+const SpatialPushBridge = ({ justTransitioned, grainContent }) => {
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ['start start', 'end start'],
+    });
+
+    // Scene A: the Scales section — shrinks, dims, gets rounded corners
+    const aScale    = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.92]);
+    const aBright   = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.4]);
+    const aRadius   = useTransform(scrollYProgress, [0.3, 0.85], [0, 20]);
+    const aFilter   = useTransform(aBright, (v) => `brightness(${v})`);
+    const aBorderRadius = useTransform(aRadius, (v) => `${v}px`);
+
+    // Scene B: GrainHero — springs up from below
+    const bY        = useTransform(scrollYProgress, [0.3, 0.85], ['100%', '0%']);
+    const bShadow   = useTransform(scrollYProgress,
+        [0.3, 0.85],
+        ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']
+    );
+
+    return (
+        <div ref={ref} style={{ position: 'relative', height: '260vh', background: 'black' }}>
+            {/* Scene A — sticky, scales down + dims */}
+            <motion.div style={{
+                position: 'sticky',
+                top: 0,
+                height: '100vh',
+                overflow: 'hidden',
+                scale: aScale,
+                filter: aFilter,
+                borderRadius: aBorderRadius,
+                zIndex: 10,
+                willChange: 'transform, filter',
+                transformOrigin: 'center center',
+            }}>
+                <div className="relative w-full h-full bg-black">
+                    <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
+                </div>
+            </motion.div>
+
+            {/* Scene B — slides in from below with deep shadow */}
+            <motion.div style={{
+                position: 'sticky',
+                top: 0,
+                height: '100vh',
+                y: bY,
+                boxShadow: bShadow,
+                zIndex: 11,
+                overflow: 'hidden',
+                willChange: 'transform',
+                marginTop: '-100vh',
+            }}>
+                {grainContent}
+            </motion.div>
+        </div>
+    );
+};
+
 const LandingPageWave = () => {
     const navigate = useNavigate();
     const [justTransitioned, setJustTransitioned] = useState(false);
@@ -2040,6 +2099,106 @@ const LandingPageWave = () => {
         }
         window.scrollTo(0, 0);
     }, []);
+
+    const grainHeroContent = (
+        <GrainHeroSection>
+            <div style={{
+                textAlign: 'center',
+                padding: '0 clamp(1rem, 5vw, 2.5rem)',
+                maxWidth: '52rem',
+                margin: '0 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+            }}>
+                {/* Headline */}
+                <h1 style={{
+                    fontFamily: "'Outfit','Inter',sans-serif",
+                    fontSize: 'clamp(2rem, 8vw, 5rem)',
+                    fontWeight: 900,
+                    lineHeight: 1.08,
+                    letterSpacing: '-0.03em',
+                    margin: '0 0 0.5rem 0',
+                    color: '#fff',
+                    wordBreak: 'break-word',
+                }}>
+                    Justice You&nbsp;
+                    <span style={{
+                        backgroundImage: 'linear-gradient(135deg,#93c5fd 0%,#60a5fa 45%,#818cf8 100%)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                    }}>Understand,</span>
+                    <br />
+                    Technology You&nbsp;
+                    <span style={{
+                        backgroundImage: 'linear-gradient(135deg,#818cf8 0%,#60a5fa 55%,#93c5fd 100%)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                    }}>Trust.</span>
+                </h1>
+
+                {/* Accent line */}
+                <div style={{ width: 60, height: 2, borderRadius: 2, background: 'linear-gradient(90deg,transparent,rgba(59,130,246,0.9),transparent)', margin: 'clamp(0.6rem,2vw,1rem) auto' }} />
+
+                {/* Subtitle */}
+                <p style={{
+                    fontFamily: "'Outfit','Inter',sans-serif",
+                    fontSize: 'clamp(0.82rem, 2.2vw, 1rem)',
+                    fontWeight: 300,
+                    lineHeight: 1.75,
+                    color: 'rgba(203,213,225,0.80)',
+                    maxWidth: '30rem',
+                    margin: '0 auto',
+                    marginBottom: 'clamp(1.4rem, 4vw, 2rem)',
+                    padding: '0 0.5rem',
+                }}>
+                    Connect with verified lawyers, get instant AI legal guidance, and access legal help in your language — all in one platform.
+                </p>
+
+                {/* CTA Buttons */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                    <button
+                        onClick={() => navigate('/find-lawyer/ai')}
+                        style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 7,
+                            padding: 'clamp(9px,2vw,12px) clamp(18px,4vw,28px)',
+                            borderRadius: 9999, border: 'none', background: '#2563eb', color: '#fff',
+                            fontSize: 'clamp(0.78rem,2vw,0.9rem)', fontWeight: 800, letterSpacing: '0.03em',
+                            fontFamily: "'Outfit',sans-serif", cursor: 'pointer',
+                            boxShadow: '0 4px 20px rgba(37,99,235,0.45)', transition: 'all 0.2s', whiteSpace: 'nowrap',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.transform = 'none'; }}
+                    >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+                        Find Lawyer
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                    </button>
+                    <div className="lxwyer-wrap">
+                        <div className="lxwyer-spin" />
+                        <button
+                            onClick={() => navigate('/lxwyerai')}
+                            className="lxwyer-inner font-bold whitespace-nowrap"
+                            style={{ padding: 'clamp(9px,2vw,11px) clamp(16px,4vw,24px)', fontSize: 'clamp(0.78rem,2vw,0.88rem)' }}
+                        >
+                            <Sparkles className="w-3.5 h-3.5 text-white/60" />
+                            <span className="lxwyer-text text-white font-black tracking-[0.04em]">Lxwyer<span className="text-blue-400">AI</span></span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Trust row */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(0.6rem,2vw,1.2rem)', justifyContent: 'center', marginTop: 'clamp(1rem,3vw,1.6rem)', opacity: 0.5 }}>
+                    {['✓ Verified Lawyers', '✓ AI Legal Guidance', '✓ Your Language'].map(txt => (
+                        <span key={txt} style={{ fontSize: 'clamp(0.62rem,1.5vw,0.72rem)', color: '#cbd5e1', fontFamily: "'Outfit',sans-serif", letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>{txt}</span>
+                    ))}
+                </div>
+            </div>
+        </GrainHeroSection>
+    );
 
     return (
         <motion.div
@@ -2055,137 +2214,8 @@ const LandingPageWave = () => {
             <div className="relative" style={{ zIndex: 2 }}>
                 <NavbarWave />
 
-                {/* ScalesOfJusticeIntro keeps its own scrolling animation behavior natively */}
-                <div className="relative w-full bg-[#f8faff] dark:bg-black z-10">
-                    <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
-                </div>
-
-                <StackedSection zIndex={11}>
-                    <GrainHeroSection>
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '0 clamp(1rem, 5vw, 2.5rem)',
-                            maxWidth: '52rem',
-                            margin: '0 auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            width: '100%',
-                        }}>
-
-                            {/* Headline — no badge, starts directly */}
-                            <h1 style={{
-                                fontFamily: "'Outfit','Inter',sans-serif",
-                                fontSize: 'clamp(2rem, 8vw, 5rem)',
-                                fontWeight: 900,
-                                lineHeight: 1.08,
-                                letterSpacing: '-0.03em',
-                                margin: '0 0 0.5rem 0',
-                                color: '#fff',
-                                wordBreak: 'break-word',
-                            }}>
-                                Justice You&nbsp;
-                                <span style={{
-                                    backgroundImage: 'linear-gradient(135deg,#93c5fd 0%,#60a5fa 45%,#818cf8 100%)',
-                                    WebkitBackgroundClip: 'text',
-                                    backgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                }}>Understand,</span>
-                                <br />
-                                Technology You&nbsp;
-                                <span style={{
-                                    backgroundImage: 'linear-gradient(135deg,#818cf8 0%,#60a5fa 55%,#93c5fd 100%)',
-                                    WebkitBackgroundClip: 'text',
-                                    backgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                }}>Trust.</span>
-                            </h1>
-
-                            {/* Accent line */}
-                            <div style={{ width: 60, height: 2, borderRadius: 2, background: 'linear-gradient(90deg,transparent,rgba(59,130,246,0.9),transparent)', margin: 'clamp(0.6rem,2vw,1rem) auto' }} />
-
-                            {/* Subtitle */}
-                            <p style={{
-                                fontFamily: "'Outfit','Inter',sans-serif",
-                                fontSize: 'clamp(0.82rem, 2.2vw, 1rem)',
-                                fontWeight: 300,
-                                lineHeight: 1.75,
-                                color: 'rgba(203,213,225,0.80)',
-                                maxWidth: '30rem',
-                                margin: '0 auto',
-                                marginBottom: 'clamp(1.4rem, 4vw, 2rem)',
-                                padding: '0 0.5rem',
-                            }}>
-                                Connect with verified lawyers, get instant AI legal guidance, and access legal help in your language — all in one platform.
-                            </p>
-
-                            {/* CTA Buttons */}
-                            <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 12,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: '100%',
-                            }}>
-                                {/* Find Lawyer */}
-                                <button
-                                    onClick={() => navigate('/find-lawyer/ai')}
-                                    style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 7,
-                                        padding: 'clamp(9px,2vw,12px) clamp(18px,4vw,28px)',
-                                        borderRadius: 9999,
-                                        border: 'none',
-                                        background: '#2563eb',
-                                        color: '#fff',
-                                        fontSize: 'clamp(0.78rem,2vw,0.9rem)',
-                                        fontWeight: 800,
-                                        letterSpacing: '0.03em',
-                                        fontFamily: "'Outfit',sans-serif",
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 20px rgba(37,99,235,0.45)',
-                                        transition: 'all 0.2s',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,99,235,0.55)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(37,99,235,0.45)'; }}
-                                >
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
-                                    Find Lawyer
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                                </button>
-
-                                {/* LxwyerAI — exact navbar style */}
-                                <div className="lxwyer-wrap">
-                                    <div className="lxwyer-spin" />
-                                    <button
-                                        onClick={() => navigate('/lxwyerai')}
-                                        className="lxwyer-inner font-bold whitespace-nowrap"
-                                        style={{ padding: 'clamp(9px,2vw,11px) clamp(16px,4vw,24px)', fontSize: 'clamp(0.78rem,2vw,0.88rem)' }}
-                                    >
-                                        <Sparkles className="w-3.5 h-3.5 text-white/60" />
-                                        <span className="lxwyer-text text-white font-black tracking-[0.04em]">Lxwyer<span className="text-blue-400">AI</span></span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Trust row */}
-                            <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 'clamp(0.6rem,2vw,1.2rem)',
-                                justifyContent: 'center',
-                                marginTop: 'clamp(1rem,3vw,1.6rem)',
-                                opacity: 0.5,
-                            }}>
-                                {['✓ Verified Lawyers', '✓ AI Legal Guidance', '✓ Your Language'].map(txt => (
-                                    <span key={txt} style={{ fontSize: 'clamp(0.62rem,1.5vw,0.72rem)', color: '#cbd5e1', fontFamily: "'Outfit',sans-serif", letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>{txt}</span>
-                                ))}
-                            </div>
-
-                        </div>
-                    </GrainHeroSection>
-                </StackedSection>
+                {/* SpatialPush bridge: Scales shrinks → GrainHero slides up */}
+                <SpatialPushBridge justTransitioned={justTransitioned} grainContent={grainHeroContent} />
 
                 <StackedSection zIndex={12} bg="bg-black">
                     <div style={{
