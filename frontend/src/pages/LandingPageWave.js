@@ -2029,27 +2029,30 @@ const StackedSection = ({ children, zIndex, bg = "" }) => (
     </div>
 );
 
-const SpatialPushBridge = ({ fromContent, toContent, height = '170vh' }) => {
+const SpatialPushBridge = ({ justTransitioned, grainContent }) => {
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ['start start', 'end start'],
     });
 
-    const aScale    = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.92]);
-    const aBright   = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.4]);
-    const aRadius   = useTransform(scrollYProgress, [0.3, 0.85], [0, 20]);
-    const aFilter   = useTransform(aBright, (v) => `brightness(${v})`);
+    // Scene A: the Scales section — shrinks, dims, gets rounded corners
+    const aScale = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.92]);
+    const aBright = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.4]);
+    const aRadius = useTransform(scrollYProgress, [0.3, 0.85], [0, 20]);
+    const aFilter = useTransform(aBright, (v) => `brightness(${v})`);
     const aBorderRadius = useTransform(aRadius, (v) => `${v}px`);
 
-    const bY        = useTransform(scrollYProgress, [0.3, 0.85], ['100%', '0%']);
-    const bShadow   = useTransform(scrollYProgress,
+    // Scene B: GrainHero — springs up from below
+    const bY = useTransform(scrollYProgress, [0.3, 0.85], ['100%', '0%']);
+    const bShadow = useTransform(scrollYProgress,
         [0.3, 0.85],
         ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']
     );
 
     return (
-        <div ref={ref} style={{ position: 'relative', height, background: 'black' }}>
+        <div ref={ref} style={{ position: 'relative', height: '170vh', background: 'black' }}>
+            {/* Scene A — sticky, scales down + dims */}
             <motion.div style={{
                 position: 'sticky',
                 top: 0,
@@ -2062,9 +2065,12 @@ const SpatialPushBridge = ({ fromContent, toContent, height = '170vh' }) => {
                 willChange: 'transform, filter',
                 transformOrigin: 'center center',
             }}>
-                {fromContent}
+                <div className="relative w-full h-full bg-black">
+                    <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
+                </div>
             </motion.div>
 
+            {/* Scene B — slides in from below with deep shadow */}
             <motion.div style={{
                 position: 'sticky',
                 top: 0,
@@ -2076,7 +2082,7 @@ const SpatialPushBridge = ({ fromContent, toContent, height = '170vh' }) => {
                 willChange: 'transform',
                 marginTop: '-100vh',
             }}>
-                {toContent}
+                {grainContent}
             </motion.div>
         </div>
     );
@@ -2094,36 +2100,7 @@ const LandingPageWave = () => {
         window.scrollTo(0, 0);
     }, []);
 
-    const scalesContent = (
-        <div className="relative w-full h-full bg-black">
-            <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
-        </div>
-    );
-
-    const confusedContent = (
-        <div style={{
-            width: '100%', height: '100%', background: '#000',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            padding: '0 clamp(1.5rem,6vw,4rem)', textAlign: 'left',
-            position: 'relative',
-        }}>
-            <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-            <div style={{ position: 'relative', zIndex: 1, maxWidth: '48rem', width: '100%' }}>
-                <p style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(0.65rem,1.5vw,0.75rem)', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(148,163,184,0.5)', marginBottom: 'clamp(1rem,3vw,1.4rem)' }}>India&apos;s Legal Future</p>
-                <h2 style={{ fontFamily: "'Outfit','Inter',sans-serif", fontSize: 'clamp(1.45rem, 6.5vw, 5rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: 'rgba(226,232,240,0.75)', margin: 0, whiteSpace: 'nowrap' }}>
-                    Driven by{' '}
-                    <AnimatedTextCycle words={['Artificial Intelligence', 'Faster Justice', 'Apex Lawyers']} interval={3000} className="text-blue-500" />
-                </h2>
-                <p style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(1.4rem,4vw,2.8rem)', fontWeight: 700, lineHeight: 1.2, color: '#fff', marginTop: 'clamp(0.3rem,1vw,0.5rem)' }}>Built for every Indian.</p>
-                <div style={{ width: 48, height: 2, background: 'linear-gradient(90deg,#3b82f6,#6366f1)', borderRadius: 2, marginTop: 'clamp(1.4rem,4vw,2.2rem)' }} />
-                <p style={{ fontFamily: "'Outfit',sans-serif", fontSize: 'clamp(0.82rem,1.8vw,0.95rem)', fontWeight: 300, lineHeight: 1.75, color: 'rgba(148,163,184,0.6)', marginTop: 'clamp(0.8rem,2vw,1.2rem)', maxWidth: '32rem' }}>AI-matched lawyers &middot; SOS legal help &middot; Verified advocates &middot; Your language</p>
-            </div>
-        </div>
-    );
-
-    return (
+    const grainHeroContent = (
         <GrainHeroSection>
             <div style={{
                 textAlign: 'center',
@@ -2237,17 +2214,86 @@ const LandingPageWave = () => {
             <div className="relative" style={{ zIndex: 2 }}>
                 <NavbarWave />
 
-                {/* Bridge 1: Scales of Justice → Justice You Understand */}
-                <SpatialPushBridge
-                    fromContent={scalesContent}
-                    toContent={grainHeroContent}
-                />
+                {/* SpatialPush bridge: Scales shrinks → GrainHero slides up */}
+                <SpatialPushBridge justTransitioned={justTransitioned} grainContent={grainHeroContent} />
 
-                {/* Bridge 2: Justice You Understand → Driven by / Built for India */}
-                <SpatialPushBridge
-                    fromContent={grainHeroContent}
-                    toContent={confusedContent}
-                />
+                <StackedSection zIndex={12} bg="bg-black">
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        background: '#000',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0 clamp(1.5rem,6vw,4rem)',
+                        textAlign: 'left',
+                    }}>
+                        {/* Subtle ambient glow */}
+                        <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+                        <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+
+                        <div style={{ position: 'relative', zIndex: 1, maxWidth: '48rem', width: '100%' }}>
+                            {/* Eyebrow */}
+                            <p style={{
+                                fontFamily: "'Outfit',sans-serif",
+                                fontSize: 'clamp(0.65rem,1.5vw,0.75rem)',
+                                fontWeight: 700,
+                                letterSpacing: '0.22em',
+                                textTransform: 'uppercase',
+                                color: 'rgba(148,163,184,0.5)',
+                                marginBottom: 'clamp(1rem,3vw,1.4rem)',
+                            }}>India&apos;s Legal Future</p>
+
+                            {/* Main cycling statement */}
+                            <h2 style={{
+                                fontFamily: "'Outfit','Inter',sans-serif",
+                                fontSize: 'clamp(1.45rem, 6.5vw, 5rem)',
+                                fontWeight: 300,
+                                lineHeight: 1.12,
+                                letterSpacing: '-0.02em',
+                                color: 'rgba(226,232,240,0.75)',
+                                margin: 0,
+                                whiteSpace: 'nowrap',
+                            }}>
+                                Driven by{' '}
+                                <AnimatedTextCycle
+                                    words={['Artificial Intelligence', 'Faster Justice', 'Apex Lawyers']}
+                                    interval={3000}
+                                    className="text-blue-500"
+                                />
+                            </h2>
+
+                            {/* Second line */}
+                            <p style={{
+                                fontFamily: "'Outfit',sans-serif",
+                                fontSize: 'clamp(1.4rem,4vw,2.8rem)',
+                                fontWeight: 700,
+                                lineHeight: 1.2,
+                                color: '#fff',
+                                marginTop: 'clamp(0.3rem,1vw,0.5rem)',
+                            }}>
+                                Built for every Indian.
+                            </p>
+
+                            {/* Divider */}
+                            <div style={{ width: 48, height: 2, background: 'linear-gradient(90deg,#3b82f6,#6366f1)', borderRadius: 2, marginTop: 'clamp(1.4rem,4vw,2.2rem)' }} />
+
+                            {/* Sub text */}
+                            <p style={{
+                                fontFamily: "'Outfit',sans-serif",
+                                fontSize: 'clamp(0.82rem,1.8vw,0.95rem)',
+                                fontWeight: 300,
+                                lineHeight: 1.75,
+                                color: 'rgba(148,163,184,0.6)',
+                                marginTop: 'clamp(0.8rem,2vw,1.2rem)',
+                                maxWidth: '32rem',
+                            }}>
+                                AI-matched lawyers &middot; SOS legal help &middot; Verified advocates &middot; Your language
+                            </p>
+                        </div>
+                    </div>
+                </StackedSection>
 
                 {/* Normal Scrolling Content */}
                 {/* Once the user finishes the cinematic scroll, the rest of the page flows naturally */}
