@@ -20,6 +20,7 @@ import AnimatedTextCycle from '../components/ui/animated-text-cycle';
 import { LogoCloud } from '../components/ui/logo-cloud-3';
 import { InfiniteSlider } from '../components/ui/infinite-slider';
 import { Hero } from '../components/ui/hero';
+import { BeamsBackground } from '../components/ui/beams-background';
 
 /* ─────────────────────────────────────────────
    CSS KEYFRAMES
@@ -419,7 +420,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
     const scaleVal = useTransform(scrollYProgress, [0, 0.5], [1.6, 0.16]);
     const opacityVal = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
     const yVal = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
-    const blurVal = useTransform(scrollYProgress, [0, 0.4], [0, 20]);
+    const blurVal = useTransform(scrollYProgress, [0, 0.4], [0, 8]); // Reduced max blur from 20 to 8
     const filterVal = useTransform(blurVal, (v) => `blur(${v}px)`);
 
     // ── Hide floating labels after 20 s ───────────────────────────────
@@ -480,13 +481,15 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                         })}
 
 
-                        {/* Animated legal laws drifting slowly - RESTORED AND BLUE */}
+                        {/* Animated legal laws drifting slowly - continuous, not restarted on nav */}
                         {legalDataItems.map((item, i) => {
                             if (item.type === 'feature') return null;
 
                             const rad = (item.angle * Math.PI) / 180;
                             const startX = Math.cos(rad) * item.dist;
                             const startY = Math.sin(rad) * item.dist;
+                            // Compute negative delay so animation appears always in-flight
+                            const continuousDelay = `-${((performance.now() / 1000 + item.delay) % item.dur).toFixed(2)}s`;
 
                             return (
                                 <div
@@ -498,7 +501,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                                         zIndex: 10,
                                         '--startX': `${startX}px`,
                                         '--startY': `${startY}px`,
-                                        animation: `convergeToCenter ${item.dur}s ease-in-out ${item.delay}s infinite`,
+                                        animation: `convergeToCenter ${item.dur}s ease-in-out ${continuousDelay} infinite`,
                                         willChange: 'transform, opacity',
                                     }}
                                 >
@@ -519,7 +522,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                                 height: '400px',
                                 borderRadius: '50%',
                                 background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.04) 50%, transparent 70%)',
-                                filter: 'blur(20px)',
+                                filter: 'blur(8px)',
                                 animation: 'pulseGlow 8s ease-in-out infinite',
                             }}
                         />
@@ -553,7 +556,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
                             viewBox="0 0 100 100"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
-                            style={{ filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.4))', position: 'relative', zIndex: 5, width: 'clamp(110px, 22vw, 180px)', height: 'clamp(110px, 22vw, 180px)' }}
+                            style={{ filter: 'drop-shadow(0 0 6px rgba(59,130,246,0.3))', position: 'relative', zIndex: 5, width: 'clamp(110px, 22vw, 180px)', height: 'clamp(110px, 22vw, 180px)' }}
                         >
                             {/* Central pillar */}
                             <rect x="48" y="20" width="4" height="65" rx="2" fill="url(#pillarGrad)" />
@@ -704,8 +707,8 @@ const SolutionParticles = ({ xPos, yPos, opacity }) => {
                 duration: 4 + Math.random() * 2,
             };
 
-            setParticles(prev => [...prev.slice(-6), newItem]);
-        }, 2800);
+            setParticles(prev => [...prev.slice(-3), newItem]);
+        }, 4500);
 
         return () => clearInterval(interval);
     }, []);
@@ -2029,64 +2032,57 @@ const StackedSection = ({ children, zIndex, bg = "" }) => (
     </div>
 );
 
-const SpatialPushBridge = ({ justTransitioned, grainContent }) => {
+/* ─────────────────────────────────────────────
+   REUSABLE 2-SCENE CINEMATIC PUSH BRIDGE
+   Scene A stays full until 40%, then shrinks+dims.
+   Scene B slides up from below 40→85%.
+   Two independent 200vh containers = no overlap.
+   ───────────────────────────────────────────── */
+const TwoScenePushBridge = ({ sceneA, sceneB }) => {
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ['start start', 'end start'],
     });
 
-    // Scene A: the Scales section — shrinks, dims, gets rounded corners
-    const aScale = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.92]);
-    const aBright = useTransform(scrollYProgress, [0.3, 0.85], [1, 0.4]);
-    const aRadius = useTransform(scrollYProgress, [0.3, 0.85], [0, 20]);
-    const aFilter = useTransform(aBright, (v) => `brightness(${v})`);
-    const aBorderRadius = useTransform(aRadius, (v) => `${v}px`);
+    // Scene A: full until 40%, then shrinks + dims + gets rounded corners
+    const aScale = useTransform(scrollYProgress, [0.40, 0.85], [1, 0.92]);
+    const aBright = useTransform(scrollYProgress, [0.40, 0.85], [1, 0.40]);
+    const aRadius = useTransform(scrollYProgress, [0.40, 0.85], [0, 20]);
+    const aFilter = useTransform(aBright, v => `brightness(${v})`);
+    const aBorderRadius = useTransform(aRadius, v => `${v}px`);
 
-    // Scene B: GrainHero — springs up from below
-    const bY = useTransform(scrollYProgress, [0.3, 0.85], ['100%', '0%']);
-    const bShadow = useTransform(scrollYProgress,
-        [0.3, 0.85],
-        ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']
-    );
+    // Scene B: slides in from below starting at 40%
+    const bY = useTransform(scrollYProgress, [0.40, 0.85], ['100%', '0%']);
+    const bShadow = useTransform(scrollYProgress, [0.40, 0.85],
+        ['0 0px 0px rgba(0,0,0,0)', '0 -40px 100px rgba(0,0,0,0.85)']);
 
     return (
-        <div ref={ref} style={{ position: 'relative', height: '170vh', background: 'black' }}>
-            {/* Scene A — sticky, scales down + dims */}
+        // 200vh: first 100vh is the dwell on Scene A, next 100vh is the transition
+        <div ref={ref} style={{ position: 'relative', height: '200vh', background: 'black' }}>
+            {/* Scene A — sticky, shrinks + dims as Scene B arrives */}
             <motion.div style={{
-                position: 'sticky',
-                top: 0,
-                height: '100vh',
-                overflow: 'hidden',
-                scale: aScale,
-                filter: aFilter,
-                borderRadius: aBorderRadius,
-                zIndex: 10,
-                willChange: 'transform, filter',
-                transformOrigin: 'center center',
+                position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
+                scale: aScale, filter: aFilter, borderRadius: aBorderRadius,
+                zIndex: 10, willChange: 'transform, filter', transformOrigin: 'center center',
             }}>
-                <div className="relative w-full h-full bg-black">
-                    <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
-                </div>
+                {sceneA}
             </motion.div>
 
-            {/* Scene B — slides in from below with deep shadow */}
+            {/* Scene B — slides up from below with deep shadow */}
             <motion.div style={{
-                position: 'sticky',
-                top: 0,
-                height: '100vh',
-                y: bY,
-                boxShadow: bShadow,
-                zIndex: 11,
-                overflow: 'hidden',
-                willChange: 'transform',
+                position: 'sticky', top: 0, height: '100vh',
+                y: bY, boxShadow: bShadow,
+                zIndex: 11, overflow: 'hidden', willChange: 'transform',
                 marginTop: '-100vh',
             }}>
-                {grainContent}
+                {sceneB}
             </motion.div>
         </div>
     );
 };
+
+
 
 const LandingPageWave = () => {
     const navigate = useNavigate();
@@ -2161,7 +2157,7 @@ const LandingPageWave = () => {
                 {/* CTA Buttons */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <button
-                        onClick={() => navigate('/find-lawyer/ai')}
+                        onClick={() => navigate('/user-get-started')}
                         style={{
                             display: 'inline-flex', alignItems: 'center', gap: 7,
                             padding: 'clamp(9px,2vw,12px) clamp(18px,4vw,28px)',
@@ -2173,9 +2169,11 @@ const LandingPageWave = () => {
                         onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)'; }}
                         onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.transform = 'none'; }}
                     >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
                         Find Lawyer
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        {/* Bouncing arrow — matches navbar style */}
+                        <span style={{ display: 'inline-flex', animation: 'arrowBounce 1.6s ease-in-out infinite' }}>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        </span>
                     </button>
                     <div className="lxwyer-wrap">
                         <div className="lxwyer-spin" />
@@ -2200,6 +2198,85 @@ const LandingPageWave = () => {
         </GrainHeroSection>
     );
 
+    const beamsContent = (
+        <BeamsBackground className="w-full h-full">
+            <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 clamp(1.5rem,6vw,4rem)',
+                textAlign: 'left',
+            }}>
+                {/* Subtle ambient glow */}
+                <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+
+                <div style={{ position: 'relative', zIndex: 1, maxWidth: '48rem', width: '100%' }}>
+                    {/* Eyebrow */}
+                    <p style={{
+                        fontFamily: "'Outfit',sans-serif",
+                        fontSize: 'clamp(0.65rem,1.5vw,0.75rem)',
+                        fontWeight: 700,
+                        letterSpacing: '0.22em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(148,163,184,0.5)',
+                        marginBottom: 'clamp(1rem,3vw,1.4rem)',
+                    }}>India&apos;s Legal Future</p>
+
+                    {/* Main cycling statement */}
+                    <h2 style={{
+                        fontFamily: "'Outfit','Inter',sans-serif",
+                        fontSize: 'clamp(1.45rem, 6.5vw, 5rem)',
+                        fontWeight: 300,
+                        lineHeight: 1.12,
+                        letterSpacing: '-0.02em',
+                        color: 'rgba(226,232,240,0.75)',
+                        margin: 0,
+                        whiteSpace: 'nowrap',
+                    }}>
+                        Driven by{' '}
+                        <AnimatedTextCycle
+                            words={['Artificial Intelligence', 'Faster Justice', 'Apex Lawyers']}
+                            interval={3000}
+                            className="text-blue-500"
+                        />
+                    </h2>
+
+                    {/* Second line */}
+                    <p style={{
+                        fontFamily: "'Outfit',sans-serif",
+                        fontSize: 'clamp(1.4rem,4vw,2.8rem)',
+                        fontWeight: 700,
+                        lineHeight: 1.2,
+                        color: '#fff',
+                        marginTop: 'clamp(0.3rem,1vw,0.5rem)',
+                    }}>
+                        Built for every Indian.
+                    </p>
+
+                    {/* Divider */}
+                    <div style={{ width: 48, height: 2, background: 'linear-gradient(90deg,#3b82f6,#6366f1)', borderRadius: 2, marginTop: 'clamp(1.4rem,4vw,2.2rem)' }} />
+
+                    {/* Sub text */}
+                    <p style={{
+                        fontFamily: "'Outfit',sans-serif",
+                        fontSize: 'clamp(0.82rem,1.8vw,0.95rem)',
+                        fontWeight: 300,
+                        lineHeight: 1.75,
+                        color: 'rgba(148,163,184,0.6)',
+                        marginTop: 'clamp(0.8rem,2vw,1.2rem)',
+                        maxWidth: '32rem',
+                    }}>
+                        AI-matched lawyers &middot; SOS legal help &middot; Verified advocates &middot; Your language
+                    </p>
+                </div>
+            </div>
+        </BeamsBackground>
+    );
+
     return (
         <motion.div
             initial={justTransitioned ? { opacity: 0, scale: 0.98, y: 20 } : false}
@@ -2213,87 +2290,15 @@ const LandingPageWave = () => {
             <FloatingEmergencyButton />
             <div className="relative" style={{ zIndex: 2 }}>
                 <NavbarWave />
+                <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
 
-                {/* SpatialPush bridge: Scales shrinks → GrainHero slides up */}
-                <SpatialPushBridge justTransitioned={justTransitioned} grainContent={grainHeroContent} />
-
-                <StackedSection zIndex={12} bg="bg-black">
-                    <div style={{
-                        width: '100%',
-                        height: '100%',
-                        background: '#000',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '0 clamp(1.5rem,6vw,4rem)',
-                        textAlign: 'left',
-                    }}>
-                        {/* Subtle ambient glow */}
-                        <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-                        <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-
-                        <div style={{ position: 'relative', zIndex: 1, maxWidth: '48rem', width: '100%' }}>
-                            {/* Eyebrow */}
-                            <p style={{
-                                fontFamily: "'Outfit',sans-serif",
-                                fontSize: 'clamp(0.65rem,1.5vw,0.75rem)',
-                                fontWeight: 700,
-                                letterSpacing: '0.22em',
-                                textTransform: 'uppercase',
-                                color: 'rgba(148,163,184,0.5)',
-                                marginBottom: 'clamp(1rem,3vw,1.4rem)',
-                            }}>India&apos;s Legal Future</p>
-
-                            {/* Main cycling statement */}
-                            <h2 style={{
-                                fontFamily: "'Outfit','Inter',sans-serif",
-                                fontSize: 'clamp(1.45rem, 6.5vw, 5rem)',
-                                fontWeight: 300,
-                                lineHeight: 1.12,
-                                letterSpacing: '-0.02em',
-                                color: 'rgba(226,232,240,0.75)',
-                                margin: 0,
-                                whiteSpace: 'nowrap',
-                            }}>
-                                Driven by{' '}
-                                <AnimatedTextCycle
-                                    words={['Artificial Intelligence', 'Faster Justice', 'Apex Lawyers']}
-                                    interval={3000}
-                                    className="text-blue-500"
-                                />
-                            </h2>
-
-                            {/* Second line */}
-                            <p style={{
-                                fontFamily: "'Outfit',sans-serif",
-                                fontSize: 'clamp(1.4rem,4vw,2.8rem)',
-                                fontWeight: 700,
-                                lineHeight: 1.2,
-                                color: '#fff',
-                                marginTop: 'clamp(0.3rem,1vw,0.5rem)',
-                            }}>
-                                Built for every Indian.
-                            </p>
-
-                            {/* Divider */}
-                            <div style={{ width: 48, height: 2, background: 'linear-gradient(90deg,#3b82f6,#6366f1)', borderRadius: 2, marginTop: 'clamp(1.4rem,4vw,2.2rem)' }} />
-
-                            {/* Sub text */}
-                            <p style={{
-                                fontFamily: "'Outfit',sans-serif",
-                                fontSize: 'clamp(0.82rem,1.8vw,0.95rem)',
-                                fontWeight: 300,
-                                lineHeight: 1.75,
-                                color: 'rgba(148,163,184,0.6)',
-                                marginTop: 'clamp(0.8rem,2vw,1.2rem)',
-                                maxWidth: '32rem',
-                            }}>
-                                AI-matched lawyers &middot; SOS legal help &middot; Verified advocates &middot; Your language
-                            </p>
-                        </div>
-                    </div>
-                </StackedSection>
+                {/* Wrap in negative margin to eliminate the blank space without overlapping the marquee */}
+                <div style={{ marginTop: '-25vh', position: 'relative', zIndex: 10 }}>
+                    <TwoScenePushBridge
+                        sceneA={grainHeroContent}
+                        sceneB={beamsContent}
+                    />
+                </div>
 
                 {/* Normal Scrolling Content */}
                 {/* Once the user finishes the cinematic scroll, the rest of the page flows naturally */}

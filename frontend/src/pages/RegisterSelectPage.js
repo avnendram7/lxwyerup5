@@ -43,13 +43,15 @@ export default function RegisterSelectPage() {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        let timeout;
         let raf;
+        const initCanvas = () => {
         let w = canvas.offsetWidth;
         let h = canvas.offsetHeight;
         canvas.width = w;
         canvas.height = h;
 
-        const dots = Array.from({ length: 60 }, () => ({
+        const dots = Array.from({ length: 30 }, () => ({
             x: Math.random() * w,
             y: Math.random() * h,
             r: Math.random() * 1.2 + 0.3,
@@ -88,7 +90,14 @@ export default function RegisterSelectPage() {
             raf = requestAnimationFrame(draw);
         };
         draw();
-        return () => cancelAnimationFrame(raf);
+        };
+        
+        timeout = setTimeout(initCanvas, 300); // defer slightly to prioritize image fetch
+        
+        return () => {
+            if (timeout) clearTimeout(timeout);
+            if (raf) cancelAnimationFrame(raf);
+        };
     }, []);
 
     return (
@@ -112,6 +121,8 @@ export default function RegisterSelectPage() {
                         alt="Futuristic legal AI — holographic scales of justice"
                         className="w-full h-full object-cover object-center"
                         style={{ filter: 'brightness(0.75) saturate(1.2)' }}
+                        fetchPriority="high"
+                        loading="eager"
                     />
 
                     {/* Gradient overlays for seamless blending */}

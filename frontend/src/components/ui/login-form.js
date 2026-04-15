@@ -114,8 +114,9 @@ export function SmokeyBackground({ color = "#1E3A8A", className = "" }) {
 
     let animFrameId;
     const render = () => {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
+      // Lower rendering resolution to improve main thread performance
+      const width = Math.floor(canvas.clientWidth * 0.5) || 1;
+      const height = Math.floor(canvas.clientHeight * 0.5) || 1;
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;

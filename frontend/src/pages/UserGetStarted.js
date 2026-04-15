@@ -99,6 +99,8 @@ export default function UserGetStarted() {
           src="/law-office-hero.jpg"
           alt="Legal professionals"
           className="w-full h-full object-cover object-[center_30%]"
+          fetchPriority="high"
+          loading="eager"
         />
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black" />
