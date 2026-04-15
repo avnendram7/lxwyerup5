@@ -352,7 +352,7 @@ const EmergencyPage = () => {
         </div>
       </nav>
 
-      <main style={{ position: 'relative', zIndex: 10, maxWidth: 960, margin: '0 auto', padding: 'clamp(32px,5vw,64px) clamp(16px,4vw,32px)' }}>
+      <main style={{ position: 'relative', zIndex: 10, maxWidth: 960, margin: '0 auto', padding: 'clamp(16px,3vw,64px) clamp(12px,4vw,32px)' }}>
         <AnimatePresence mode="wait">
 
           {/* ── Mode Selection ── */}
@@ -367,39 +367,39 @@ const EmergencyPage = () => {
                 <p style={{ color: '#64748b', fontSize: 'clamp(14px,2vw,17px)', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>{lang === 'hi' ? 'तत्काल कानूनी सहायता — जिस तरह का समर्थन आपको अभी चाहिए उसे चुनें।' : 'Get immediate legal assistance — choose the type of support you need right now.'}</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20, maxWidth: 800, margin: '0 auto 40px auto' }}>
-                {/* Talk Mode */}
-                <button className="es-card-talk" onClick={() => { setSosMode('talk'); setStep('form'); }} style={{ position: 'relative', padding: '36px 32px', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(37,99,235,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(59,130,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Phone style={{ width: 22, height: 22, color: '#60a5fa' }} /></div>
-                  <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: '0 0 10px 0' }}>{lang === 'hi' ? 'SOS कॉल' : 'SOS Talk'}</h3>
-                  <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.7, margin: '0 0 20px 0' }}>{lang === 'hi' ? 'फ़ोन या वीडियो कॉल के माध्यम से SOS वकील के साथ तत्काल परामर्श। अनुपलब्ध होने पर अगले वकील को स्वतः सौंपा जाता है।' : 'Immediate consultation with an SOS lawyer via phone or video call. If unavailable, next lawyer is auto-assigned.'}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
-                    {(lang === 'hi' ? ['तत्काल फ़ोन/वीडियो परामर्श', 'वकील अनुपलब्ध होने पर स्वतः पुनः असाइन', 'सुरक्षित एवं गोपनीय सत्र'] : ['Instant phone/video consultation', 'Auto-reassigned if lawyer unavailable', 'Secure & confidential session']).map(f => (
-                      <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><CheckCircle2 style={{ width: 14, height: 14, color: '#60a5fa', flexShrink: 0 }} /><span style={{ fontSize: 12.5, color: '#94a3b8' }}>{f}</span></div>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContents: 'space-between' }}>
-                    <div style={{ flex: 1 }}><p style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0 }}>₹300</p><p style={{ fontSize: 11, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'प्रति सत्र' : 'per session'}</p></div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 10, background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 700 }}>{lang === 'hi' ? 'वकील पाएं' : 'Get Lawyer'} <ArrowRight style={{ width: 13, height: 13 }} /></div>
-                  </div>
-                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 16, maxWidth: 800, margin: '0 auto 32px auto' }}>
+                  {/* Talk Mode */}
+                  <button className="es-card-talk" onClick={() => { setSosMode('talk'); setStep('form'); }} style={{ position: 'relative', padding: 'clamp(20px,3vw,36px) clamp(18px,3vw,32px)', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(37,99,235,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(59,130,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}><Phone style={{ width: 20, height: 20, color: '#60a5fa' }} /></div>
+                    <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 18, margin: '0 0 8px 0' }}>{lang === 'hi' ? 'SOS कॉल' : 'SOS Talk'}</h3>
+                    <p style={{ color: '#64748b', fontSize: 12.5, lineHeight: 1.6, margin: '0 0 14px 0' }}>{lang === 'hi' ? 'फ़ोन या वीडियो कॉल के माध्यम से SOS वकील के साथ तत्काल परामर्श।' : 'Immediate consultation with an SOS lawyer via phone or video call.'}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 18 }}>
+                      {(lang === 'hi' ? ['तत्काल फ़ोन/वीडियो परामर्श', 'सुरक्षित एवं गोपनीय सत्र'] : ['Instant phone/video consultation', 'Secure & confidential session']).map(f => (
+                        <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CheckCircle2 style={{ width: 12, height: 12, color: '#60a5fa', flexShrink: 0 }} /><span style={{ fontSize: 11.5, color: '#94a3b8' }}>{f}</span></div>
+                      ))}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <div><p style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>₹300</p><p style={{ fontSize: 10, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'प्रति सत्र' : 'per session'}</p></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 8, background: '#2563eb', color: '#fff', fontSize: 12, fontWeight: 700 }}>{lang === 'hi' ? 'वकील पाएं' : 'Get Lawyer'} <ArrowRight style={{ width: 11, height: 11 }} /></div>
+                    </div>
+                  </button>
 
-                {/* Visit Mode */}
-                <button className="es-card-visit" onClick={() => { setSosMode('visit'); setStep('form'); }} style={{ position: 'relative', padding: '36px 32px', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(185,28,28,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(185,28,28,0.15)', border: '1px solid rgba(239,68,68,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Car style={{ width: 22, height: 22, color: '#f87171' }} /></div>
-                  <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 20, margin: '0 0 10px 0' }}>{lang === 'hi' ? 'पूर्ण SOS' : 'Full SOS'}</h3>
-                  <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.7, margin: '0 0 20px 0' }}>{lang === 'hi' ? 'सत्यापित SOS वकील 30 मिनट के अंदर आपके स्थान पर पहुंचता है। अनुपलब्ध होने पर अगले वकील को स्वतः सौंपा जाता है।' : 'A verified SOS lawyer physically travels to your location within 30 minutes. Next lawyer is auto-assigned if unavailable.'}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
-                    {(lang === 'hi' ? ['30 मिनट में वकील आपके पास पहुंचेगा', 'हर 30 मिनट पर OTP से उपस्थिति की पुष्टि', 'वकील की उपस्थिति के दौरान बिलिंग जारी'] : ['Lawyer reaches you within 30 min', 'OTP verified every 30 min to confirm presence', 'Billing continues while lawyer is present']).map(f => (
-                      <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><CheckCircle2 style={{ width: 14, height: 14, color: '#f87171', flexShrink: 0 }} /><span style={{ fontSize: 12.5, color: '#94a3b8' }}>{f}</span></div>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContents: 'space-between' }}>
-                    <div style={{ flex: 1 }}><p style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0 }}>₹1100</p><p style={{ fontSize: 11, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'आधार + अतिरिक्त/30 मिनट' : 'base + extra/30 min'}</p></div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', borderRadius: 10, background: '#dc2626', color: '#fff', fontSize: 13, fontWeight: 700 }}>{lang === 'hi' ? 'विज़िट अनुरोध' : 'Request Visit'} <ArrowRight style={{ width: 13, height: 13 }} /></div>
-                  </div>
-                </button>
-              </div>
+                  {/* Visit Mode */}
+                  <button className="es-card-visit" onClick={() => { setSosMode('visit'); setStep('form'); }} style={{ position: 'relative', padding: 'clamp(20px,3vw,36px) clamp(18px,3vw,32px)', borderRadius: 20, textAlign: 'left', background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(185,28,28,0.25)', backdropFilter: 'blur(20px)', cursor: 'pointer', transition: 'all 0.25s ease', outline: 'none', overflow: 'hidden' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(185,28,28,0.15)', border: '1px solid rgba(239,68,68,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}><Car style={{ width: 20, height: 20, color: '#f87171' }} /></div>
+                    <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 18, margin: '0 0 8px 0' }}>{lang === 'hi' ? 'पूर्ण SOS' : 'Full SOS'}</h3>
+                    <p style={{ color: '#64748b', fontSize: 12.5, lineHeight: 1.6, margin: '0 0 14px 0' }}>{lang === 'hi' ? 'सत्यापित SOS वकील 30 मिनट के अंदर आपके स्थान पर पहुंचता है।' : 'A verified SOS lawyer physically travels to your location within 30 minutes.'}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 18 }}>
+                      {(lang === 'hi' ? ['30 मिनट में वकील आपके पास पहुंचेगा', 'हर 30 मिनट पर OTP से उपस्थिति की पुष्टि'] : ['Lawyer reaches you within 30 min', 'OTP verified every 30 min']).map(f => (
+                        <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CheckCircle2 style={{ width: 12, height: 12, color: '#f87171', flexShrink: 0 }} /><span style={{ fontSize: 11.5, color: '#94a3b8' }}>{f}</span></div>
+                      ))}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <div><p style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>₹1100</p><p style={{ fontSize: 10, color: '#475569', margin: 0 }}>{lang === 'hi' ? 'आधार + अतिरिक्त/30 मिनट' : 'base + extra/30 min'}</p></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 8, background: '#dc2626', color: '#fff', fontSize: 12, fontWeight: 700 }}>{lang === 'hi' ? 'विज़िट अनुरोध' : 'Request Visit'} <ArrowRight style={{ width: 11, height: 11 }} /></div>
+                    </div>
+                  </button>
+                </div>
             </motion.div>
           )}
 
