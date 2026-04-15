@@ -446,7 +446,7 @@ const ScalesOfJusticeIntro = React.memo(({ justTransitioned }) => {
 
     // On mobile (≤768px) use 100vh so it doesn't waste 2 full screens
     return (
-        <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500 min-h-[90vh] flex items-center justify-center pt-16 md:pt-20 pb-20 md:pb-32 overflow-hidden">
+        <section ref={ref} className="relative bg-[#f8faff] dark:bg-black transition-colors duration-500 min-h-[100vh] lg:min-h-[90vh] flex items-center justify-center pt-16 md:pt-20 pb-48 md:pb-32 overflow-hidden">
             <div style={{ zIndex: 20, pointerEvents: 'none', overflow: 'visible', width: '100%' }}>
                 {/* Hero tubelight effect removed as requested */}
                 <motion.div 

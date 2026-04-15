@@ -335,23 +335,21 @@ function BentoFeaturePage() {
   const [sos, apex, ai, booking, caseTrack, docs, clients, notifs, analytics, allDay] = featuresList;
 
   return (
-    <div className="min-h-screen bg-[#080a0f] text-white overflow-hidden" style={{ fontFamily: "'Outfit', sans-serif" }}>
+    <div className="min-h-screen bg-black text-white overflow-hidden" style={{ fontFamily: "'Outfit', sans-serif" }}>
       <NavbarWave />
 
       {/* Hero */}
       <section className="pt-28 pb-6 px-6 text-center">
-        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/8 bg-white/4 text-[10px] tracking-[0.2em] uppercase text-slate-400 font-bold mb-4">{d.cap_sub}</span>
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white mb-2 leading-tight" style={{ letterSpacing: '-0.02em' }}>{d.heroTitle1}</h1>
         <p className="text-slate-500 text-sm max-w-md mx-auto">{d.cap_desc}</p>
       </section>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20 mt-4 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-6 gap-3 sm:gap-4">
 
           {/* ── ROW 1 ── */}
 
-          {/* SOS — full width on mobile, 2 cols on lg — RED */}
-          <div className="bento-card sm:col-span-6 lg:col-span-2 relative overflow-hidden rounded-2xl border border-red-900/40 bg-[#0e0608] hover:border-red-500/50 transition-colors duration-300 group" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-6 lg:col-span-2 relative overflow-hidden rounded-2xl border border-red-900/40 bg-[#0e0608] hover:border-red-500/50 transition-colors duration-300 group" style={{ minHeight: 240 }}>
             {/* Animated ping rings inside card */}
             <div style={{ position: 'absolute', top: '38%', right: '18%', width: 72, height: 72, pointerEvents: 'none' }}>
               <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1.5px solid rgba(239,68,68,0.5)', animation: 'sosRing 2.5s ease-out infinite' }} />
@@ -382,8 +380,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          {/* APEX — teal/pearl */}
-          <div className="bento-card sm:col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-teal-900/30 bg-[#050d0b] hover:border-teal-500/40 transition-colors duration-300" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-teal-900/30 bg-[#050d0b] hover:border-teal-500/40 transition-colors duration-300" style={{ minHeight: 240 }}>
             {/* Fingerprint SVG */}
             <div style={{ position: 'absolute', bottom: -15, right: -15, width: 140, height: 140, opacity: 0.12, pointerEvents: 'none' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
@@ -411,8 +408,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          {/* AI Chatbot */}
-          <div className="bento-card sm:col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/6 bg-[#08090e] hover:border-blue-500/30 transition-colors duration-300" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/6 bg-[#08090e] hover:border-blue-500/30 transition-colors duration-300" style={{ minHeight: 240 }}>
             {/* Visual Chat nodes behind */}
             <div style={{ position: 'absolute', top: 20, right: 16, display: 'flex', flexDirection: 'column', gap: 8, opacity: 0.35, pointerEvents: 'none' }}>
               <div style={{ padding: '6px 10px', borderRadius: '12px 12px 0 12px', background: 'rgba(59,130,246,0.3)', border: '1px solid rgba(59,130,246,0.4)', fontSize: 9, color: '#fff', whiteSpace: 'nowrap', animation: 'bentoFloat 4s ease-in-out infinite', alignSelf: 'flex-end' }}>FIR Procedure</div>
@@ -465,7 +461,7 @@ function BentoFeaturePage() {
               )
             },
           ].map(({ f, icon, visual }, i) => (
-            <div key={i} className="bento-card sm:col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+            <div key={i} className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
               {visual}
               <div className="relative z-10 p-6 flex flex-col h-full justify-between">
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{icon}</div>
@@ -483,7 +479,7 @@ function BentoFeaturePage() {
             { f: clients, icon: <Users style={{ width: 14, height: 14, color: '#94a3b8' }} /> },
             { f: notifs, icon: <Bell style={{ width: 14, height: 14, color: '#94a3b8' }} /> },
           ].map(({ f, icon }, i) => (
-            <div key={i} className="bento-card sm:col-span-2 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 150 }}>
+            <div key={i} className="bento-card col-span-2 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 150 }}>
               <div className="relative z-10 p-5 flex flex-col h-full justify-between">
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>{icon}</div>
                 <div>
@@ -494,8 +490,7 @@ function BentoFeaturePage() {
             </div>
           ))}
 
-          {/* ── ROW 4 — Analytics + 24/7 ── */}
-          <div className="bento-card sm:col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
             {/* Chart line trace */}
             <div style={{ position: 'absolute', bottom: 10, right: 10, left: 10, height: 70, opacity: 0.25, pointerEvents: 'none' }}>
               <svg viewBox="0 0 300 70" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -514,7 +509,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          <div className="bento-card sm:col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
             {/* Uptime dots */}
             <div style={{ position: 'absolute', bottom: 16, right: 16, display: 'flex', gap: 4, flexWrap: 'wrap', width: 95, opacity: 0.35, pointerEvents: 'none' }}>
               {Array.from({ length: 18 }).map((_, i) => (
