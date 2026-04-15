@@ -344,12 +344,12 @@ function BentoFeaturePage() {
         <p className="text-slate-500 text-sm max-w-md mx-auto">{d.cap_desc}</p>
       </section>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20 mt-4 relative z-10">
-        <div className="grid grid-cols-6 gap-3 sm:gap-4">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pb-32 mt-6 relative z-10">
+        <div className="grid grid-cols-6 gap-4 sm:gap-6">
 
           {/* ── ROW 1 ── */}
 
-          <div className="bento-card col-span-6 lg:col-span-2 relative overflow-hidden rounded-2xl border border-red-900/40 bg-[#0e0608] hover:border-red-500/50 transition-colors duration-300 group" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-6 lg:col-span-2 relative overflow-hidden rounded-2xl border border-red-900/40 bg-[#0e0608] hover:border-red-500/50 transition-colors duration-300 group" style={{ minHeight: 336 }}>
             {/* Animated ping rings inside card */}
             <div style={{ position: 'absolute', top: '38%', right: '18%', width: 72, height: 72, pointerEvents: 'none' }}>
               <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1.5px solid rgba(239,68,68,0.5)', animation: 'sosRing 2.5s ease-out infinite' }} />
@@ -362,7 +362,7 @@ function BentoFeaturePage() {
             {/* Ambient subtle glow */}
             <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 80% 40%, rgba(239,68,68,0.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
             
-            <div className="relative z-10 p-6 flex flex-col h-full justify-between" style={{ minHeight: 240 }}>
+            <div className="relative z-10 p-8 flex flex-col h-full justify-between" style={{ minHeight: 336 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                   <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#fca5a5', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', padding: '3px 10px', borderRadius: 100, animation: 'bentoPulse 2s ease-in-out infinite' }}>{sos.badge || 'LIVE NOW'}</span>
@@ -380,7 +380,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-teal-900/30 bg-[#050d0b] hover:border-teal-500/40 transition-colors duration-300" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-teal-900/30 bg-[#050d0b] hover:border-teal-500/40 transition-colors duration-300" style={{ minHeight: 336 }}>
             {/* Fingerprint SVG */}
             <div style={{ position: 'absolute', bottom: -15, right: -15, width: 140, height: 140, opacity: 0.12, pointerEvents: 'none' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
@@ -395,7 +395,7 @@ function BentoFeaturePage() {
             </div>
             <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 100% 100%, rgba(45,212,191,0.05) 0%, transparent 60%)', pointerEvents: 'none' }} />
             
-            <div className="relative z-10 p-6 flex flex-col h-full justify-between" style={{ minHeight: 240 }}>
+            <div className="relative z-10 p-8 flex flex-col h-full justify-between" style={{ minHeight: 336 }}>
               <div>
                 <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5eead4', background: 'rgba(45,212,191,0.1)', border: '1px solid rgba(45,212,191,0.2)', padding: '3px 10px', borderRadius: 100, display: 'inline-block', marginBottom: 14 }}>{apex.badge || 'APEX'}</span>
                 <p style={{ fontSize: 38, fontWeight: 900, color: '#2dd4bf', margin: '0 0 4px 0', lineHeight: 1 }}>100%</p>
@@ -408,7 +408,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/6 bg-[#08090e] hover:border-blue-500/30 transition-colors duration-300" style={{ minHeight: 240 }}>
+          <div className="bento-card col-span-3 lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/6 bg-[#08090e] hover:border-blue-500/30 transition-colors duration-300" style={{ minHeight: 336 }}>
             {/* Visual Chat nodes behind */}
             <div style={{ position: 'absolute', top: 20, right: 16, display: 'flex', flexDirection: 'column', gap: 8, opacity: 0.35, pointerEvents: 'none' }}>
               <div style={{ padding: '6px 10px', borderRadius: '12px 12px 0 12px', background: 'rgba(59,130,246,0.3)', border: '1px solid rgba(59,130,246,0.4)', fontSize: 9, color: '#fff', whiteSpace: 'nowrap', animation: 'bentoFloat 4s ease-in-out infinite', alignSelf: 'flex-end' }}>FIR Procedure</div>
@@ -416,7 +416,7 @@ function BentoFeaturePage() {
               <div style={{ padding: '6px 10px', borderRadius: '12px 12px 0 12px', background: 'rgba(59,130,246,0.5)', border: '1px solid rgba(59,130,246,0.6)', fontSize: 9, color: '#fff', whiteSpace: 'nowrap', animation: 'bentoFloat 5s ease-in-out 1s infinite', alignSelf: 'flex-end', display: 'flex', gap: 4 }}><span style={{width:4,height:4,borderRadius:'50%',background:'#fff',animation:'bentoPulse 1s infinite'}}/><span style={{width:4,height:4,borderRadius:'50%',background:'#fff',animation:'bentoPulse 1s .2s infinite'}}/><span style={{width:4,height:4,borderRadius:'50%',background:'#fff',animation:'bentoPulse 1s .4s infinite'}}/></div>
             </div>
             
-            <div className="relative z-10 p-6 flex flex-col h-full justify-between" style={{ minHeight: 240 }}>
+            <div className="relative z-10 p-8 flex flex-col h-full justify-between" style={{ minHeight: 336 }}>
               <div>
                 <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
                   <span style={{ fontSize: 9, fontWeight: 700, padding: '3px 10px', borderRadius: 100, border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', background: 'rgba(59,130,246,0.1)', letterSpacing: '0.05em' }}>24/7 AI</span>
@@ -461,7 +461,7 @@ function BentoFeaturePage() {
               )
             },
           ].map(({ f, icon, visual }, i) => (
-            <div key={i} className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+            <div key={i} className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 224 }}>
               {visual}
               <div className="relative z-10 p-6 flex flex-col h-full justify-between">
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{icon}</div>
@@ -479,7 +479,7 @@ function BentoFeaturePage() {
             { f: clients, icon: <Users style={{ width: 14, height: 14, color: '#94a3b8' }} /> },
             { f: notifs, icon: <Bell style={{ width: 14, height: 14, color: '#94a3b8' }} /> },
           ].map(({ f, icon }, i) => (
-            <div key={i} className="bento-card col-span-2 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 150 }}>
+            <div key={i} className="bento-card col-span-2 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 210 }}>
               <div className="relative z-10 p-5 flex flex-col h-full justify-between">
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>{icon}</div>
                 <div>
@@ -490,7 +490,7 @@ function BentoFeaturePage() {
             </div>
           ))}
 
-          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 224 }}>
             {/* Chart line trace */}
             <div style={{ position: 'absolute', bottom: 10, right: 10, left: 10, height: 70, opacity: 0.25, pointerEvents: 'none' }}>
               <svg viewBox="0 0 300 70" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -509,7 +509,7 @@ function BentoFeaturePage() {
             </div>
           </div>
 
-          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 160 }}>
+          <div className="bento-card col-span-3 relative overflow-hidden rounded-2xl border border-white/5 bg-[#0b0c13] hover:bg-[#10131f] transition-colors duration-300" style={{ minHeight: 224 }}>
             {/* Uptime dots */}
             <div style={{ position: 'absolute', bottom: 16, right: 16, display: 'flex', gap: 4, flexWrap: 'wrap', width: 95, opacity: 0.35, pointerEvents: 'none' }}>
               {Array.from({ length: 18 }).map((_, i) => (

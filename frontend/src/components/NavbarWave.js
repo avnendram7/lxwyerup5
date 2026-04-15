@@ -194,10 +194,10 @@ export const NavbarWave = () => {
                             <img
                                 src="/logo.png"
                                 alt="Lxwyer Up Logo"
-                                className="w-8 h-8 xl:w-9 xl:h-9 object-contain rounded"
+                                className="w-10 h-10 md:w-12 md:h-12 object-contain rounded"
                                 style={{ mixBlendMode: 'screen' }}
                             />
-                            <span className="text-base md:text-lg xl:text-[20px] font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none">
+                            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none mt-1">
                                 Lxwyer Up
                             </span>
                         </button>
