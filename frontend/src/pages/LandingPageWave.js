@@ -264,8 +264,8 @@ const pageKeyframes = `
   75% { transform: translate3d(10px, -6px, 0) scale(1.02); }
 }
 @keyframes arrowBounce {
-  0%, 100% { transform: translateY(0px); opacity: 0.5; }
-  50% { transform: translateY(6px); opacity: 1; }
+  0%, 100% { transform: translateX(0px); opacity: 0.6; }
+  50% { transform: translateX(5px); opacity: 1; }
 }
 @keyframes marqueeScroll {
   0% { transform: translateX(0); }
@@ -1863,7 +1863,9 @@ const CTASection = () => {
                                 }}
                             >
                                 {t('landing_cta_btn')}
-                                <ArrowRight className="ml-2 w-5 h-5" />
+                                <span style={{ display: 'inline-flex', animation: 'arrowBounce 1.6s ease-in-out infinite' }}>
+                                    <ArrowRight className="ml-2 w-5 h-5" />
+                                </span>
                             </Button>
                         </motion.div>
                     </div>

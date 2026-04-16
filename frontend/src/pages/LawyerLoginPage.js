@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Scale, Mail, Lock, ArrowRight, ArrowLeft, Home } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { API } from '../App';
@@ -37,21 +37,14 @@ export default function LawyerLoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black flex flex-col">
-      {/* Navigation Bar */}
-      <nav className="p-4 flex items-center justify-between">
+      {/* Navigation Bar - Compact Back Arrow */}
+      <nav className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-900/60 border border-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-800 transition-all backdrop-blur-md"
+          title="Go Back"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </button>
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors"
-        >
-          <Home className="w-5 h-5" />
-          <span>Home</span>
         </button>
       </nav>
 

@@ -140,6 +140,18 @@ export default function FindLawyerManual() {
     }
   }, [location.state]);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedLawyer) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedLawyer]);
+
   // Fetch verified lawyers from backend
   useEffect(() => {
     const fetchLawyers = async () => {
@@ -618,18 +630,26 @@ export default function FindLawyerManual() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, paddingBottom: 32 }}>
+            {/* Prev button */}
+            <button
+              type="button"
+              onClick={() => { setCurrentPage(prev => Math.max(1, prev - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === 1}
-              className="w-10 h-10 rounded-xl disabled:opacity-50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600"
+              style={{
+                width: 40, height: 40, borderRadius: 12, border: '1px solid',
+                borderColor: currentPage === 1 ? 'rgba(148,163,184,0.3)' : 'rgba(148,163,184,0.5)',
+                background: 'transparent', cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: currentPage === 1 ? 0.4 : 1,
+                transition: 'all 0.15s',
+                color: 'inherit',
+              }}
             >
               <ChevronLeft className="w-4 h-4" />
-            </Button>
+            </button>
 
-            <div className="flex items-center gap-2 px-2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {[...Array(Math.min(totalPages, 5))].map((_, idx) => {
                 let pageNum;
                 if (totalPages <= 5) {
@@ -642,14 +662,23 @@ export default function FindLawyerManual() {
                   pageNum = currentPage - 2 + idx;
                 }
 
+                const isActive = currentPage === pageNum;
                 return (
                   <button
                     key={idx}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`w-10 h-10 rounded-xl text-sm font-medium transition-all ${currentPage === pageNum
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-110'
-                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-                      }`}
+                    type="button"
+                    onClick={() => { setCurrentPage(pageNum); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      border: isActive ? 'none' : '1px solid rgba(148,163,184,0.3)',
+                      background: isActive ? '#2563eb' : 'transparent',
+                      color: isActive ? '#ffffff' : 'inherit',
+                      fontSize: 14, fontWeight: isActive ? 700 : 500,
+                      cursor: 'pointer',
+                      transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                      transition: 'all 0.15s',
+                      boxShadow: isActive ? '0 4px 16px rgba(37,99,235,0.35)' : 'none',
+                    }}
                   >
                     {pageNum}
                   </button>
@@ -657,15 +686,23 @@ export default function FindLawyerManual() {
               })}
             </div>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            {/* Next button */}
+            <button
+              type="button"
+              onClick={() => { setCurrentPage(prev => Math.min(totalPages, prev + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === totalPages}
-              className="w-10 h-10 rounded-xl disabled:opacity-50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600"
+              style={{
+                width: 40, height: 40, borderRadius: 12, border: '1px solid',
+                borderColor: currentPage === totalPages ? 'rgba(148,163,184,0.3)' : 'rgba(148,163,184,0.5)',
+                background: 'transparent', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: currentPage === totalPages ? 0.4 : 1,
+                transition: 'all 0.15s',
+                color: 'inherit',
+              }}
             >
               <ChevronRight className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         )}
       </div>
@@ -686,28 +723,40 @@ export default function FindLawyerManual() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-5xl bg-white dark:bg-[#121212] rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] dark:shadow-none overflow-hidden flex flex-col max-h-[90vh] border border-white/20 dark:border-[#2A2A2A]"
+              className="dark relative w-full max-w-5xl rounded-[2rem] overflow-hidden flex flex-col max-h-[90vh] border border-white/5"
+              style={{ background: '#000000', boxShadow: '0 40px 100px rgba(0,0,0,0.9)' }}
             >
-              {/* Modal Header — pure gradient banner, no overflowing image */}
-              <div className="h-44 bg-gradient-to-br from-blue-700 via-indigo-600 to-violet-700 dark:from-slate-800 dark:via-[#111] dark:to-black relative shrink-0">
-                {/* Fine pattern overlay */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-                {/* Watermark */}
-                <span className="absolute top-5 right-7 text-white/20 dark:text-white/5 font-black text-5xl tracking-widest select-none pointer-events-none uppercase">Lxwyer Up</span>
-                {/* Close button */}
+              {/* Modal Header */}
+              <div className="h-32 relative shrink-0" style={{ background: '#000000' }}>
+                {/* Watermark — smaller, shifted to bottom-right without background */}
+                <span
+                  className="absolute bottom-2 right-4 select-none pointer-events-none font-bold"
+                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.08)', letterSpacing: '0.25em', textTransform: 'uppercase' }}
+                >Lxwyer Up</span>
+                {/* Close button — top-left, transparent bg */}
                 <button
                   onClick={() => setSelectedLawyer(null)}
-                  className="absolute top-5 left-5 p-2 bg-white/10 hover:bg-white/20 dark:bg-black/20 dark:hover:bg-black/40 rounded-full text-white dark:text-slate-300 transition-colors backdrop-blur-md"
+                  className="absolute top-4 left-4 p-2 rounded-full transition-colors z-10"
+                  style={{ background: 'transparent', color: 'rgba(255,255,255,0.6)' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}
                 >
                   <X className="w-5 h-5" />
                 </button>
+                {/* Subtle gradient separator */}
+                <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
               </div>
 
-              <div className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-10 pb-10 custom-scrollbar">
-                {/* Avatar + name row — in normal flow, no absolute overlap */}
-                <div className="flex items-center gap-5 pt-6 pb-6 mb-2 border-b border-slate-100 dark:border-slate-800">
+              <div
+                className="flex-1 overflow-y-auto px-5 sm:px-10 pb-10 custom-scrollbar"
+                style={{ overscrollBehavior: 'contain', touchAction: 'pan-y' }}
+                onWheel={e => e.stopPropagation()}
+                onTouchMove={e => e.stopPropagation()}
+              >
+                {/* Avatar + name row */}
+                <div className="flex items-center gap-5 pt-6 pb-6 mb-2 border-b border-white/8" style={{borderBottomColor:'rgba(255,255,255,0.08)'}}>
                   {/* Avatar */}
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl shrink-0">
+                  <div style={{ width:80, height:80, borderRadius:16, overflow:'hidden', border:'3px solid rgba(255,255,255,0.12)', boxShadow:'0 8px 24px rgba(0,0,0,0.6)', flexShrink:0 }}>
                     {getLawyerPhoto(selectedLawyer.photo, selectedLawyer.name) ? (
                       <img
                         src={getLawyerPhoto(selectedLawyer.photo, selectedLawyer.name)}
@@ -715,51 +764,51 @@ export default function FindLawyerManual() {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-                        <span className="text-2xl font-black text-white">{getInitials(selectedLawyer.name)}</span>
+                      <div style={{ width:'100%', height:'100%', background:'linear-gradient(135deg,#1e3a8a,#4f46e5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <span style={{ fontSize:28, fontWeight:900, color:'#fff' }}>{getInitials(selectedLawyer.name)}</span>
                       </div>
                     )}
                   </div>
                   {/* Name / spec */}
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white truncate">{selectedLawyer.name}</h2>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium text-base mt-0.5">{selectedLawyer.specialization}</p>
+                    <h2 style={{ fontSize:'clamp(1.2rem,4vw,1.75rem)', fontWeight:800, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{selectedLawyer.name}</h2>
+                    <p style={{ color:'#60a5fa', fontWeight:600, fontSize:'0.95rem', marginTop:2 }}>{selectedLawyer.specialization}</p>
                   </div>
                   {/* Verified badge */}
                   {selectedLawyer.verified && (
-                    <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-semibold rounded-lg border border-green-100 dark:border-green-800 shrink-0">
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'6px 12px', background:'rgba(16,185,129,0.12)', color:'#34d399', fontSize:'0.78rem', fontWeight:700, borderRadius:8, border:'1px solid rgba(16,185,129,0.25)', flexShrink:0 }}>
                       <Check className="w-4 h-4" /> Verified
                     </span>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold">
-                      <Briefcase className="w-4 h-4 text-blue-500" /> {d.experience}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div style={{ padding:'20px 24px', background:'rgba(255,255,255,0.04)', borderRadius:20, border:'1px solid rgba(255,255,255,0.08)' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(148,163,184,0.7)', marginBottom:8, fontSize:'0.7rem', textTransform:'uppercase', letterSpacing:'0.12em', fontWeight:700 }}>
+                      <Briefcase className="w-4 h-4" style={{color:'#60a5fa'}} /> {d.experience}
                     </div>
-                    <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.experience} {d.years}</div>
+                    <div style={{ fontSize:'1.4rem', fontWeight:800, color:'#fff' }}>{selectedLawyer.experience} {d.years}</div>
                   </div>
-                  <div className="p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none flex flex-col justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-xs uppercase tracking-wider font-bold">
-                      <MapPin className="w-4 h-4 text-blue-500" /> {d.location}
+                  <div style={{ padding:'20px 24px', background:'rgba(255,255,255,0.04)', borderRadius:20, border:'1px solid rgba(255,255,255,0.08)' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(148,163,184,0.7)', marginBottom:8, fontSize:'0.7rem', textTransform:'uppercase', letterSpacing:'0.12em', fontWeight:700 }}>
+                      <MapPin className="w-4 h-4" style={{color:'#60a5fa'}} /> {d.location}
                     </div>
-                    <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{selectedLawyer.city}</div>
+                    <div style={{ fontSize:'1.25rem', fontWeight:800, color:'#fff' }}>{selectedLawyer.city}</div>
                   </div>
                 </div>
 
-                <div className="mb-10 p-6 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-100 dark:border-[#333] shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center gap-2 text-slate-400 mb-3 text-xs uppercase tracking-wider font-bold">
-                    <GraduationCap className="w-4 h-4 text-blue-500" /> {d.education}
+                <div style={{ marginBottom:32, padding:'20px 24px', background:'rgba(255,255,255,0.04)', borderRadius:20, border:'1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(148,163,184,0.7)', marginBottom:10, fontSize:'0.7rem', textTransform:'uppercase', letterSpacing:'0.12em', fontWeight:700 }}>
+                    <GraduationCap className="w-4 h-4" style={{color:'#60a5fa'}} /> {d.education}
                   </div>
-                  <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">{selectedLawyer.education}</div>
+                  <div style={{ fontSize:'1.05rem', fontWeight:700, color:'#fff', lineHeight:1.5 }}>{selectedLawyer.education}</div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'rgba(255,255,255,0.85)', marginBottom:12, display:'flex', alignItems:'center', gap:8 }}>
                       {d.about}
-                      <div className="h-px flex-1 bg-slate-100 dark:bg-[#2A2A2A]" />
+                      <div style={{ flex:1, height:1, background:'rgba(255,255,255,0.08)' }} />
                     </h3>
                     {selectedLawyer.bio ? (() => {
                       const parts = selectedLawyer.bio
