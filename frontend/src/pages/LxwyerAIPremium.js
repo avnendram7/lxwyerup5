@@ -235,6 +235,7 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
           } else {
             const all = dummyLawFirms;
             results = city ? all.filter(f => (f.city || '').toLowerCase().includes(city)) : all;
+          }
           if (results.length > 0) {
             const shuffled = [...results].sort(() => Math.random() - 0.5);
             const signatureList = shuffled.filter(l => l.isSignature || String(l.package).toLowerCase() === 'signature' || String(l.plan).toLowerCase() === 'signature');
