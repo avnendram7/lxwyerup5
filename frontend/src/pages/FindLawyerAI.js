@@ -813,19 +813,20 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
           matchBadges: r.match_reasons || [],
           score: r.score,
         }));
-      } else {
-        // ── Fallback: local client-side matching ──────────────────────────
-        const basePool = allLawyersList.filter(l => {
-          const loc = ((l.state || '') + ' ' + (l.city || '')).toLowerCase();
-          return ALLOWED_LAWYER_STATES.some(s => loc.includes(s));
-        });
+      }
+
+      // ── Always merge local client-side matching to ensure rich dummy data ──────────────────────────
+      const basePool = allLawyersList.filter(l => {
+        const loc = ((l.state || '') + ' ' + (l.city || '')).toLowerCase();
+        return ALLOWED_LAWYER_STATES.some(s => loc.includes(s));
+      });
 
         const scoredLawyers = basePool.map(lawyer => {
           const prediction = predictLawyerMatch(userMessage, lawyer);
           return { ...lawyer, ...prediction };
         });
 
-        enriched = scoredLawyers
+        const localEnriched = scoredLawyers
           .filter(l => {
             const specMatch  = caseType && (l.specialization === caseType || l.secondarySpecializations?.includes(caseType));
             const locMatch   = location && ((location.city && l.city === location.city) || (location.state && l.state === location.state));
@@ -856,8 +857,12 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
             if (language) badges.push('Language');
             if (urgent) badges.push('Urgent');
             return { ...l, matchBadges: badges };
-          });
-      }
+          })
+          .slice(0, 15);
+          
+      // Merge, filter out duplicates, and ensure robust UI
+      const combined = [...enriched, ...localEnriched];
+      enriched = Array.from(new Map(combined.map(item => [item.id || item._id, item])).values());
 
       // --- NEW: Universal Shuffling and Signature Priority Algorithm ---
       // We take the matches (either from backend or fallback), shuffle them randomly,

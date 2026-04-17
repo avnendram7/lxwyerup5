@@ -196,11 +196,16 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
           const matchData = await smartMatchLawyers(query);
           let results = [];
           if (matchData && matchData.results && matchData.results.length > 0) {
-            results = matchData.results;
-          } else {
-            const all = dummyLawyers;
-            results = city ? all.filter(l => (l.city || '').toLowerCase().includes(city)) : all;
+            results = [...matchData.results];
           }
+          
+          // Always merge dummy lawyers to ensure robust profiles
+          const dummyMatches = dummyLawyers.filter(l => {
+            const locMatch = city ? (l.city || '').toLowerCase().includes(city) : true;
+            const specMatch = spec ? (l.specialization || '').toLowerCase().includes(spec.toLowerCase()) : true;
+            return locMatch && specMatch;
+          });
+          results = [...results, ...dummyMatches];
 
           if (results.length > 0) {
             const shuffled = [...results].sort(() => Math.random() - 0.5);
@@ -231,11 +236,16 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
           const matchData = await smartMatchFirms(query);
           let results = [];
           if (matchData && matchData.results && matchData.results.length > 0) {
-            results = matchData.results;
-          } else {
-            const all = dummyLawFirms;
-            results = city ? all.filter(f => (f.city || '').toLowerCase().includes(city)) : all;
+            results = [...matchData.results];
           }
+          
+          // Always merge dummy firms to ensure robust profiles
+          const dummyFirmsMatches = dummyLawFirms.filter(f => {
+            const locMatch = city ? (f.city || '').toLowerCase().includes(city) : true;
+            const specMatch = spec ? (f.practiceAreas?.join(' ') || '').toLowerCase().includes(spec.toLowerCase()) : true;
+            return locMatch && specMatch;
+          });
+          results = [...results, ...dummyFirmsMatches];
           if (results.length > 0) {
             const shuffled = [...results].sort(() => Math.random() - 0.5);
             const signatureList = shuffled.filter(l => l.isSignature || String(l.package).toLowerCase() === 'signature' || String(l.plan).toLowerCase() === 'signature');
