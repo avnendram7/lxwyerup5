@@ -422,12 +422,21 @@ export default function FindLawFirmAI() {
     let enriched = [];
     if (matchData && matchData.results && matchData.results.length > 0) {
       enriched = matchData.results;
-    } else if (practiceArea || location) {
-      enriched = localMatchFirms(practiceArea, location);
-      // Broaden if nothing found
-      if (enriched.length === 0 && location) enriched = localMatchFirms(null, location).slice(0, 3);
-      if (enriched.length === 0 && practiceArea) enriched = localMatchFirms(practiceArea, null).slice(0, 3);
     }
+    
+    // Always merge local matches to ensure rich dummy data is present
+    let localMatches = [];
+    if (practiceArea || location) {
+      localMatches = localMatchFirms(practiceArea, location);
+      // Broaden if nothing found
+      if (localMatches.length === 0 && location) localMatches = localMatchFirms(null, location).slice(0, 3);
+      if (localMatches.length === 0 && practiceArea) localMatches = localMatchFirms(practiceArea, null).slice(0, 3);
+    } else {
+      localMatches = allFirms.slice(0, 10);
+    }
+    
+    const combined = [...enriched, ...localMatches];
+    enriched = Array.from(new Map(combined.map(item => [item.id || item._id, item])).values());
 
     if (enriched.length > 0) {
       const shuffled = [...enriched].sort(() => Math.random() - 0.5);
@@ -677,8 +686,8 @@ export default function FindLawFirmAI() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col flex-1 bg-black overflow-hidden
-                ${mobileView === 'results' ? 'flex' : 'hidden lg:flex'}`}
+              className={`flex flex-col flex-1 min-w-0 min-h-0 bg-black overflow-hidden
+                ${mobileView === 'results' ? 'flex absolute inset-0 z-50' : 'hidden lg:flex'}`}
             >
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
@@ -706,7 +715,7 @@ export default function FindLawFirmAI() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
                 {recommendedFirms.map((firm, index) => (
                   <FirmCard 
                     key={firm.id || index}
