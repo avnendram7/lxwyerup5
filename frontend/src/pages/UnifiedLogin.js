@@ -58,7 +58,6 @@ const UnifiedLogin = () => {
       });
       handleSuccessfulLogin(response.data);
     } catch (error) {
-    } catch (error) {
       const detail = error.response?.data?.detail;
       const errorMsg = Array.isArray(detail) ? detail[0].msg : (typeof detail === 'string' ? detail : 'Google Login Failed');
       toast.error(errorMsg);

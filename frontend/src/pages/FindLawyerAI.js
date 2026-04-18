@@ -1143,7 +1143,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col flex-1 min-w-0 min-h-0 bg-black overflow-hidden
+              className={`flex flex-col flex-1 h-full min-w-0 min-h-0 bg-black overflow-hidden
                 ${mobileView === 'matches' ? 'flex absolute inset-0 z-50' : 'hidden lg:flex'}`}
             >
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
@@ -1172,7 +1172,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   </button>
                 </div>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+              <div className="flex-1 h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
                 {(showAllLawyers ? recommendedLawyers : recommendedLawyers.slice(0, 5)).map((lawyer, index) => {
                   const grad = GRADIENTS[index % GRADIENTS.length];
                   const photoSrc = getLawyerPhoto(lawyer.photo, lawyer.name);

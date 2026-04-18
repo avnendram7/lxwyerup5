@@ -686,7 +686,7 @@ export default function FindLawFirmAI() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col flex-1 min-w-0 min-h-0 bg-black overflow-hidden
+              className={`flex flex-col flex-1 h-full min-w-0 min-h-0 bg-black overflow-hidden
                 ${mobileView === 'results' ? 'flex absolute inset-0 z-50' : 'hidden lg:flex'}`}
             >
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
@@ -715,7 +715,7 @@ export default function FindLawFirmAI() {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+              <div className="flex-1 h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
                 {recommendedFirms.map((firm, index) => (
                   <FirmCard 
                     key={firm.id || index}
