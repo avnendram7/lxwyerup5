@@ -522,8 +522,7 @@ export default function FindLawFirmAI() {
   return (
     <WaveLayout activePage="find-law-firm">
       <div
-        className="flex bg-black text-white overflow-hidden"
-        style={{ height: 'calc(100dvh - 64px)' }}
+        style={{ display: 'flex', height: 'calc(100dvh - 64px)', overflow: 'hidden', background: '#000', color: '#fff' }}
       >
         {/* ── Left: Chat Panel ── */}
         <div className={`flex flex-col transition-all duration-500
@@ -686,11 +685,17 @@ export default function FindLawFirmAI() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col bg-black
-                ${mobileView === 'results' ? 'absolute inset-0 z-50 flex' : 'hidden lg:flex'}`}
-              style={{ width: '48%', height: '100dvh', position: 'relative', overflow: 'hidden' }}
+              className={mobileView === 'results' ? 'absolute inset-0 z-50' : 'hidden lg:flex'}
+              style={{
+                flexDirection: 'column',
+                width: '48%',
+                height: '100%',
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: '#000',
+              }}
             >
-              <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
+              <div style={{ flexShrink: 0, height: 56, borderBottom: '1px solid rgba(51,65,85,0.6)', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-indigo-400" />
                   {d.topMatches}
@@ -717,16 +722,12 @@ export default function FindLawFirmAI() {
               </div>
 
               <div
-                className="p-4 space-y-4"
                 style={{
-                  position: 'absolute',
-                  top: 56,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  overflowY: 'scroll',
+                  flex: 1,
+                  minHeight: 0,
+                  overflowY: 'auto',
                   WebkitOverflowScrolling: 'touch',
-                  overscrollBehavior: 'contain',
+                  padding: '16px',
                 }}
               >
                 {recommendedFirms.map((firm, index) => (
