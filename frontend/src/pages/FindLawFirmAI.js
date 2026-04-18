@@ -686,8 +686,9 @@ export default function FindLawFirmAI() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col flex-1 h-full min-w-0 min-h-0 bg-black overflow-hidden
-                ${mobileView === 'results' ? 'flex absolute inset-0 z-50' : 'hidden lg:flex'}`}
+              className={`flex flex-col bg-black
+                ${mobileView === 'results' ? 'absolute inset-0 z-50 flex' : 'hidden lg:flex'}`}
+              style={{ width: '48%', height: '100dvh', position: 'relative', overflow: 'hidden' }}
             >
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
@@ -715,7 +716,19 @@ export default function FindLawFirmAI() {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 block" style={{ WebkitOverflowScrolling: "touch", WebkitTransform: "translate3d(0,0,0)", touchAction: "pan-y" }}>
+              <div
+                className="p-4 space-y-4"
+                style={{
+                  position: 'absolute',
+                  top: 56,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  overflowY: 'scroll',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain',
+                }}
+              >
                 {recommendedFirms.map((firm, index) => (
                   <FirmCard 
                     key={firm.id || index}

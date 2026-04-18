@@ -1143,8 +1143,9 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
-              className={`flex flex-col flex-1 h-full min-w-0 min-h-0 bg-black overflow-hidden
-                ${mobileView === 'matches' ? 'flex absolute inset-0 z-50' : 'hidden lg:flex'}`}
+              className={`flex flex-col bg-black
+                ${mobileView === 'matches' ? 'absolute inset-0 z-50 flex' : 'hidden lg:flex'}`}
+              style={{ width: '48%', height: '100dvh', position: 'relative', overflow: 'hidden' }}
             >
               <div className="shrink-0 px-5 py-4 border-b border-slate-800/60 h-14 flex items-center justify-between">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
@@ -1172,19 +1173,32 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   </button>
                 </div>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 block" style={{ WebkitOverflowScrolling: "touch", WebkitTransform: "translate3d(0,0,0)", touchAction: "pan-y" }}>
+              <div
+                className="p-4 space-y-4"
+                style={{
+                  position: 'absolute',
+                  top: 56,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  overflowY: 'scroll',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain',
+                }}
+              >
                 {(showAllLawyers ? recommendedLawyers : recommendedLawyers.slice(0, 5)).map((lawyer, index) => {
                   const grad = GRADIENTS[index % GRADIENTS.length];
                   const photoSrc = getLawyerPhoto(lawyer.photo, lawyer.name);
 
                   if (lawyer.isFirm) {
                     return (
-                      <div key={lawyer.id} className="cursor-pointer">
+                      <div key={lawyer.id || lawyer._id} className="cursor-pointer">
                         <FirmCard 
                            firm={lawyer} 
-                           index={index} 
-                           onProfileClick={(firm) => handleViewProfile({ ...firm, isFirm: true })} 
-                           onBookClick={(firm) => handleBookConsultation(firm)} 
+                           index={index}
+                           dm={true}
+                           onDetails={(firm) => handleViewProfile({ ...firm, isFirm: true })} 
+                           onBook={(firm) => handleBookConsultation(firm)} 
                         />
                       </div>
                     );
