@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, Search, Filter, MapPin, Users, ArrowRight, Star, Globe, Phone, Mail, Award, Check, X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Building2, Search, Filter, MapPin, Users, ArrowRight, Star, Globe, Phone, Mail, Award, Check, X, ChevronLeft, ChevronRight, ChevronUp, Sparkles } from 'lucide-react';
 import { WaveLayout } from '../components/WaveLayout';
 import { Button } from '../components/ui/button';
 import { dummyLawFirms, states, practiceAreas } from '../data/lawFirmsData';
@@ -103,12 +103,26 @@ export default function FindLawFirmManual() {
     priceMax: ''
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [searchCollapsed, setSearchCollapsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedFirm, setSelectedFirm] = useState(null);
 
-  // Lock body scroll when firm modal is open
-  useScrollLock(!!selectedFirm);
+  // Lock body scroll when firm modal OR filter sheet is open
+  useScrollLock(!!(selectedFirm || showFilters));
   const firmsPerPage = 9;
+
+  // Collapse search bar on mobile scroll
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const cur = window.scrollY;
+      if (cur > 120 && cur > lastY) setSearchCollapsed(true);
+      if (cur < 80) setSearchCollapsed(false);
+      lastY = cur;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Fetch verified law firms from backend
   const [dbFirms, setDbFirms] = useState([]);
@@ -229,113 +243,138 @@ export default function FindLawFirmManual() {
           </motion.p>
         </div>
 
-        {/* Search & Filters */}
-        <FloatingCard className="p-4 sm:p-6 mb-6 sm:mb-12 sticky top-20 sm:top-24 z-30 max-h-[80vh] overflow-y-auto custom-scrollbar">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={d.searchPlaceholder}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className={`w-full sm:min-w-[120px] sm:w-auto h-[46px] sm:h-[50px] border-slate-200 dark:border-slate-700 ${showFilters ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-300'}`}
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              {d.filters}
-            </Button>
-          </div>
-
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
-                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.state}</label>
-                    <select
-                      value={filters.state}
-                      onChange={(e) => {
-                        handleFilterChange('state', e.target.value);
-                        handleFilterChange('city', '');
-                      }}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="">{d.allStates}</option>
-                      {Object.keys(states).map(state => (
-                        <option key={state} value={state}>{state}</option>
-                      ))}
+        {/* ── Mobile Filter Bottom Sheet ── */}
+        <AnimatePresence>
+          {showFilters && (
+            <div className="sm:hidden">
+              <motion.div key="firm-filter-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={() => setShowFilters(false)} />
+              <motion.div key="firm-filter-sheet" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-3xl bg-white dark:bg-[#121212] border-t border-slate-200 dark:border-[#2a2a2a] shadow-2xl" style={{ maxHeight: '88vh' }}>
+                <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="w-10 h-1 bg-slate-300 dark:bg-slate-600 rounded-full" /></div>
+                <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2"><Filter className="w-4 h-4 text-blue-500" /> {d.filters}</h3>
+                  <button onClick={() => setShowFilters(false)} className="p-2 rounded-full bg-slate-100 dark:bg-[#222] text-slate-500"><X className="w-4 h-4" /></button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5" style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', touchAction: 'pan-y' }} onTouchMove={(e) => e.stopPropagation()}>
+                  <div className="space-y-2"><label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{d.state}</label>
+                    <select value={filters.state} onChange={(e) => { handleFilterChange('state', e.target.value); handleFilterChange('city', ''); }} className="w-full p-3 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
+                      <option value="">{d.allStates}</option>{Object.keys(states).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.city}</label>
-                    <select
-                      value={filters.city}
-                      onChange={(e) => handleFilterChange('city', e.target.value)}
-                      disabled={!filters.state}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50"
-                    >
-                      <option value="">{d.allCities}</option>
-                      {getCities().map(city => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
+                  <div className="space-y-2"><label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{d.city}</label>
+                    <select value={filters.city} onChange={(e) => handleFilterChange('city', e.target.value)} disabled={!filters.state} className="w-full p-3 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                      <option value="">{d.allCities}</option>{getCities().map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.practiceArea}</label>
-                    <select
-                      value={filters.practiceArea}
-                      onChange={(e) => handleFilterChange('practiceArea', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="">{d.allPracticeAreas}</option>
-                      {practiceAreas.map(area => (
-                        <option key={area} value={area}>{area}</option>
-                      ))}
+                  <div className="space-y-2"><label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{d.practiceArea}</label>
+                    <select value={filters.practiceArea} onChange={(e) => handleFilterChange('practiceArea', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
+                      <option value="">{d.allPracticeAreas}</option>{practiceAreas.map(a => <option key={a} value={a}>{a}</option>)}
                     </select>
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.maxFee}</label>
-                    <select
-                      value={filters.priceMax}
-                      onChange={(e) => handleFilterChange('priceMax', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
-                    >
+                  <div className="space-y-2"><label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{d.maxFee}</label>
+                    <select value={filters.priceMax} onChange={(e) => handleFilterChange('priceMax', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-xl text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
                       <option value="">{d.anyPrice}</option>
-                      <option value="5000">{d.under5k}</option>
-                      <option value="10000">{d.under10k}</option>
-                      <option value="20000">{d.under20k}</option>
-                      <option value="50000">{d.under50k}</option>
+                      <option value="5000">{d.under5k}</option><option value="10000">{d.under10k}</option>
+                      <option value="20000">{d.under20k}</option><option value="50000">{d.under50k}</option>
                     </select>
                   </div>
                 </div>
-
-                <div className="flex justify-end mt-4">
-                  <button
-                    onClick={clearFilters}
-                    className="text-sm text-red-500 hover:text-red-600 font-medium transition-colors"
-                  >
-                    {d.clearAllFilters}
-                  </button>
+                <div className="shrink-0 px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-[#121212] flex gap-3">
+                  <button onClick={clearFilters} className="flex-1 py-3 rounded-xl text-sm font-semibold border border-slate-200 dark:border-[#333] text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-[#1A1A1A]">{d.clearAllFilters}</button>
+                  <Button onClick={() => setShowFilters(false)} className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm">Apply Filters</Button>
                 </div>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </FloatingCard>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Search & Filters */}
+        <div className="sticky top-20 sm:top-24 z-30 mb-6 sm:mb-12">
+          {/* Collapsed pill — visible on mobile when search is hidden */}
+          {searchCollapsed && (
+            <div className="sm:hidden flex justify-end mb-2">
+              <button
+                onClick={() => { setSearchCollapsed(false); }}
+                className="bg-white dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] shadow-lg rounded-full px-4 py-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >
+                <Search className="w-4 h-4 text-blue-500" />
+                Search & Filter
+                {Object.values(filters).some(v => v) && <span className="w-2 h-2 rounded-full bg-blue-600" />}
+              </button>
+            </div>
+          )}
+          <FloatingCard className={`w-full p-4 sm:p-6 transition-all duration-300 ${searchCollapsed ? 'hidden sm:block' : 'block'}`}>
+            <div className="flex gap-3 items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={d.searchPlaceholder}
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`shrink-0 h-[48px] px-4 border-slate-200 dark:border-[#333] dark:bg-[#1A1A1A] ${showFilters || Object.values(filters).some(v => v) ? 'bg-blue-50 dark:bg-[#222] border-blue-200 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-300'}`}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                {d.filters}
+                {Object.values(filters).some(v => v) && <span className="ml-2 w-2 h-2 rounded-full bg-blue-600" />}
+              </Button>
+              {/* Minimize button — mobile only */}
+              <button
+                onClick={() => setSearchCollapsed(true)}
+                className="sm:hidden shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-[#222] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#333]"
+                title="Collapse search"
+              >
+                <ChevronUp className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Desktop inline filter expansion */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                  animate={{ height: 'auto', opacity: 1, marginTop: 20 }}
+                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden hidden sm:block"
+                >
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="space-y-2"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.state}</label>
+                      <select value={filters.state} onChange={(e) => { handleFilterChange('state', e.target.value); handleFilterChange('city', ''); }} className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="">{d.allStates}</option>{Object.keys(states).map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.city}</label>
+                      <select value={filters.city} onChange={(e) => handleFilterChange('city', e.target.value)} disabled={!filters.state} className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                        <option value="">{d.allCities}</option>{getCities().map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.practiceArea}</label>
+                      <select value={filters.practiceArea} onChange={(e) => handleFilterChange('practiceArea', e.target.value)} className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="">{d.allPracticeAreas}</option>{practiceAreas.map(a => <option key={a} value={a}>{a}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.maxFee}</label>
+                      <select value={filters.priceMax} onChange={(e) => handleFilterChange('priceMax', e.target.value)} className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="">{d.anyPrice}</option><option value="5000">{d.under5k}</option>
+                        <option value="10000">{d.under10k}</option><option value="20000">{d.under20k}</option><option value="50000">{d.under50k}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button onClick={clearFilters} className="text-sm text-slate-500 hover:text-red-500 font-medium transition-colors">{d.clearAllFilters}</button>
+                    <Button onClick={() => setShowFilters(false)} className="bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]">Apply Filters</Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </FloatingCard>
+        </div>
 
         {/* Results Grid */}
         <div className="mb-8 flex items-center justify-between text-slate-600 dark:text-slate-400 px-2">
@@ -645,7 +684,7 @@ export default function FindLawFirmManual() {
 
       {/* Floating AI Lawyer Matching Button */}
       {!selectedFirm && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-50">
+        <div className="fixed bottom-20 sm:bottom-8 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-30">
           <motion.button
             onClick={() => navigate('/ai-firm-finder')}
             initial={{ opacity: 0, scale: 0.8, y: 20 }}

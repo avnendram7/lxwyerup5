@@ -1465,17 +1465,17 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                       </h3>
                       <div className="space-y-4">
                         {[...selectedLawyer.achievements].sort((a, b) => b.pinned - a.pinned).map(ach => (
-                          <div key={ach.id} className={`rounded-2xl border p-5 flex gap-5 items-center transition-all shadow-sm hover:shadow-md ${ach.pinned ? 'bg-white dark:bg-[#0d1520] border-blue-300 dark:border-blue-500/40' : 'bg-white/80 dark:bg-[#111]/80 border-blue-100 dark:border-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-500/30'}`}>
+                          <div key={ach.id} className={`rounded-2xl border p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 transition-all shadow-sm hover:shadow-md ${ach.pinned ? 'bg-white dark:bg-[#0d1520] border-blue-300 dark:border-blue-500/40' : 'bg-white/80 dark:bg-[#111]/80 border-blue-100 dark:border-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-500/30'}`}>
                             {ach.photo ? (
-                              <img src={ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`} alt="achievement" className="w-24 h-24 rounded-2xl object-cover shrink-0 border border-blue-200 dark:border-blue-500/30 shadow-sm" />
+                              <img src={ach.photo.startsWith('http') || ach.photo.startsWith('data:') ? ach.photo : `${API.replace('/api', '')}${ach.photo}`} alt="achievement" className="w-full sm:w-20 sm:h-20 h-36 rounded-xl sm:rounded-2xl object-cover shrink-0 border border-blue-200 dark:border-blue-500/30 shadow-sm" />
                             ) : (
-                              <div className="w-24 h-24 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-900/20 border border-blue-200 dark:border-blue-700/50">
-                                <Award className="w-10 h-10 text-blue-500 dark:text-blue-400" />
+                              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-900/20 border border-blue-200 dark:border-blue-700/50">
+                                <Award className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500 dark:text-blue-400" />
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <p className="font-bold text-lg leading-snug text-slate-900 dark:text-white">{ach.title}</p>
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <p className="font-bold text-base sm:text-lg leading-snug text-slate-900 dark:text-white">{ach.title}</p>
                                 {ach.pinned && (
                                   <span className="shrink-0 flex items-center gap-1.5 text-[10px] font-black text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-2.5 py-1 rounded-full tracking-wider uppercase border border-blue-200 dark:border-blue-800/50">
                                     <Star className="w-3 h-3 fill-current" /> {d.featured}

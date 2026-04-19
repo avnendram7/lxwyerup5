@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Briefcase, MapPin, ArrowRight, ChevronLeft, ChevronRight, Scale, X, Check, GraduationCap, Sparkles, Award, Star, Calendar } from 'lucide-react';
+import { Search, Filter, Briefcase, MapPin, ArrowRight, ChevronLeft, ChevronRight, ChevronUp, Scale, X, Check, GraduationCap, Sparkles, Award, Star, Calendar } from 'lucide-react';
 import axios from 'axios';
 import { API } from '../App';
 import { WaveLayout } from '../components/WaveLayout';
@@ -539,8 +539,8 @@ export default function FindLawyerManual() {
           )}
 
           <FloatingCard className={`w-full p-4 sm:p-6 transition-all duration-300 ${searchCollapsed ? 'hidden sm:block' : 'block'}`}>
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div className="relative flex-1 w-full relative">
+          <div className="flex flex-row gap-3 items-center justify-between">
+            <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
@@ -563,6 +563,14 @@ export default function FindLawyerManual() {
                 </span>
               )}
             </Button>
+            {/* Minimize button — mobile only */}
+            <button
+              onClick={() => setSearchCollapsed(true)}
+              className="sm:hidden shrink-0 w-[46px] h-[46px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#222] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#333]"
+              title="Collapse search"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Active Filter Badges */}
