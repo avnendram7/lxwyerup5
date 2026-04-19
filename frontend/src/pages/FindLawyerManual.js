@@ -455,7 +455,7 @@ export default function FindLawyerManual() {
             </button>
           )}
 
-          <FloatingCard className={`w-full p-4 sm:p-6 transition-all duration-300 ${searchCollapsed ? 'hidden sm:block' : 'block'} max-h-[80vh] overflow-y-auto custom-scrollbar`}>
+          <FloatingCard className={`w-full p-4 sm:p-6 transition-all duration-300 ${searchCollapsed ? 'hidden sm:block' : 'block'}`}>
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
             <div className="relative flex-1 w-full relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -505,112 +505,116 @@ export default function FindLawyerManual() {
                 exit={{ height: 0, opacity: 0, marginTop: 0 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_state')}</label>
-                    <select
-                      value={filters.state}
-                      onChange={(e) => {
-                        handleFilterChange('state', e.target.value);
-                        handleFilterChange('city', '');
-                        handleFilterChange('court', '');
-                      }}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
-                    >
-                      <option value="">{t('fl_all_states')}</option>
-                      {Object.keys(states).map(state => (
-                        <option key={state} value={state}>{state}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_city')}</label>
-                    <select
-                      value={filters.city}
-                      onChange={(e) => handleFilterChange('city', e.target.value)}
-                      disabled={!filters.state}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50 dark:focus:border-[#555]"
-                    >
-                      <option value="">{t('fl_all_cities')}</option>
-                      {getCities().map(city => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_specialization')}</label>
-                    <select
-                      value={filters.specialization}
-                      onChange={(e) => handleFilterChange('specialization', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
-                    >
-                      <option value="">{t('fl_all_specs')}</option>
-                      {specializations.map(spec => (
-                        <option key={spec} value={spec}>{spec}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_court')}</label>
-                    <select
-                      value={filters.court}
-                      onChange={(e) => handleFilterChange('court', e.target.value)}
-                      disabled={!filters.state}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50 dark:focus:border-[#555]"
-                    >
-                      <option value="">{t('fl_all_courts')}</option>
-                      {getCourts().map(court => (
-                        <option key={court} value={court}>{court}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Consultation Type filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_consult_type')}</label>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {[
-                        { val: '', label: 'Any' },
-                        { val: 'video', label: '🎥 Video Call' },
-                        { val: 'in_person', label: '🏛️ In-Person' },
-                      ].map(opt => (
-                        <button
-                          key={opt.val}
-                          onClick={() => handleFilterChange('consultationType', opt.val)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${filters.consultationType === opt.val
-                            ? 'bg-blue-600 border-blue-600 text-white shadow'
-                            : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-400'
-                            }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                {/* Scrollable filter dropdowns — max height on mobile so Apply button stays visible */}
+                <div className="overflow-y-auto" style={{ maxHeight: 'min(55vh, 420px)' }}>
+                  <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_state')}</label>
+                      <select
+                        value={filters.state}
+                        onChange={(e) => {
+                          handleFilterChange('state', e.target.value);
+                          handleFilterChange('city', '');
+                          handleFilterChange('court', '');
+                        }}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
+                      >
+                        <option value="">{t('fl_all_states')}</option>
+                        {Object.keys(states).map(state => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
+                      </select>
                     </div>
-                  </div>
 
-                  {/* Price filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.maxFee}</label>
-                    <select
-                      value={filters.priceMax}
-                      onChange={(e) => handleFilterChange('priceMax', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
-                    >
-                      <option value="">{d.anyPrice}</option>
-                      <option value="1000">{d.under} ₹1,000</option>
-                      <option value="3000">{d.under} ₹3,000</option>
-                      <option value="5000">{d.under} ₹5,000</option>
-                      <option value="10000">{d.under} ₹10,000</option>
-                      <option value="20000">{d.under} ₹20,000</option>
-                      <option value="50000">{d.under} ₹50,000</option>
-                    </select>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_city')}</label>
+                      <select
+                        value={filters.city}
+                        onChange={(e) => handleFilterChange('city', e.target.value)}
+                        disabled={!filters.state}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50 dark:focus:border-[#555]"
+                      >
+                        <option value="">{t('fl_all_cities')}</option>
+                        {getCities().map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_specialization')}</label>
+                      <select
+                        value={filters.specialization}
+                        onChange={(e) => handleFilterChange('specialization', e.target.value)}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
+                      >
+                        <option value="">{t('fl_all_specs')}</option>
+                        {specializations.map(spec => (
+                          <option key={spec} value={spec}>{spec}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_court')}</label>
+                      <select
+                        value={filters.court}
+                        onChange={(e) => handleFilterChange('court', e.target.value)}
+                        disabled={!filters.state}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 disabled:opacity-50 dark:focus:border-[#555]"
+                      >
+                        <option value="">{t('fl_all_courts')}</option>
+                        {getCourts().map(court => (
+                          <option key={court} value={court}>{court}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Consultation Type filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('fl_consult_type')}</label>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {[
+                          { val: '', label: 'Any' },
+                          { val: 'video', label: '🎥 Video Call' },
+                          { val: 'in_person', label: '🏛️ In-Person' },
+                        ].map(opt => (
+                          <button
+                            key={opt.val}
+                            onClick={() => handleFilterChange('consultationType', opt.val)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${filters.consultationType === opt.val
+                              ? 'bg-blue-600 border-blue-600 text-white shadow'
+                              : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-400'
+                              }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{d.maxFee}</label>
+                      <select
+                        value={filters.priceMax}
+                        onChange={(e) => handleFilterChange('priceMax', e.target.value)}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-[#333] rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-[#555]"
+                      >
+                        <option value="">{d.anyPrice}</option>
+                        <option value="1000">{d.under} ₹1,000</option>
+                        <option value="3000">{d.under} ₹3,000</option>
+                        <option value="5000">{d.under} ₹5,000</option>
+                        <option value="10000">{d.under} ₹10,000</option>
+                        <option value="20000">{d.under} ₹20,000</option>
+                        <option value="50000">{d.under} ₹50,000</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                {/* Apply button row — always visible, outside the scrollable area */}
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
                       onClick={() => handleFilterChange('withAchievement', !filters.withAchievement)}
