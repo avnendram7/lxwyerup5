@@ -8,6 +8,7 @@ import { WaveLayout } from '../components/WaveLayout';
 import { Button } from '../components/ui/button';
 import { dummyLawFirms, states, practiceAreas } from '../data/lawFirmsData';
 import { useLang } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const LOCAL_TEXT_FIRM_MANUAL = {
   en: {
@@ -104,6 +105,9 @@ export default function FindLawFirmManual() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedFirm, setSelectedFirm] = useState(null);
+
+  // Lock body scroll when firm modal is open
+  useScrollLock(!!selectedFirm);
   const firmsPerPage = 9;
 
   // Fetch verified law firms from backend

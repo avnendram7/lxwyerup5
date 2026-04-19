@@ -15,6 +15,7 @@ import { WaveLayout } from '../components/WaveLayout';
 import { getLawyerPhoto, onPhotoError } from '../utils/lawyerPhoto';
 import { buildKnowledgeBase, lookupByName, getPlatformAwarenessResponse, getSuggestiveChips } from '../utils/lawyerKnowledgeBase';
 import { useLang } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 // ── FAQ Data ────────────────────────────────────────────────────────────────
 const LAWYER_FAQ = [
@@ -180,6 +181,9 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
   const [isLoading, setIsLoading] = useState(false);
   const [recommendedLawyers, setRecommendedLawyers] = useState([]);
   const [selectedLawyer, setSelectedLawyer] = useState(null);
+
+  // Lock body scroll when profile modal is open
+  useScrollLock(!!selectedLawyer);
   const [isListening, setIsListening] = useState(false);
   const [showAllLawyers, setShowAllLawyers] = useState(false);
   const [allLawyersList, setAllLawyersList] = useState(dummyLawyers);

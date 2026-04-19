@@ -11,6 +11,7 @@ import { dummyLawyers, states, specializations, searchLawyers } from '../data/la
 import LawyerCard from '../components/LawyerCard';
 import { getLawyerPhoto, getInitials, onPhotoError } from '../utils/lawyerPhoto';
 import { useLang } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 
 
@@ -164,17 +165,8 @@ export default function FindLawyerManual() {
     }
   }, [location.state]);
 
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (selectedLawyer) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [selectedLawyer]);
+  // Lock body scroll when modal OR filter sheet is open
+  useScrollLock(!!(selectedLawyer || showFilters));
 
   // Collapse search bar on mobile scroll
   useEffect(() => {
@@ -479,7 +471,11 @@ export default function FindLawyerManual() {
                   </button>
                 </div>
                 {/* Scrollable filter content */}
-                <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5" style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}>
+                <div
+                  className="flex-1 overflow-y-auto px-5 py-4 space-y-5"
+                  style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', touchAction: 'pan-y' }}
+                  onTouchMove={(e) => e.stopPropagation()}
+                >
                   {[
                     { label: t('fl_state'), key: 'state', options: Object.keys(states), defaultLabel: t('fl_all_states'), extra: (e) => { handleFilterChange('city', ''); handleFilterChange('court', ''); } },
                     { label: t('fl_city'), key: 'city', options: getCities(), defaultLabel: t('fl_all_cities'), disabled: !filters.state },
