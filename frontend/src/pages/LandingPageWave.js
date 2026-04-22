@@ -1354,7 +1354,7 @@ const HeroSection = () => {
                     width: b.size, height: b.size,
                     background: `radial-gradient(circle, ${b.color} 0%, transparent 70%)`,
                     animation: `heroBlob ${b.dur}s ease-in-out ${b.delay}s infinite`,
-                    filter: 'blur(40px)', pointerEvents: 'none', zIndex: 0,
+                    pointerEvents: 'none', zIndex: 0,
                     transform: 'translate3d(-50%, -50%, 0)',
                     willChange: 'transform',
                 }} />
@@ -1658,8 +1658,8 @@ const EcosystemSection = () => {
             ))}
 
             {/* Breathing orbs — blur reduced, will-change for GPU layer */}
-            <div style={{ position: 'absolute', top: '20%', left: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'breathe 14s ease-in-out infinite', pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }} />
-            <div style={{ position: 'absolute', bottom: '15%', right: '10%', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.09) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'breathe 18s ease-in-out 6s infinite', pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }} />
+            <div style={{ position: 'absolute', top: '20%', left: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 70%)', animation: 'breathe 14s ease-in-out infinite', pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }} />
+            <div style={{ position: 'absolute', bottom: '15%', right: '10%', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.09) 0%, transparent 70%)', animation: 'breathe 18s ease-in-out 6s infinite', pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }} />
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Animated headline */}
@@ -1838,7 +1838,6 @@ const CTASection = () => {
                     height: '500px',
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, rgba(59,130,246,0.20) 0%, transparent 70%)',
-                    filter: 'blur(80px)',
                     pointerEvents: 'none',
                 }}
             />
@@ -2219,8 +2218,8 @@ const LandingPageWave = () => {
                 textAlign: 'left',
             }}>
                 {/* Subtle ambient glow */}
-                <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '30%', left: '20%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)', pointerEvents: 'none' }} />
 
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '48rem', width: '100%' }}>
                     {/* Eyebrow */}
