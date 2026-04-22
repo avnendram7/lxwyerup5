@@ -1071,7 +1071,7 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6" style={{ minHeight: 0 }}>
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <h2 className="text-2xl font-bold text-white mb-1">
@@ -1239,21 +1239,18 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                   </button>
                 </div>
               </div>
-              {/* Scrollable cards — explicit height so browser has unambiguous scroll boundary */}
+              {/* Scrollable cards */}
               <div
                 ref={scrollPanelRef}
-                tabIndex={-1}
-                onMouseEnter={() => { if (scrollPanelRef.current) scrollPanelRef.current.focus({ preventScroll: true }); }}
                 style={{
                   display: 'block',
                   height: `calc(100% - 56px)`,
-                  overflowY: 'auto',
+                  overflowY: 'scroll',
                   WebkitOverflowScrolling: 'touch',
                   touchAction: 'pan-y',
                   overscrollBehavior: 'contain',
                   padding: '16px',
                   boxSizing: 'border-box',
-                  outline: 'none',
                 }}
               >
                 {(showAllLawyers ? recommendedLawyers : recommendedLawyers.slice(0, 5)).map((lawyer, index) => {

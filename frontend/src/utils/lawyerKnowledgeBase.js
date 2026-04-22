@@ -223,7 +223,7 @@ export function getSuggestiveChips(kb, partialInput, memoryState = {}) {
   // Generic completions based on common patterns
   if (chips.length === 0) {
     if (/bail|arrest|police|criminal|murder|theft/.test(input)) {
-      chips.push('Criminal lawyer in Delhi', 'Bail application help', 'FIR quash Noida');
+      chips.push('Criminal lawyer in Delhi', 'Criminal lawyer in Noida', 'Criminal lawyer in Gurgaon');
     } else if (/property|land|flat|rent|tenant|evict/.test(input)) {
       chips.push('Property lawyer Delhi', 'Tenant rights help', 'Land dispute Noida');
     } else if (/divorce|family|custody|maintenance|alimony/.test(input)) {

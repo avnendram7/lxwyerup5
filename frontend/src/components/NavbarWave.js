@@ -287,20 +287,17 @@ export const NavbarWave = () => {
 
                     {/* ── Mobile Toggle ─────────────────────────────────── */}
                     <div className="md:hidden flex items-center gap-1.5">
-                        {/* LxwyerAI mobile — labelled pill with blue glow border */}
-                        <button
+                        {/* LxwyerAI mobile — identical animated border sweep as desktop */}
+                        <div className="lxwyer-wrap">
+                          <div className="lxwyer-spin" />
+                          <button
                             onClick={() => navigate('/lxwyerai')}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap"
-                            style={{
-                                background: 'rgba(37,99,235,0.12)',
-                                border: '1px solid rgba(96,165,250,0.55)',
-                                color: '#93c5fd',
-                                boxShadow: '0 0 8px rgba(59,130,246,0.25)',
-                            }}
-                        >
-                            <Sparkles className="w-3 h-3" />
-                            <span>Lxwyer<span style={{ color: '#60a5fa' }}>AI</span></span>
-                        </button>
+                            className="lxwyer-inner px-2.5 py-[6px] text-[11px] font-bold whitespace-nowrap"
+                          >
+                            <Sparkles className="w-3 h-3 text-white/60" />
+                            <span className="lxwyer-text text-white font-black tracking-[0.05em]">Lxwyer<span className="text-blue-400">AI</span></span>
+                          </button>
+                        </div>
 
                         {/* Find Lawyer mobile inline */}
                         <button
@@ -356,17 +353,6 @@ export const NavbarWave = () => {
                                 className="w-full rounded-full px-5 py-2.5 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-md shadow-blue-500/30 flex items-center justify-center gap-2">
                                 {t('nav_find_lawyer')} <ArrowRight className="w-4 h-4" />
                             </button>
-                            {/* LxwyerAI mobile — spinning border sweep */}
-                            <div className="lxwyer-wrap lxwyer-w-full">
-                              <div className="lxwyer-spin" />
-                              <button
-                                onClick={() => handleNavigation('/lxwyerai')}
-                                className="lxwyer-inner w-full p-3 rounded-2xl justify-start active:scale-[0.98]"
-                              >
-                                <Sparkles className="w-4 h-4 text-white/60" />
-                                <span className="lxwyer-text text-white font-black tracking-[0.05em]">Lxwyer<span className="text-blue-400">AI</span></span>
-                              </button>
-                            </div>
                             <div className="flex flex-col gap-2 pt-1">
                                 <button onClick={() => { setMenuOpen(false); navigate('/lawyer-application'); }}
                                     className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors flex items-center justify-start gap-3">
