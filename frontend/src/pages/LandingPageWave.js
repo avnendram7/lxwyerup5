@@ -20,7 +20,7 @@ import AnimatedTextCycle from '../components/ui/animated-text-cycle';
 import { LogoCloud } from '../components/ui/logo-cloud-3';
 import { InfiniteSlider } from '../components/ui/infinite-slider';
 import { Hero } from '../components/ui/hero';
-import { BeamsBackground } from '../components/ui/beams-background';
+import { TubesCursor } from '../components/ui/tube-cursor';
 
 /* ─────────────────────────────────────────────
    CSS KEYFRAMES
@@ -2206,7 +2206,7 @@ const LandingPageWave = () => {
     );
 
     const beamsContent = (
-        <BeamsBackground className="w-full h-full">
+        <TubesCursor className="w-full h-full">
             <div style={{
                 width: '100%',
                 height: '100%',
@@ -2285,7 +2285,7 @@ const LandingPageWave = () => {
                     </p>
                 </div>
             </div>
-        </BeamsBackground>
+        </TubesCursor>
     );
 
     return (
