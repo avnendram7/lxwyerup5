@@ -1047,8 +1047,8 @@ export default function FindLawyerManual() {
                               </div>
                             )}
                             <div className="flex-1 min-w-0 flex flex-col justify-center relative z-10">
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <p className="font-bold text-lg sm:text-xl leading-snug break-words text-slate-900 dark:text-emerald-50 flex-1">
+                              <div className="flex flex-col sm:flex-row items-start justify-between gap-2 mb-2">
+                                <p className="font-bold text-lg sm:text-xl leading-snug break-words text-slate-900 dark:text-emerald-50 w-full sm:w-auto flex-1 pr-2">
                                   {ach.title}
                                 </p>
                                 {ach.pinned && (
@@ -1113,7 +1113,7 @@ export default function FindLawyerManual() {
                     </div>
 
                     {/* Consultation Fee */}
-                    <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-5 py-4">
                       <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0">{d.consultationFee}</span>
                       <span className="text-base font-semibold text-slate-900 dark:text-white">
                         {(() => {
@@ -1139,7 +1139,7 @@ export default function FindLawyerManual() {
 
                           if (fee30 || fee60) {
                             return (
-                              <div className="flex items-center gap-3">
+                              <div className="flex flex-wrap items-center gap-3">
                                 {fee30 && <span style={{ minWidth: 100, display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between' }} className="bg-slate-100 dark:bg-[#222] text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[#333] text-sm tracking-wide font-bold">₹{fee30} <span className="text-xs font-medium opacity-60 ml-1">/ 30m</span></span>}
                                 {fee60 && <span style={{ minWidth: 100, display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between' }} className="bg-slate-100 dark:bg-[#222] text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[#333] text-sm tracking-wide font-bold">₹{fee60} <span className="text-xs font-medium opacity-60 ml-1">/ 1h</span></span>}
                               </div>
@@ -1153,7 +1153,7 @@ export default function FindLawyerManual() {
                       </span>
                     </div>
 
-                    <div className="flex items-start gap-4 px-5 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 px-5 py-4">
                       <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0 pt-0.5">{d.mode}</span>
                       <div className="flex flex-wrap gap-1.5">
                         {(() => {

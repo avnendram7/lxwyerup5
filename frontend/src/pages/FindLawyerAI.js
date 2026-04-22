@@ -1554,8 +1554,8 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2 mb-1">
-                                <p className="font-bold text-base sm:text-lg leading-snug text-slate-900 dark:text-white">{ach.title}</p>
+                              <div className="flex flex-col sm:flex-row items-start justify-between gap-2 mb-2">
+                                <p className="font-bold text-lg sm:text-xl leading-snug break-words text-slate-900 dark:text-emerald-50 w-full sm:w-auto flex-1 pr-2">{ach.title}</p>
                                 {ach.pinned && (
                                   <span className="shrink-0 flex items-center gap-1.5 text-[10px] font-black text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-2.5 py-1 rounded-full tracking-wider uppercase border border-blue-200 dark:border-blue-800/50">
                                     <Star className="w-3 h-3 fill-current" /> {d.featured}
@@ -1583,15 +1583,15 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
                         ))}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between px-5 py-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-5 gap-4">
                       <div>
                         <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{d.consultationFee}</div>
                         <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                           {selectedLawyer.feeMin ? `₹${selectedLawyer.feeMin.toLocaleString()} – ₹${selectedLawyer.feeMax?.toLocaleString()}` : (selectedLawyer.fee || d.contactForFee)}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{d.mode}</div>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 pt-2 sm:pt-0">
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest w-36 shrink-0 pt-0.5">{d.mode}</span>
                         <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">
                           {selectedLawyer.consultation_preferences === 'both' ? d.videoInPerson : selectedLawyer.consultation_preferences === 'in_person' ? d.inPerson : selectedLawyer.consultation_preferences === 'online' ? d.videoCall : d.notSpecified}
                         </span>

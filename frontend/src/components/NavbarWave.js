@@ -196,10 +196,10 @@ export const NavbarWave = () => {
                             <img
                                 src="/logo.png"
                                 alt="Lxwyer Up Logo"
-                                className="w-7 h-7 md:w-8 md:h-8 xl:w-9 xl:h-9 object-contain rounded"
+                                className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 xl:w-9 xl:h-9 object-contain rounded"
                                 style={{ mixBlendMode: 'screen' }}
                             />
-                            <span className="text-[1.15rem] md:text-xl xl:text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none mt-1 md:mt-0.5">
+                            <span className="text-[0.95rem] sm:text-[1.15rem] md:text-xl xl:text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-['Outfit'] select-none mt-0.5 md:mt-0">
                                 Lxwyer Up
                             </span>
                         </button>
@@ -286,15 +286,15 @@ export const NavbarWave = () => {
                     </div>
 
                     {/* ── Mobile Toggle ─────────────────────────────────── */}
-                    <div className="md:hidden flex items-center gap-1.5">
+                    <div className="md:hidden flex items-center gap-1 sm:gap-1.5">
                         {/* LxwyerAI mobile — identical animated border sweep as desktop */}
                         <div className="lxwyer-wrap">
                           <div className="lxwyer-spin" />
                           <button
                             onClick={() => navigate('/lxwyerai')}
-                            className="lxwyer-inner px-2.5 py-[6px] text-[11px] font-bold whitespace-nowrap"
+                            className="lxwyer-inner px-2 py-[4px] sm:px-2.5 sm:py-[6px] text-[10px] sm:text-[11px] font-bold whitespace-nowrap"
                           >
-                            <Sparkles className="w-3 h-3 text-white/60" />
+                            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white/60" />
                             <span className="lxwyer-text text-white font-black tracking-[0.05em]">Lxwyer<span className="text-blue-400">AI</span></span>
                           </button>
                         </div>
@@ -302,17 +302,17 @@ export const NavbarWave = () => {
                         {/* Find Lawyer mobile inline */}
                         <button
                             onClick={() => navigate('/user-get-started')}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 whitespace-nowrap"
+                            className="flex items-center gap-0.5 sm:gap-1 px-2 py-1 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 whitespace-nowrap"
                         >
                             {t('nav_find_lawyer')}
-                            <ArrowRight className="w-3 h-3 moving-arrow" />
+                            <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 moving-arrow" />
                         </button>
 
                         {/* Language toggle mobile */}
                         {isHome && (
                         <button
                             onClick={toggleLang}
-                            className="px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all duration-200"
+                            className="px-1.5 py-1 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold border transition-all duration-200"
                             style={{
                                 background: lang === 'hi' ? 'linear-gradient(135deg,#f97316,#ea580c)' : 'transparent',
                                 color: lang === 'hi' ? '#fff' : '#64748b',
@@ -323,10 +323,10 @@ export const NavbarWave = () => {
                         </button>
                         )}
                         <button
-                            className="p-2 text-slate-600 dark:text-slate-300"
+                            className="p-1 sm:p-2 text-slate-600 dark:text-slate-300"
                             onClick={() => setMenuOpen(!menuOpen)}
                         >
-                            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                            {menuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
                     </div>
                 </div>
