@@ -306,7 +306,7 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
               ...r,
               id: r.id || r.lawyer_id,
               name: r.name,
-              experience: r.experience || r.experience_years ? `${r.experience_years} yr EXP.` : undefined,
+              experience: (r.experience_years || r.experience) ? `${r.experience_years || r.experience} yr EXP.` : undefined,
               specialization: r.specialization,
               city: r.city || r.location?.city,
               state: r.state || r.location?.state,
@@ -317,9 +317,18 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
               verified: r.verified !== false, // default true
               rating: r.rating || 4.8,
             }));
-          } else {
+          }
+          
+          // Backfill with dummy data if backend returned fewer than 5 results
+          if (results.length < 5) {
             const all = dummyLawyers;
-            results = city ? all.filter(l => (l.city || '').toLowerCase().includes(city)) : all;
+            const dummies = city ? all.filter(l => (l.city || '').toLowerCase().includes(city)) : all;
+            const existingIds = new Set(results.map(r => String(r.id)));
+            for (const d of dummies) {
+              if (!existingIds.has(String(d.id))) {
+                results.push(d);
+              }
+            }
           }
           
           // --- Universal Shuffling and Signature Priority Algorithm ---
@@ -363,9 +372,18 @@ export default function QuickChat({ embedded = false, darkMode: darkModeProp }) 
               image: f.image || f.logo_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600&h=400',
               lawyersCount: f.lawyersCount || f.team_size || '10+',
             }));
-          } else {
+          }
+          
+          // Backfill with dummy data if backend returned fewer than 5 results
+          if (results.length < 5) {
             const all = dummyLawFirms;
-            results = city ? all.filter(f => (f.city || '').toLowerCase().includes(city)) : all;
+            const dummies = city ? all.filter(f => (f.city || '').toLowerCase().includes(city)) : all;
+            const existingIds = new Set(results.map(f => String(f.id)));
+            for (const d of dummies) {
+              if (!existingIds.has(String(d.id))) {
+                results.push(d);
+              }
+            }
           }
           
           // --- Universal Shuffling and Signature Priority Algorithm ---
