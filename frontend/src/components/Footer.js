@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Scale, Mail, Phone, MapPin } from 'lucide-react';
+import { Scale, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Facebook } from 'lucide-react';
 
 export const Footer = () => {
   return (
@@ -61,8 +61,22 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400 text-sm">
+        <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-400 text-sm">
           <p>&copy; 2026 Lxwyer Up. All rights reserved.</p>
+          <div className="flex items-center space-x-4">
+            <a href="https://www.linkedin.com/company/lxwyerup1" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors" aria-label="LinkedIn">
+              <Linkedin className="w-5 h-5" />
+            </a>
+            <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="Twitter">
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="Instagram">
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="Facebook">
+              <Facebook className="w-5 h-5" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
