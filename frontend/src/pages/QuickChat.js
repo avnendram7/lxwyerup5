@@ -23,6 +23,7 @@ import FirmProfile from './FirmProfile'
 
 import { buildKnowledgeBase, lookupByName } from '../utils/lawyerKnowledgeBase'
 import { getLawyerPhoto } from '../utils/lawyerPhoto'
+import GenerativeBubble from '../components/GenerativeBubble'
 
 /* ========== CARD DEFINITIONS ========== */
 const CARD_DEFS = [
