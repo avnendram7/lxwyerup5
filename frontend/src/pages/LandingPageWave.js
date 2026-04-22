@@ -2299,9 +2299,6 @@ const LandingPageWave = () => {
                 <StyleInjector />
 
                 <GradientOrbs />
-                {/* Sphere + explosion only mounted after first scroll — saves ~20ms of paint on load */}
-                {sphereReady && <ScrollReactiveSphere />}
-                {sphereReady && <SphereExplosion />}
                 <div className="relative" style={{ zIndex: 2 }}>
                     <NavbarWave />
                     <ScalesOfJusticeIntro justTransitioned={justTransitioned} />
