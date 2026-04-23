@@ -71,8 +71,8 @@ function getColors(spec = '') {
 // Define stat item component for DRY principle
 const StatItem = ({ label, value }) => (
   <div className="flex flex-col text-center px-1 flex-1">
-    <span className="text-[13px] font-bold text-[#f0f4ff]">{value}</span>
-    <span className="text-[9px] text-[#94a3b8] uppercase tracking-wider mt-1">{label}</span>
+    <span className="text-[11px] sm:text-[13px] font-bold text-[#f0f4ff]">{value}</span>
+    <span className="text-[8px] sm:text-[9px] text-[#94a3b8] uppercase tracking-wider mt-1">{label}</span>
   </div>
 );
 
@@ -131,7 +131,7 @@ const LawyerCard = ({ className, lawyer, index = 0, onProfileClick, onBookClick,
       {isSignature && <div className="absolute inset-0 bg-gradient-to-tr from-[#d4af37]/5 to-transparent pointer-events-none z-0" />}
 
       {/* Top section with background image and content */}
-      <div className="relative h-[280px] w-full z-10 overflow-hidden">
+      <div className="relative h-[200px] sm:h-[280px] w-full z-10 overflow-hidden">
         <img
           src={imageUrl}
           alt={lawyer.name}
@@ -149,19 +149,19 @@ const LawyerCard = ({ className, lawyer, index = 0, onProfileClick, onBookClick,
         <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-20">
           {isSignature ? (
             <div className="relative flex items-center px-2 py-1">
-              <span className="text-[26px] font-[cursive] font-bold text-[#d4af37] drop-shadow-md capitalize pb-[1px]" style={{ fontFamily: '"Great Vibes", cursive' }}>Signature</span>
+              <span className="text-[20px] sm:text-[26px] font-[cursive] font-bold text-[#d4af37] drop-shadow-md capitalize pb-[1px]" style={{ fontFamily: '"Great Vibes", cursive' }}>Signature</span>
             </div>
           ) : <div />}
           
           <div className="flex flex-col items-end gap-0.5">
-            <span className="text-[22px] font-black text-white/40 tracking-tighter select-none">Lxwyer Up</span>
+            <span className="text-[16px] sm:text-[22px] font-black text-white/40 tracking-tighter select-none">Lxwyer Up</span>
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 w-full p-5 flex flex-col justify-end z-20">
           <div className="flex justify-between items-end w-full">
             <div className="text-white overflow-hidden pr-2 transition-all duration-300 group-hover:max-w-[50%]">
-              <h3 className="text-[22px] font-extrabold text-[#f0f4ff] tracking-tight leading-tight mb-1 truncate">
+              <h3 className="text-[18px] sm:text-[22px] font-extrabold text-[#f0f4ff] tracking-tight leading-tight mb-1 truncate">
                 {lawyer.name}
               </h3>
               <div className="flex items-center gap-1.5 text-white/80 text-sm">
@@ -178,27 +178,27 @@ const LawyerCard = ({ className, lawyer, index = 0, onProfileClick, onBookClick,
       </div>
 
       {/* Bottom section with trail details */}
-      <div className="p-5 z-10 relative bg-[#040404]">
+      <div className="p-3 sm:p-5 z-10 relative bg-[#040404]">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <p className="font-bold text-[14px]" style={{ color: themeColor }}>
+            <p className="font-bold text-[12px] sm:text-[14px] leading-tight sm:leading-normal" style={{ color: themeColor }}>
               {lawyer.specialization || d.legalExpert}
             </p>
-            <p className="text-[12px] text-[#94a3b8] mt-0.5 font-medium">
+            <p className="text-[10px] sm:text-[12px] text-[#94a3b8] mt-0.5 font-medium">
               {lawyer.experience} {d.yr} {d.exp}
             </p>
           </div>
           
           {lawyer.verified && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex-shrink-0">
-               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-               <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{d.verified}</span>
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex-shrink-0">
+               <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />
+               <span className="text-[8px] sm:text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{d.verified}</span>
             </div>
           )}
         </div>
 
         {lawyer.catchphrase && (
-          <p className="text-[12px] italic text-[#64748b] mt-3 line-clamp-2 leading-relaxed">
+          <p className="text-[10px] sm:text-[12px] italic text-[#64748b] mt-2 sm:mt-3 line-clamp-2 leading-relaxed">
             "{lawyer.catchphrase}"
           </p>
         )}
@@ -212,24 +212,24 @@ const LawyerCard = ({ className, lawyer, index = 0, onProfileClick, onBookClick,
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 mt-5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4 sm:mt-5">
           <Button
             variant="secondary"
             size="sm"
             onClick={(e) => { e.stopPropagation(); onProfileClick(lawyer); }}
             className={cn(
-              "w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl transition-colors",
+              "w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl transition-colors text-[10px] sm:text-sm h-8 sm:h-9 px-1 sm:px-3",
               isSignature && "hover:bg-[#d4af37]/10 border-[#d4af37]/20 text-[#d4af37]"
             )}
           >
-            <Eye className="mr-2 h-4 w-4" />
+            <Eye className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             {d.profile}
           </Button>
           <Button
             size="sm"
             onClick={(e) => { e.stopPropagation(); onBookClick(lawyer); }}
             className={cn(
-              "w-full rounded-xl border-0 shadow-[0_4px_15px_rgba(0,0,0,0.3)] transition-all",
+              "w-full rounded-xl border-0 shadow-[0_4px_15px_rgba(0,0,0,0.3)] transition-all text-[10px] sm:text-sm h-8 sm:h-9 px-1 sm:px-3",
               isSignature 
                 ? "bg-gradient-to-r from-[#d4af37] to-[#b5952f] text-black hover:from-[#e5bd3d] hover:to-[#c5a336]" 
                 : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500"

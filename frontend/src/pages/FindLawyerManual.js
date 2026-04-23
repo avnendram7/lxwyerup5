@@ -523,6 +523,34 @@ export default function FindLawyerManual() {
                     </button>
                     <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2"><Award className="w-4 h-4 text-blue-500" /> {t('fl_achievements')}</span>
                   </div>
+
+                  {/* Signature Lawyers toggle */}
+                  <div className="flex items-center gap-3 pb-2">
+                    <button
+                      onClick={() => {
+                        handleFilterChange('onlySignature', !filters.onlySignature);
+                        if (!filters.onlySignature) handleFilterChange('noSignature', false);
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${filters.onlySignature ? 'bg-[#d4af37]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${filters.onlySignature ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">✨ Signature Lawyers</span>
+                  </div>
+
+                  {/* Standard Lawyers toggle */}
+                  <div className="flex items-center gap-3 pb-2">
+                    <button
+                      onClick={() => {
+                        handleFilterChange('noSignature', !filters.noSignature);
+                        if (!filters.noSignature) handleFilterChange('onlySignature', false);
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${filters.noSignature ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${filters.noSignature ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">⚖️ Standard Lawyers</span>
+                  </div>
                 </div>
                 {/* Pinned Apply bar — always visible, never scrolls away */}
                 <div className="shrink-0 px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-[#121212] flex gap-3">
@@ -810,7 +838,7 @@ export default function FindLawyerManual() {
 
 
         {currentLawyers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-12">
             {currentLawyers.map((lawyer, index) => (
               <LawyerCard
                 key={lawyer.id}
