@@ -97,6 +97,7 @@ export default function MonitorDashboard() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState({});
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [isWebsiteRestricted, setIsWebsiteRestricted] = useState(false);
   const refreshInterval = useRef(null);
   const token = localStorage.getItem(TK);
   const headers = { Authorization:`Bearer ${token}` };
@@ -123,6 +124,26 @@ export default function MonitorDashboard() {
   const fetchLive = useCallback(() => fetch1('live','/monitor/activity-feed?limit=150'), [fetch1]);
   const fetchOverview = useCallback(() => fetch1('overview','/monitor/overview'), [fetch1]);
 
+  const fetchWebsiteStatus = useCallback(async () => {
+    try {
+      const r = await axios.get(`${API}/monitor/website-status`);
+      setIsWebsiteRestricted(r.data.is_restricted);
+    } catch(e) {}
+  }, []);
+
+  const toggleWebsiteStatus = async () => {
+    const newVal = !isWebsiteRestricted;
+    if (!window.confirm(`Are you sure you want to turn ${newVal ? 'OFF' : 'ON'} the entire website?`)) return;
+    try {
+      const freshToken = localStorage.getItem(TK);
+      await axios.post(`${API}/monitor/website-status`, { is_restricted: newVal }, { headers: { Authorization: `Bearer ${freshToken}` } });
+      setIsWebsiteRestricted(newVal);
+      alert(`Website is now ${newVal ? 'RESTRICTED (OFF)' : 'ACTIVE (ON)'}`);
+    } catch(e) {
+      alert('Failed to update website status');
+    }
+  };
+
   // Tab → URL map
   const TAB_URL = {
     waitlist:'/monitor/waitlist-full',
@@ -136,15 +157,15 @@ export default function MonitorDashboard() {
 
   useEffect(() => {
     if (!token) { nav('/monitor-login'); return; }
-    fetchOverview(); fetchLive();
+    fetchOverview(); fetchLive(); fetchWebsiteStatus();
   }, []);
 
   useEffect(() => {
     if (autoRefresh) {
-      refreshInterval.current = setInterval(() => { fetchLive(); fetchOverview(); }, 30000);
+      refreshInterval.current = setInterval(() => { fetchLive(); fetchOverview(); fetchWebsiteStatus(); }, 30000);
     } else clearInterval(refreshInterval.current);
     return () => clearInterval(refreshInterval.current);
-  }, [autoRefresh, fetchLive, fetchOverview]);
+  }, [autoRefresh, fetchLive, fetchOverview, fetchWebsiteStatus]);
 
   const handleTab = (id) => {
     setTab(id); setSearch('');
@@ -205,7 +226,10 @@ export default function MonitorDashboard() {
         </nav>
 
         <div style={{ padding:'12px 14px', borderTop:'1px solid rgba(0,255,180,0.1)' }}>
-          <button onClick={()=>{handleTab(tab); fetchOverview(); fetchLive();}} style={{ ...s.btn(false), marginBottom:6, justifyContent:'center', border:'1px solid rgba(0,255,180,0.15)' }}>↻ REFRESH ALL</button>
+          <button onClick={toggleWebsiteStatus} style={{ ...s.btn(false), marginBottom:6, justifyContent:'center', border: isWebsiteRestricted ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(0,255,180,0.3)', color: isWebsiteRestricted ? '#ef4444' : '#00ffb2', background: isWebsiteRestricted ? 'rgba(239,68,68,0.1)' : 'rgba(0,255,180,0.1)' }}>
+            {isWebsiteRestricted ? '⚠ WEBSITE OFF' : '🌐 WEBSITE ON'}
+          </button>
+          <button onClick={()=>{handleTab(tab); fetchOverview(); fetchLive(); fetchWebsiteStatus();}} style={{ ...s.btn(false), marginBottom:6, justifyContent:'center', border:'1px solid rgba(0,255,180,0.15)' }}>↻ REFRESH ALL</button>
           <button onClick={logout} style={{ ...s.btn(false), color:'#ef4444', borderColor:'rgba(239,68,68,0.2)', background:'rgba(239,68,68,0.04)', justifyContent:'center' }}>⏻ LOGOUT</button>
         </div>
       </div>

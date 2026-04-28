@@ -147,7 +147,7 @@ const VisionaryForm = memo(function VisionaryForm() {
 });
 
 /* ─── Main ────────────────────────────────────────────────── */
-export default function RevolutionisingSoon() {
+export default function RevolutionisingSoon({ isWebsiteRestricted }) {
   const { t } = useLang();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
@@ -204,10 +204,20 @@ export default function RevolutionisingSoon() {
   }, []);
 
   const goDemo = () => {
-    setShowRestricted(true);
-    setTimeout(() => {
-      setShowRestricted(false);
-    }, 3000);
+    if (isWebsiteRestricted) {
+      setShowRestricted(true);
+      setTimeout(() => setShowRestricted(false), 3000);
+    } else {
+      if (transitioning) return;
+      setTransitioning(true);
+      // Start the triangle zoom animation after a short delay (let overlay appear first)
+      setTimeout(() => setTrianglePhase('zoom'), 50);
+      // Navigate to /home after the triangle animation completes (~2.2s)
+      setTimeout(() => {
+        sessionStorage.setItem('fromLanding', 'true');
+        navigate('/home');
+      }, 2200);
+    }
   };
 
   const sx = spot.x.toFixed(1), sy = spot.y.toFixed(1), sr = spot.r.toFixed(1);

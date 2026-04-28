@@ -32,6 +32,29 @@ async def monitor_login(data: MonitorLogin):
     return {"token": token, "message": "Monitor login successful"}
 
 
+# ─────────────────── Website Status ───────────────────────────────────────────
+@router.get("/website-status")
+async def get_website_status():
+    doc = await db.system_settings.find_one({"_id": "website_status"})
+    if not doc:
+        return {"is_restricted": False}
+    return {"is_restricted": doc.get("is_restricted", False)}
+
+
+class WebsiteStatusUpdate(BaseModel):
+    is_restricted: bool
+
+
+@router.post("/website-status")
+async def update_website_status(data: WebsiteStatusUpdate, admin=Depends(get_monitor)):
+    await db.system_settings.update_one(
+        {"_id": "website_status"},
+        {"$set": {"is_restricted": data.is_restricted, "updated_at": datetime.now(timezone.utc)}},
+        upsert=True
+    )
+    return {"message": "Website status updated successfully", "is_restricted": data.is_restricted}
+
+
 # ─────────────────── Overview ─────────────────────────────────────────────────
 @router.get("/overview")
 async def monitor_overview(admin=Depends(get_monitor)):

@@ -149,7 +149,7 @@ const SmoothScrolling = () => {
 };
 
 /* AnimatedRoutes — must be inside BrowserRouter so useLocation works */
-function AnimatedRoutes({ user }) {
+function AnimatedRoutes({ user, isWebsiteRestricted }) {
   const location = useLocation();
 
   useEffect(() => {
@@ -163,8 +163,22 @@ function AnimatedRoutes({ user }) {
   return (
     <Suspense fallback={<PageLoader />}>
       <AnimatePresence mode="wait">
+        {isWebsiteRestricted && location.pathname !== '/' && !location.pathname.startsWith('/monitor') && !location.pathname.startsWith('/admin') ? (
+          <Route key="restricted" path="*" element={
+            <div style={{
+              minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontFamily: "'Outfit', sans-serif", padding: 20, textAlign: 'center'
+            }}>
+              <div style={{ color: '#ef4444', marginBottom: 16 }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
+              <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: 12 }}>Access Restricted</h1>
+              <p style={{ fontSize: '1.1rem', color: '#94a3b8', maxWidth: 400 }}>Website is restricted it will soon open, Namaste.</p>
+            </div>
+          } />
+        ) : (
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<RevolutionisingSoon />} />
+          <Route path="/" element={<RevolutionisingSoon isWebsiteRestricted={isWebsiteRestricted} />} />
           <Route path="/home" element={<LandingPageWave />} />
 
           <Route path="/lxwyerai" element={<PageTransition><QuickChat /></PageTransition>} />
@@ -217,6 +231,7 @@ function AnimatedRoutes({ user }) {
           <Route path="/monitor-login" element={<LocalOnlyRoute><PageTransition><MonitorLogin /></PageTransition></LocalOnlyRoute>} />
           <Route path="/monitor-dashboard" element={<LocalOnlyRoute><PageTransition><MonitorDashboard /></PageTransition></LocalOnlyRoute>} />
         </Routes>
+        )}
       </AnimatePresence>
     </Suspense>
   );
@@ -224,6 +239,23 @@ function AnimatedRoutes({ user }) {
 
 function App() {
   const [user, setUser] = useState(null);
+  const [isWebsiteRestricted, setIsWebsiteRestricted] = useState(false);
+
+  // Poll website status
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await axios.get(`${API}/monitor/website-status`);
+        setIsWebsiteRestricted(res.data.is_restricted);
+      } catch (e) {
+        console.error("Failed to fetch website status", e);
+      }
+    };
+    
+    fetchStatus();
+    const intervalId = setInterval(fetchStatus, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     try {
@@ -245,7 +277,7 @@ function App() {
             <BrowserRouter>
               <SmoothScrolling />
               <ScrollToTop />
-              <AnimatedRoutes user={user} />
+              <AnimatedRoutes user={user} isWebsiteRestricted={isWebsiteRestricted} />
             </BrowserRouter>
             <Toaster position="top-right" />
           </div>
