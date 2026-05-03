@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTheme } from 'next-themes'
 import axios from 'axios'
 import {
@@ -36,10 +36,10 @@ const CARD_DEFS = [
 
 /* ========== SUGGESTIONS ========== */
 const SUGGESTED_QUERIES = [
-  { text: 'What is murder under IPC?', icon: '↗' },
-  { text: 'How to file for divorce?', icon: '↗' },
-  { text: 'Steps for company incorporation', icon: '↗' },
-  { text: 'What are my rights during arrest?', icon: '↗' },
+  { text: 'Find law firm in Delhi',         icon: '🏛️', opts: { recType: 'firm',   city: 'delhi' } },
+  { text: 'Recommend a lawyer in Delhi',    icon: '⚖️', opts: { recType: 'lawyer', city: 'delhi' } },
+  { text: 'How to file for divorce?',       icon: '↗',  opts: {} },
+  { text: 'What are my rights during arrest?', icon: '↗', opts: {} },
 ]
 
 /* ========== CLASSIFIERS ========== */
@@ -162,6 +162,7 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
   const dm = embedded ? !!darkModeProp : true // lxwyerai always monochrome dark
 
   const navigate = useNavigate()
+  const location = useLocation()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -218,7 +219,7 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
   useEffect(() => { scrollToBottom() }, [messages, isTyping])
   useEffect(() => { inputRef.current?.focus() }, [])
 
-  const handleSend = async (text) => {
+  const handleSend = async (text, opts = {}) => {
     const query = (text || input).trim()
     if (!query) return
 
@@ -228,10 +229,11 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
     setIsTyping(true)
 
     // --- Check for recommendation intent first ---
-    const recIntent = detectRecommendationIntent(query)
+    // opts.recType / opts.city can be forced by quick-action chips (bypass NLP)
+    const recIntent = opts.recType || detectRecommendationIntent(query)
     if (recIntent) {
-      const city = extractLocation(query)
-      const spec = extractSpecialization(query)
+      const city = opts.city || extractLocation(query)
+      const spec = opts.spec || extractSpecialization(query)
       try {
         if (recIntent === 'lawyer') {
           const matchData = await smartMatchLawyers(query);
@@ -282,39 +284,51 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
             results = [...matchData.results];
           }
           
-          // Always merge dummy firms to ensure robust profiles
+          // Merge dummy firms — match by city OR fall back to all allowed-region firms
           const dummyFirmsMatches = dummyLawFirms.filter(f => {
             const ALLOWED_STATES = ['delhi', 'new delhi', 'uttar pradesh', 'haryana'];
             const inRegion = ALLOWED_STATES.includes((f.state || '').toLowerCase());
-            const locMatch = city ? (f.city || '').toLowerCase().includes(city) : true;
-            const specMatch = spec ? (f.practiceAreas?.join(' ') || '').toLowerCase().includes(spec.toLowerCase()) : true;
+            // If city extracted, match city; otherwise show all in-region firms
+            const locMatch = city
+              ? (f.city || '').toLowerCase().includes(city) ||
+                (f.state || '').toLowerCase().includes(city)
+              : true;
+            const specMatch = spec
+              ? (f.practiceAreas?.join(' ') || '').toLowerCase().includes(spec.toLowerCase())
+              : true;
             return inRegion && locMatch && specMatch;
           });
           results = [...results, ...dummyFirmsMatches];
+
           if (results.length > 0) {
             const shuffled = [...results].sort(() => Math.random() - 0.5);
-            const signatureList = shuffled.filter(l => l.isSignature || String(l.package).toLowerCase() === 'signature' || String(l.plan).toLowerCase() === 'signature');
-            const normalList = shuffled.filter(l => !(l.isSignature || String(l.package).toLowerCase() === 'signature' || String(l.plan).toLowerCase() === 'signature'));
-            
+            const signatureList = shuffled.filter(l => l.isSignature || String(l.package).toLowerCase() === 'signature');
+            const normalList = shuffled.filter(l => !(l.isSignature || String(l.package).toLowerCase() === 'signature'));
             const topSig = signatureList.slice(0, 3);
-            const remainingSlots = Math.max(0, results.length - topSig.length);
-            const fillers = normalList.slice(0, remainingSlots);
-            
+            const fillers = normalList.slice(0, Math.max(0, 5 - topSig.length));
             results = [...topSig, ...fillers];
+
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              id: Date.now() + 1,
+              is_recommendation: true,
+              rec_type: 'firm',
+              rec_items: results.slice(0, 5),
+              rec_query: query,
+              city, spec,
+              intentLabel: 'Firm Finder',
+              sentiment: 0,
+              cards: [],
+              sources: [],
+            }])
+          } else {
+            // No results — friendly guidance
+            setMessages(prev => [...prev, {
+              role: 'assistant', id: Date.now() + 1, is_greeting: true,
+              greeting_text: `🏛️ No verified law firms found for your query yet.\n\n**Our network currently covers:**\n• 🔴 **Delhi NCR** — New Delhi, Noida, Greater Noida\n• 🟠 **Uttar Pradesh** — Lucknow, Agra, Meerut, Kanpur\n• 🟡 **Haryana** — Gurgaon, Faridabad, Panipat\n\nTry: _"Find law firm in Delhi"_ or _"Corporate law firm in Noida"_`,
+              intentLabel: 'Firm Finder', sentiment: 0, cards: [], sources: [],
+            }])
           }
-          setMessages(prev => [...prev, {
-            role: 'assistant',
-            id: Date.now() + 1,
-            is_recommendation: true,
-            rec_type: 'firm',
-            rec_items: results.slice(0, 5),
-            rec_query: query,
-            city, spec,
-            intentLabel: 'Firm Finder',
-            sentiment: 0,
-            cards: [],
-            sources: [],
-          }])
         }
       } catch (err) {
         setMessages(prev => [...prev, {
@@ -417,6 +431,14 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
       setIsTyping(false)
     }
   }
+
+  // Auto-send initialQuery passed via route state on first mount
+  // e.g. navigate('/lxwyerai', { state: { initialQuery: 'find law firm in delhi' } })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const q = location?.state?.initialQuery
+    if (q) setTimeout(() => handleSend(q), 500)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const openCard = (card, ctx) => { setExpandedCard(card); setExpandedCtx(ctx) }
   const closeCard = () => { setExpandedCard(null); setExpandedCtx(null) }
@@ -588,7 +610,7 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
                 {SUGGESTED_QUERIES.slice(0, 2).map((sq, i) => (
                   <button
                     key={i}
-                    onClick={() => handleSend(sq.text)}
+                    onClick={() => handleSend(sq.text, sq.opts || {})}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-medium transition-all hover:scale-[1.02] hover:shadow-md active:scale-95 backdrop-blur-sm
                       ${dm
                         ? 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-300'
@@ -602,7 +624,8 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
               </div>
             </div>
           ) : (
-            <div className="min-h-full flex flex-col justify-end space-y-8 max-w-4xl mx-auto pb-6 px-4 sm:px-6" style={{ position: 'relative', zIndex: 1 }}>
+            <div className="min-h-full flex flex-col space-y-8 max-w-4xl mx-auto pb-6 px-4 sm:px-6" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="flex-1" />
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} animate-in slide-in-from-bottom-4 duration-500`}>
                   {/* Avatar */}
@@ -656,7 +679,13 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
                         </div>
                         {msg.rec_items.map((item, i) => (
                           msg.rec_type === 'lawyer'
-                            ? <LawyerCard key={item.id || item._id || i} lawyer={item} expanded={true} dm={dm} />
+                            ? <LawyerCard
+                                key={item.id || item._id || i}
+                                lawyer={item}
+                                dm={dm}
+                                onProfileClick={(l) => navigate(`/lawyer/${l.id || l._id}`, { state: { lawyer: l } })}
+                                onBookClick={(l) => navigate('/book-consultation-signup', { state: { lawyer: l } })}
+                              />
                             : <FirmCard key={item.id || item._id || i} firm={item} expanded={true} dm={dm} />
                         ))}
                         {msg.rec_items.length > 0 && (
@@ -774,13 +803,37 @@ export default function LxwyerAIPremium({ embedded = false, darkMode: darkModePr
           ? 'bg-gradient-to-t from-black via-black/90 to-transparent'
           : 'bg-gradient-to-t from-white via-white/90 to-transparent'} z-20`}>
           <div className="max-w-4xl mx-auto relative group">
+
+            {/* ── Persistent Quick-Action Chips ── always visible */}
+            <div className="flex flex-wrap gap-2 mb-3 justify-center">
+              {[
+                { label: '🏛️ Find Law Firm in Delhi',    opts: { recType: 'firm',   city: 'delhi' },  query: 'Find law firm in Delhi' },
+                { label: '⚖️ Recommend Lawyer in Delhi', opts: { recType: 'lawyer', city: 'delhi' },  query: 'Recommend a lawyer in Delhi' },
+                { label: '🔍 Criminal Lawyer Delhi',     opts: { recType: 'lawyer', city: 'delhi', spec: 'Criminal Law' }, query: 'Find a criminal lawyer in Delhi' },
+                { label: '🏠 Property Lawyer Delhi',    opts: { recType: 'lawyer', city: 'delhi', spec: 'Property Law' }, query: 'Find a property lawyer in Delhi' },
+              ].map((chip) => (
+                <button
+                  key={chip.query}
+                  onClick={() => handleSend(chip.query, chip.opts)}
+                  disabled={isTyping}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                    ${dm
+                      ? 'bg-zinc-900/80 border-zinc-700 text-zinc-300 hover:border-blue-500/60 hover:text-white hover:bg-zinc-800'
+                      : 'bg-white/80 border-zinc-300 text-zinc-600 hover:border-blue-400 hover:text-zinc-900 hover:bg-white'
+                    }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
             <div className="absolute inset-0 rounded-full blur-3xl opacity-0 group-hover:opacity-0" />
             <div className={`relative flex items-center gap-2 p-1.5 pl-5 ${inputBg} border rounded-full shadow-xl focus-within:border-zinc-600 transition-all backdrop-blur-2xl`} style={{ outline: 'none' }}>
               <input
                 ref={inputRef}
                 className={`flex-1 bg-transparent border-none ${textPrimary} ${dm ? 'placeholder-slate-600' : 'placeholder-slate-400'} font-medium py-2 text-sm`}
                 style={{ outline: 'none', boxShadow: 'none' }}
-                placeholder="Ask a legal question..."
+                placeholder="Ask a legal question or find a lawyer..."
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleSend() }}

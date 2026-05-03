@@ -776,9 +776,7 @@ export default function UserDashboard() {
       <div className={`hidden md:flex w-44 m-3 ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-white/50'} rounded-2xl flex-col py-3 shadow-[0_4px_20px_rgba(0,0,0,0.10)] border backdrop-blur-sm z-20 h-[calc(100dvh-1.5rem)] transition-all duration-300 shrink-0`}>
         {/* Logo */}
         <div className="px-4 py-3 flex items-center gap-2.5 mb-1">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow shadow-blue-500/30 shrink-0">
-            <span className="text-white font-bold text-sm">L</span>
-          </div>
+          <img src="/logo.png" alt="Lxwyer Up Logo" className="w-8 h-8 rounded-xl object-contain shadow shadow-blue-500/30 shrink-0" style={{ mixBlendMode: darkMode ? "normal" : "screen", backgroundColor: darkMode ? "transparent" : "#1e40af" }} />
           <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-slate-800'}`}>LxwyerUp</span>
         </div>
 

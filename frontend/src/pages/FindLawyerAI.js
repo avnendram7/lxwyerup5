@@ -1061,7 +1061,8 @@ export default function FindLawyerAI({ hideNavbar = false, embedded = false }) {
 
   const handleViewProfile = (lawyer) => {
     logFeedback(lawyer.id || lawyer._id, 'view');
-    setSelectedLawyer(lawyer);
+    const lawyerId = lawyer.id || lawyer._id;
+    navigate(`/lawyer/${lawyerId}`, { state: { lawyer } });
   };
 
   const content = (

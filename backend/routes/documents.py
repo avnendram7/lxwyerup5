@@ -37,21 +37,37 @@ async def create_document(doc_data: DocumentCreate, current_user: dict = Depends
     return doc_obj
 
 
-@router.get("", response_model=List[Document])
+@router.get("")
 async def get_documents(case_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     """Get documents for current user, optionally filtered by case"""
-    query = {'user_id': current_user['id']}
+    uid = current_user["id"]
+    query = {"$or": [{"user_id": uid}, {"shared_with": uid}, {"client_id": uid}]}
+    
+    # If case_id is provided, further filter
     if case_id:
-        query['case_id'] = case_id
+        query = {"$and": [query, {"case_id": case_id}]}
     
     documents = await db.documents.find(query, {'_id': 0}).to_list(100)
     
+    def _safe_dt(val):
+        if val is None:
+            return None
+        if isinstance(val, datetime):
+            return val.isoformat()
+        if isinstance(val, str):
+            return val
+        return str(val)
+
+    result = []
     for doc in documents:
-        if isinstance(doc['uploaded_at'], str):
-            dt_str = doc['uploaded_at'].replace('Z', '+00:00') if doc['uploaded_at'].endswith('Z') else doc['uploaded_at']
-            doc['uploaded_at'] = datetime.fromisoformat(dt_str)
+        doc['uploaded_at'] = _safe_dt(doc.get('uploaded_at'))
+        doc.setdefault('title', 'Untitled Document')
+        doc.setdefault('file_url', '')
+        doc.setdefault('file_type', 'application/pdf')
+        doc.setdefault('file_size', 0)
+        result.append(doc)
     
-    return documents
+    return result
 @router.post("/upload")
 async def upload_document(
     file: UploadFile = File(...),

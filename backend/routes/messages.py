@@ -20,10 +20,10 @@ async def _get_messaging_permission(user_id: str, other_user_id: str) -> dict:
     # 1. Check if there's a case with approved status between these two users
     approved_case = await db.cases.find_one({
         "$or": [
-            {"client_id": user_id, "lawyer_id": other_user_id, "status": "approved"},
-            {"user_id": user_id, "lawyer_id": other_user_id, "status": "approved"},
-            {"client_id": other_user_id, "lawyer_id": user_id, "status": "approved"},
-            {"user_id": other_user_id, "lawyer_id": user_id, "status": "approved"},
+            {"client_id": user_id, "lawyer_id": other_user_id, "status": {"$in": ["approved", "active"]}},
+            {"user_id": user_id, "lawyer_id": other_user_id, "status": {"$in": ["approved", "active"]}},
+            {"client_id": other_user_id, "lawyer_id": user_id, "status": {"$in": ["approved", "active"]}},
+            {"user_id": other_user_id, "lawyer_id": user_id, "status": {"$in": ["approved", "active"]}},
         ]
     })
     if approved_case:
@@ -32,8 +32,8 @@ async def _get_messaging_permission(user_id: str, other_user_id: str) -> dict:
     # 2. Check if there's a confirmed booking between these two users
     confirmed_booking = await db.bookings.find_one({
         "$or": [
-            {"client_id": user_id, "lawyer_id": other_user_id, "status": "confirmed"},
-            {"client_id": other_user_id, "lawyer_id": user_id, "status": "confirmed"},
+            {"client_id": user_id, "lawyer_id": other_user_id, "status": {"$in": ["confirmed", "completed"]}},
+            {"client_id": other_user_id, "lawyer_id": user_id, "status": {"$in": ["confirmed", "completed"]}},
         ]
     })
     if confirmed_booking:
@@ -54,7 +54,7 @@ async def _get_messaging_permission(user_id: str, other_user_id: str) -> dict:
         lawyer_booking = await db.bookings.find_one({
             "lawyer_id": user_id,
             "$or": [
-                {"client_id": other_user_id, "status": "confirmed"},
+                {"client_id": other_user_id, "status": {"$in": ["confirmed", "completed"]}},
             ]
         })
         if lawyer_booking:
@@ -123,9 +123,9 @@ async def get_eligible_contacts(current_user: dict = Depends(get_current_user)):
     # Also find approved cases
     cases_cursor = db.cases.find({
         "$or": [
-            {"client_id": user_id, "status": "approved"},
-            {"user_id": user_id, "status": "approved"},
-            {"lawyer_id": user_id, "status": "approved"},
+            {"client_id": user_id, "status": {"$in": ["approved", "active"]}},
+            {"user_id": user_id, "status": {"$in": ["approved", "active"]}},
+            {"lawyer_id": user_id, "status": {"$in": ["approved", "active"]}},
         ]
     })
     async for c in cases_cursor:

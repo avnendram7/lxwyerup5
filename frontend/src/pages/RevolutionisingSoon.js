@@ -206,7 +206,6 @@ export default function RevolutionisingSoon({ isWebsiteRestricted }) {
   const goDemo = () => {
     if (isWebsiteRestricted) {
       setShowRestricted(true);
-      setTimeout(() => setShowRestricted(false), 3000);
     } else {
       if (transitioning) return;
       setTransitioning(true);
@@ -307,14 +306,13 @@ export default function RevolutionisingSoon({ isWebsiteRestricted }) {
       {showRestricted && (
         <div style={{
           position: 'fixed',
-          top: 0, left: 0, right: 0, zIndex: 999999,
-          background: '#ef4444', color: '#fff',
-          textAlign: 'center', padding: '12px',
-          fontWeight: 600, fontSize: '0.95rem',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          animation: 'fadeDown 0.3s ease-out forwards',
+          inset: 0, zIndex: 999999,
+          background: '#000', color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontWeight: 600, fontSize: '1.5rem',
+          fontFamily: "'Outfit', sans-serif"
         }}>
-          This website is restricted for some time
+          it is restricted not open
         </div>
       )}
 

@@ -132,18 +132,19 @@ const LawyerCard = ({ className, lawyer, index = 0, onProfileClick, onBookClick,
 
       {/* Top section with background image and content */}
       <div className="relative h-[200px] sm:h-[280px] w-full z-10 overflow-hidden">
+        {/* Image — face clearly visible */}
         <img
           src={imageUrl}
           alt={lawyer.name}
-          className="h-full w-full object-cover object-[center_5%] transition-transform duration-700 group-hover:scale-105"
+          className="h-full w-full object-cover object-[center_15%] transition-transform duration-700 group-hover:scale-105"
           onError={(e) => {
              e.target.src = "https://images.unsplash.com/photo-1556856425-366d6618905d?q=80&w=2070&auto=format&fit=crop";
           }}
         />
         
-        {/* Gradients to make text readable */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#040404] via-[#040404]/60 to-transparent opacity-100" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#040404]/60 via-transparent to-transparent opacity-80" />
+        {/* Subtle vignette only — keep face visible */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#040404] via-[#040404]/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#040404]/15 via-transparent to-transparent" />
 
         {/* Top Badges */}
         <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-20">

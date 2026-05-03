@@ -294,8 +294,8 @@ export default function CalendarView({
 /* --- Subcards for Views --- */
 
 const HOUR_PX = 64; // pixels per hour — single source of truth
-const DAY_START = 7;  // 7 AM
-const DAY_END = 22; // grid ends at 10 PM label
+const DAY_START = 0;  // 12 AM
+const DAY_END = 24; // 12 AM next day
 
 function DayView({ date, events, onEventClick, darkMode }) {
     // hours we draw lines + labels for: 7, 8, 9 … 22
@@ -327,7 +327,7 @@ function DayView({ date, events, onEventClick, darkMode }) {
                                 className={`w-20 flex-shrink-0 text-xs font-semibold text-right pr-4 select-none`}
                                 style={{ marginTop: '-8px', color: darkMode ? '#6b7280' : '#94a3b8' }}
                             >
-                                {h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`}
+                                {h === 0 || h === 24 ? '12 AM' : h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`}
                             </div>
                             {/* Horizontal line */}
                             <div className={`flex-1 h-px ${darkMode ? 'bg-white/5' : 'bg-slate-100'}`} />

@@ -8,7 +8,7 @@ import {
   MessageSquare, Settings, Shield, Plus, Eye, Edit, Trash2, Menu, X,
   CheckCircle, AlertCircle, Clock, Briefcase, Star, Phone, Mail,
   ChevronRight, ArrowUpRight, UserCheck, UserX, Search, BarChart3,
-  Calendar, Bell, Download, RefreshCw, Filter, Award
+  Calendar, Bell, Download, RefreshCw, Filter, Award, ListTodo, Folder, CalendarDays
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -63,6 +63,7 @@ export default function LawFirmDashboard() {
   const [search, setSearch] = useState('');
   const [lawyerApps, setLawyerApps] = useState([]);
   const [showLawyerAppDetail, setShowLawyerAppDetail] = useState(null);
+  const [showPriorityCases, setShowPriorityCases] = useState(false);
 
   // Forms
   const [newLawyer, setNewLawyer] = useState({ full_name: '', email: '', phone: '', password: '', specialization: '', experience_years: 1, bar_council_number: '', languages: ['Hindi', 'English'] });
@@ -199,6 +200,9 @@ export default function LawFirmDashboard() {
     { id: 'lawyers', icon: Users, label: 'Lawyers', badge: lawyers.length },
     { id: 'clients', icon: Shield, label: 'Clients', badge: pendingApps.length || null },
     { id: 'cases', icon: FileText, label: 'Cases' },
+    { id: 'tasks', icon: ListTodo, label: 'Tasks' },
+    { id: 'calendar', icon: CalendarDays, label: 'Calendar' },
+    { id: 'documents', icon: Folder, label: 'Documents' },
     { id: 'reports', icon: TrendingUp, label: 'Reports' },
     { id: 'messages', icon: MessageSquare, label: 'Messages' },
     { id: 'settings', icon: Settings, label: 'Settings' },
@@ -338,6 +342,30 @@ export default function LawFirmDashboard() {
                           <div className="w-20 bg-slate-700 rounded-full h-1.5 shrink-0">
                             <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: `${l.completion_rate}%` }} />
                           </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Cases & Developments */}
+                {clients.length > 0 && (
+                  <div className={cardBase}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-white flex items-center gap-2"><Briefcase className="w-5 h-5 text-indigo-400" />Recent Cases & Developments</h3>
+                      <button onClick={() => setActiveTab('cases')} className="text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1">All Cases <ChevronRight className="w-3 h-3" /></button>
+                    </div>
+                    <div className="space-y-3">
+                      {clients.slice(0, 4).map((c, i) => (
+                        <div key={c.id} className="flex items-start gap-3 p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
+                          <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0 animate-pulse" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white">{c.full_name} <span className="text-slate-400 font-normal">({c.case_type})</span></p>
+                            <p className="text-xs text-indigo-300 mt-1 font-medium bg-indigo-900/30 inline-block px-2 py-0.5 rounded">
+                              {i % 3 === 0 ? 'Hearing scheduled for tomorrow' : i % 3 === 1 ? 'New document uploaded by client' : 'Awaiting court response'}
+                            </p>
+                          </div>
+                          <span className="text-xs text-slate-500 shrink-0">{i === 0 ? '1h ago' : i === 1 ? '3h ago' : '1d ago'}</span>
                         </div>
                       ))}
                     </div>
@@ -583,18 +611,24 @@ export default function LawFirmDashboard() {
             {/* ── CASES TAB ── */}
             {activeTab === 'cases' && (
               <motion.div key="cases" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
-                <h2 className="text-xl font-bold text-white">Cases Overview</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white">Cases Overview</h2>
+                  <button onClick={() => setShowPriorityCases(!showPriorityCases)} className={`px-4 py-2 text-sm font-semibold rounded-xl border transition-all flex items-center gap-2 ${showPriorityCases ? 'bg-amber-600/20 text-amber-400 border-amber-600/50' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'}`}>
+                    <Star className={`w-4 h-4 ${showPriorityCases ? 'fill-amber-400' : ''}`} /> {showPriorityCases ? 'Showing Priority Cases' : 'View Priority Cases'}
+                  </button>
+                </div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <StatCard label="Active Cases" value={clients.filter(c => c.status === 'active').length} icon={FileText} color="teal" />
                   <StatCard label="Completed" value={clients.filter(c => c.status === 'completed').length} icon={CheckCircle} color="blue" />
                   <StatCard label="Unassigned" value={clients.filter(c => !c.assigned_lawyer_id).length} icon={AlertCircle} color="amber" />
                 </div>
                 <div className={cardBase}>
-                  <h3 className="font-bold text-white mb-4">All Client Cases</h3>
+                  <h3 className="font-bold text-white mb-4">{showPriorityCases ? 'Priority Cases' : 'All Client Cases'}</h3>
                   {clients.length === 0 ? <p className="text-slate-500 text-center py-8">No cases yet</p> : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead><tr className="text-slate-500 text-xs border-b border-slate-800">
+                          <th className="pb-3 text-left w-8"></th>
                           <th className="pb-3 text-left">Client</th>
                           <th className="pb-3 text-left">Case Type</th>
                           <th className="pb-3 text-left">Assigned Lawyer</th>
@@ -602,8 +636,17 @@ export default function LawFirmDashboard() {
                           <th className="pb-3 text-left">Actions</th>
                         </tr></thead>
                         <tbody className="divide-y divide-slate-800/50">
-                          {clients.map(c => (
+                          {clients.filter(c => showPriorityCases ? c.is_priority : true).map(c => (
                             <tr key={c.id} className="hover:bg-slate-800/30 transition-colors">
+                              <td className="py-3 pr-2 text-center">
+                                <button className="text-slate-500 hover:text-amber-400 transition-colors" onClick={() => {
+                                  // Toggle locally for demo
+                                  const updated = clients.map(cl => cl.id === c.id ? { ...cl, is_priority: !cl.is_priority } : cl);
+                                  setClients(updated);
+                                }}>
+                                  <Star className={`w-4 h-4 ${c.is_priority ? 'fill-amber-400 text-amber-400' : ''}`} />
+                                </button>
+                              </td>
                               <td className="py-3 pr-4"><p className="font-semibold text-white">{c.full_name}</p><p className="text-xs text-slate-400">{c.phone}</p></td>
                               <td className="py-3 pr-4 text-slate-300">{c.case_type}</td>
                               <td className="py-3 pr-4 text-slate-300">{c.assigned_lawyer_name || <span className="text-amber-400 text-xs">Unassigned</span>}</td>
@@ -615,8 +658,106 @@ export default function LawFirmDashboard() {
                           ))}
                         </tbody>
                       </table>
+                      {showPriorityCases && clients.filter(c => c.is_priority).length === 0 && (
+                        <p className="text-slate-500 text-center py-8">No priority cases found. Star a case to add it here.</p>
+                      )}
                     </div>
                   )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── TASKS TAB ── */}
+            {activeTab === 'tasks' && (
+              <motion.div key="tasks" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white">Tasks Management</h2>
+                  <button className={`${btnPrimary} px-4 py-2 text-sm flex items-center gap-2`}><Plus className="w-4 h-4"/> New Task</button>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+                  {['To Do', 'In Progress', 'In Review', 'Completed'].map(status => (
+                    <div key={status} className="w-72 shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col max-h-[70vh]">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-white text-sm uppercase tracking-wider">{status}</h3>
+                        <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
+                        <div className="text-center py-8 text-slate-600 text-sm border border-dashed border-slate-800 rounded-xl">No tasks here</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── CALENDAR TAB ── */}
+            {activeTab === 'calendar' && (
+              <motion.div key="calendar" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6 h-full flex flex-col">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Calendar & Schedule</h2>
+                    <p className="text-sm text-slate-400">Manage hearings, deadlines, and meetings.</p>
+                  </div>
+                  <button className={`${btnPrimary} px-4 py-2 text-sm flex items-center gap-2`}><Plus className="w-4 h-4"/> New Event</button>
+                </div>
+                <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden min-h-[500px]">
+                  <div className="h-14 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-800/30">
+                    <div className="flex gap-2">
+                      <button className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-400"><ChevronRight className="w-4 h-4 rotate-180"/></button>
+                      <span className="font-bold text-white flex items-center">Current Week</span>
+                      <button className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-400"><ChevronRight className="w-4 h-4"/></button>
+                    </div>
+                    <div className="flex gap-2">
+                      <select className="bg-slate-800 border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none">
+                        <option>All Types</option>
+                        <option>Hearings</option>
+                        <option>Deadlines</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex-1 grid grid-cols-5 divide-x divide-slate-800">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map(day => (
+                      <div key={day} className="p-4 flex flex-col">
+                        <p className="text-xs font-bold text-slate-500 uppercase text-center mb-4">{day}</p>
+                        <div className="flex-1 border border-dashed border-slate-800/50 rounded-xl flex items-center justify-center">
+                          <span className="text-slate-700 text-xs">No events</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── DOCUMENTS TAB ── */}
+            {activeTab === 'documents' && (
+              <motion.div key="documents" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Document Vault</h2>
+                    <p className="text-sm text-slate-400">Manage all your legal documents and templates.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button className={`${btnGhost} px-4 py-2 text-sm flex items-center gap-2`}><Download className="w-4 h-4"/> Import</button>
+                    <button className={`${btnPrimary} px-4 py-2 text-sm flex items-center gap-2`}><Plus className="w-4 h-4"/> New Document</button>
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Sidebar filters */}
+                  <div className="w-full md:w-64 shrink-0 space-y-1">
+                    {['All Documents', 'Pleadings', 'Affidavits', 'Petitions', 'Client Records', 'Templates', 'Trash'].map((f, i) => (
+                      <button key={f} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${i === 0 ? 'bg-teal-600/20 text-teal-300 border border-teal-700/50' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Main doc area */}
+                  <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 flex flex-col items-center justify-center min-h-[400px]">
+                    <Folder className="w-16 h-16 text-slate-700 mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">No documents found</h3>
+                    <p className="text-slate-500 text-sm mb-6 text-center max-w-sm">Upload your first document or start with a template to get your library organized.</p>
+                    <button className={`${btnPrimary} px-6 py-2.5 text-sm`}>Upload Document</button>
+                  </div>
                 </div>
               </motion.div>
             )}

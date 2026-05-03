@@ -30,7 +30,7 @@ async def create_case(case_data: CaseCreate, current_user: dict = Depends(get_cu
     return case_obj
 
 
-@router.get("", response_model=List[Case])
+@router.get("")
 async def get_cases(current_user: dict = Depends(get_current_user)):
     """Get cases for current user"""
     uid = current_user['id']
@@ -40,17 +40,30 @@ async def get_cases(current_user: dict = Depends(get_current_user)):
         {"user_id": uid},
         {"lawyer_id": uid}
     ]}
-    cases = await db.cases.find(query, {'_id': 0}).to_list(100)
-    
+    cases = await db.cases.find(query, {'_id': 0}).to_list(200)
+
+    def _safe_dt(val):
+        """Convert any date string to isoformat string safely."""
+        if val is None:
+            return None
+        if isinstance(val, datetime):
+            return val.isoformat()
+        if isinstance(val, str):
+            return val
+        return str(val)
+
+    result = []
     for case in cases:
-        if isinstance(case.get('created_at'), str):
-            dt_str = case['created_at'].replace('Z', '+00:00') if case['created_at'].endswith('Z') else case['created_at']
-            case['created_at'] = datetime.fromisoformat(dt_str)
-        if isinstance(case.get('updated_at'), str):
-            dt_str = case['updated_at'].replace('Z', '+00:00') if case['updated_at'].endswith('Z') else case['updated_at']
-            case['updated_at'] = datetime.fromisoformat(dt_str)
-    
-    return cases
+        case['created_at'] = _safe_dt(case.get('created_at'))
+        case['updated_at'] = _safe_dt(case.get('updated_at'))
+        case.setdefault('description', '')
+        case.setdefault('status', 'active')
+        case.setdefault('title', 'Untitled Case')
+        case.setdefault('case_type', 'General')
+        case.setdefault('updates', [])
+        result.append(case)
+
+    return result
 
 
 @router.get("/{case_id}", response_model=Case)

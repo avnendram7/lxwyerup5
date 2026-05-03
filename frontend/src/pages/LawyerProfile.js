@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scale, Briefcase, MapPin, ArrowLeft, Phone, Mail,
@@ -14,6 +14,7 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 export default function LawyerProfile({ lawyerId, onCloseModal }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id: routeId } = useParams();
   const id = lawyerId || routeId;
   const isModal = !!lawyerId;
@@ -22,12 +23,31 @@ export default function LawyerProfile({ lawyerId, onCloseModal }) {
 
   useEffect(() => {
     const fetchLawyer = async () => {
+      // ── Priority 1: Data passed via route state (e.g. from FindLawyerAI navigation) ──
+      const stateData = location?.state?.lawyer;
+      if (stateData && (stateData.id === id || stateData._id === id)) {
+        setLawyer({
+          ...stateData,
+          name: stateData.name || stateData.full_name,
+          is_verified: stateData.is_approved || stateData.verified,
+          location: stateData.location || `${stateData.city || ''}, ${stateData.state || ''}`.replace(/^,\s*|,\s*$/g, ''),
+          feeMin: stateData.feeMin || stateData.charge_30min || 'N/A',
+          feeMax: stateData.feeMax || stateData.charge_60min || stateData.consultation_fee || 'N/A',
+          image: (stateData.photo && stateData.photo.length > 5) ? stateData.photo : null,
+          consultationModes: stateData.consultationModes || ['In-Person', 'Video Call'],
+          achievements: stateData.achievements || [],
+        });
+        setLoading(false);
+        return;
+      }
+
+      // ── Priority 2: Dummy data by id ──
       const dummy = dummyLawyers.find(l => l.id === id);
       if (dummy) {
         setLawyer({
           ...dummy,
           is_verified: dummy.verified,
-          location: dummy.location || `${dummy.city || ''}, ${dummy.state || ''}`.replace(/^,\s*|,\s*$/, ''),
+          location: dummy.location || `${dummy.city || ''}, ${dummy.state || ''}`.replace(/^,\s*|,\s*$/g, ''),
           feeMin: dummy.feeMin || 'N/A',
           feeMax: dummy.feeMax || 'N/A',
           image: (dummy.photo && dummy.photo.length > 5) ? dummy.photo : null,
@@ -37,11 +57,13 @@ export default function LawyerProfile({ lawyerId, onCloseModal }) {
         setLoading(false);
         return;
       }
+
+      // ── Priority 3: Live API ──
       try {
         const res = await axios.get(`${API}/lawyers`);
-        const found = res.data.find(l => l.id === id);
+        const found = res.data.find(l => l.id === id || l._id === id);
         if (found) {
-          const loc = `${found.city || ''}, ${found.state || ''}`.replace(/^,\s*|,\s*$/, '');
+          const loc = `${found.city || ''}, ${found.state || ''}`.replace(/^,\s*|,\s*$/g, '');
           const feeStr = found.fee_range || '';
           const parts = feeStr.split('-');
           setLawyer({
@@ -63,7 +85,7 @@ export default function LawyerProfile({ lawyerId, onCloseModal }) {
       }
     };
     fetchLawyer();
-  }, [id]);
+  }, [id, location]);
 
   if (loading) {
     return (
